@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clash Royale - Multi-Tela Responsivo</title>
+    
+    <!-- Link para os ícones (Font Awesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <!-- Início do CSS -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --primary-blue: #0a4a8f;
+            --secondary-blue: #1a6fbf;
+            --accent-yellow: #feca57;
+            --text-light: #ffffff;
+            --text-dark: #2c3e50;
+            --green: #2ecc71;
+            --purple: #9b59b6;
+            --grey: #bdc3c7;
+            --bg-dark-alpha: rgba(0,0,0,0.2);
+            --bg-darker-alpha: rgba(0,0,0,0.3);
+        }
+
+        /* --- [NOVO] ESTRUTURA E DESIGN RESPONSIVO FLUIDO --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        html {
+            /* 
+             * Mágica da responsividade: 
+             * Define um tamanho de fonte base que se ajusta à largura da tela.
+             * Mínimo de 14px, ideal de 3.5% da largura da tela, máximo de 18px.
+             * Todos os 'rem' se basearão nisso, escalando a UI inteira.
+            */
+            font-size: clamp(14px, 3.5vw, 18px);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #34495e;
+            color: var(--text-light);
+            /* Garante que o body ocupe toda a tela */
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; /* Evita barras de rolagem indesejadas */
+        }
+
+        .game-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        .game-screen {
+            width: 100%;
+            height: 100%; /* Ocupa 100% do container */
+            background: linear-gradient(180deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem; /* Usando REM para ser responsivo */
+            gap: 1rem;
+        }
+
+        /* --- COMPONENTES GLOBAIS (HEADER E NAV) --- */
+        .game-header { display: flex; justify-content: space-between; align-items: center; }
+        .xp-bar-container { display: flex; align-items: center; background-color: var(--bg-dark-alpha); padding: 0.3rem; border-radius: 1.25rem; }
+        .player-level { background-color: var(--secondary-blue); border: 2px solid var(--text-light); border-radius: 50%; width: 1.8rem; height: 1.8rem; display: flex; justify-content: center; align-items: center; font-weight: bold; margin-right: 0.3rem; font-size: 0.9rem; }
+        .xp-bar { width: 6rem; height: 1rem; background-color: var(--text-dark); border-radius: 0.6rem; overflow: hidden; position: relative; }
+        .xp-fill { background-color: var(--green); height: 100%; transition: width 0.5s ease; }
+        .xp-text { position: absolute; top: 0; left: 0; width: 100%; text-align: center; font-size: 0.6rem; line-height: 1rem; font-weight: 600; }
+        .resources { display: flex; gap: 0.5rem; }
+        .resource-item { display: flex; align-items: center; background-color: var(--bg-dark-alpha); padding: 0.4rem 0.8rem; border-radius: 1rem; gap: 0.3rem; font-size: 0.9rem; }
+        .add-icon { color: var(--green); cursor: pointer; }
+
+        .bottom-nav { margin-top: auto; display: flex; justify-content: space-around; background-color: var(--bg-dark-alpha); padding: 0.6rem 0; border-radius: 1rem; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-light); text-decoration: none; opacity: 0.7; cursor: pointer; transition: all 0.2s ease; }
+        .nav-item.active { opacity: 1; transform: scale(1.1); }
+        .nav-item i { font-size: 1.5rem; }
+        .nav-item span { font-size: 0.75rem; }
+
+        /* --- CONTROLE DE TELAS --- */
+        .screen-content { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; min-height: 0; /* Essencial para flexbox funcionar */ }
+        .screen { display: none; flex-direction: column; flex: 1; }
+        .screen.active { display: flex; }
+        
+        .screen-content::-webkit-scrollbar { width: 5px; }
+        .screen-content::-webkit-scrollbar-track { background: transparent; }
+        .screen-content::-webkit-scrollbar-thumb { background: var(--accent-yellow); border-radius: 10px; }
+
+        /* --- TELA DE BATALHA (#battle-screen) --- */
+        #battle-screen .player-info-container, #battle-screen .timed-chests { display: flex; justify-content: space-between; align-items: center; background-color: rgba(0,0,0,0.1); padding: 0.6rem; border-radius: 0.6rem; margin-top: 1rem; }
+        #battle-screen .player-profile { display: flex; align-items: center; gap: 0.6rem; }
+        #battle-screen .profile-icon { font-size: 2.2rem; }
+        #battle-screen .player-name { font-weight: bold; }
+        #battle-screen .clan-name { font-size: 0.8em; opacity: 0.8; }
+        #battle-screen .trophies { background-color: var(--bg-dark-alpha); padding: 0.4rem 1rem; border-radius: 1rem; font-weight: bold; }
+        #battle-screen .trophies .fa-trophy { color: var(--accent-yellow); }
+        #battle-screen .settings { font-size: 1.5rem; cursor: pointer; }
+        #battle-screen .timed-chests { gap: 0.6rem; }
+        #battle-screen .timed-chest { flex: 1; background: var(--bg-dark-alpha); padding: 0.6rem; border-radius: 0.5rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; }
+        #battle-screen .timed-chest.ready { background: var(--green); cursor: pointer; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
+        #battle-screen .arena-section { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        #battle-screen .arena-icon { font-size: 5rem; }
+        #battle-screen h2 { margin: 0.6rem 0 0; font-size: 1.5rem; }
+        #battle-screen .battle-button { background-color: var(--accent-yellow); color: var(--text-dark); border: none; font-size: 1.8rem; font-weight: bold; padding: 1rem 4rem; border-radius: 1rem; cursor: pointer; box-shadow: 0 5px 0 #c78f1e; transition: all 0.1s ease; margin: 1.25rem 0; }
+        #battle-screen .battle-button:active { transform: translateY(3px); box-shadow: 0 2px 0 #c78f1e; }
+        #battle-screen .chest-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+        #battle-screen .chest-slot { background-color: var(--bg-dark-alpha); min-height: 6rem; border-radius: 0.6rem; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0.3rem; cursor: pointer; transition: transform 0.2s; border: 2px solid transparent; font-size: 0.8rem; }
+        #battle-screen .chest-slot:hover { transform: scale(1.05); }
+        #battle-screen .chest-slot.unlocking { border-color: var(--accent-yellow); }
+        #battle-screen .chest-slot.ready { border-color: var(--green); animation: pulse 1.5s infinite; }
+        #battle-screen .chest-slot button { background: var(--green); color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 0.3rem; margin-top: 0.3rem; cursor: pointer; }
+        
+        /* --- ESTILOS COMUNS PARA AS OUTRAS TELAS --- */
+        .screen h3 { border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 0.6rem; margin: 1.25rem 0; font-size: 1.1rem; }
+        .action-button { background-color: var(--accent-yellow); color: var(--text-dark); border: none; font-weight: bold; padding: 0.6rem 1.25rem; border-radius: 0.5rem; cursor: pointer; box-shadow: 0 3px 0 #c78f1e; transition: all 0.1s ease; font-size: 0.9rem; }
+        .action-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #c78f1e; }
+        
+        /* --- TELA DA LOJA (#shop-screen) --- */
+        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .shop-item { background: var(--bg-darker-alpha); border-radius: 0.6rem; padding: 1rem; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+        .shop-item .item-icon { font-size: 3rem; margin-bottom: 0.6rem; }
+        .shop-item.gold .item-icon { color: var(--accent-yellow); }
+        .shop-item.gem .item-icon { color: var(--green); }
+        .shop-item.chest .item-icon { color: var(--purple); }
+        .shop-item .item-name { font-weight: 600; }
+        .shop-item .item-price { margin: 0.6rem 0; }
+        
+        /* --- TELA DE CARTAS (#cards-screen) --- */
+        #cards-screen .deck-info { display: flex; justify-content: space-between; align-items: center; background: var(--bg-dark-alpha); padding: 0.6rem; border-radius: 0.6rem; margin: 1rem 0; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 0.6rem; }
+        .card-item { background: var(--bg-dark-alpha); border-radius: 0.5rem; padding: 0.6rem; aspect-ratio: 3/4; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .card-item .card-icon { font-size: 2rem; flex-grow: 1; display: flex; align-items: center;}
+        .card-item .card-name { font-size: 0.8em; font-weight: bold; }
+        .card-item .card-level { font-size: 0.7em; background: var(--secondary-blue); padding: 2px 5px; border-radius: 5px; margin-top: 0.3rem; }
+
+        /* --- TELA SOCIAL (#social-screen) --- */
+        .clan-search { display: flex; gap: 0.6rem; margin: 1rem 0; }
+        .clan-search input { flex-grow: 1; background: var(--bg-darker-alpha); border: 1px solid var(--secondary-blue); border-radius: 0.5rem; padding: 0.6rem; color: var(--text-light); font-family: 'Poppins', sans-serif; font-size: 1rem;}
+        .clan-list { display: flex; flex-direction: column; gap: 0.6rem; }
+        .clan-item { display: flex; align-items: center; gap: 1rem; background: var(--bg-dark-alpha); padding: 0.6rem; border-radius: 0.6rem; }
+        .clan-badge { font-size: 2rem; color: var(--accent-yellow); }
+        .clan-info { flex-grow: 1; }
+        .clan-stats { font-size: 0.8em; opacity: 0.8; }
+        
+        /* --- TELA DE EVENTOS (#events-screen) --- */
+        .events-list { display: flex; flex-direction: column; gap: 1rem; }
+        .event-item { background: var(--bg-dark-alpha); border-radius: 0.6rem; padding: 1rem; display: flex; gap: 1rem; align-items: center; }
+        .event-icon { font-size: 3rem; color: var(--purple); }
+        .event-details { flex-grow: 1; }
+        .event-title { font-weight: bold; }
+        .event-desc { font-size: 0.9em; opacity: 0.9; }
+
+
+        /* --- CSS PARA TELAS LARGAS (DESKTOP/LANDSCAPE) --- */
+        @media (min-width: 768px) {
+            html {
+                font-size: 16px; /* Volta para uma base fixa no desktop */
+            }
+            
+            body {
+                padding: 20px; /* Adiciona espaçamento para ver o fundo */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .game-screen {
+                display: grid;
+                grid-template-columns: 200px 1fr;
+                grid-template-rows: auto 1fr;
+                grid-template-areas:
+                    "header header"
+                    "nav    main";
+                
+                max-width: 1200px;
+                height: 90vh;
+                max-height: 800px; /* Limita a altura máxima */
+                border-radius: 20px; /* Adiciona de volta a borda arredondada */
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3); /* Adiciona de volta a sombra */
+                gap: 15px;
+            }
+
+            .game-header { grid-area: header; }
+            .screen-content { grid-area: main; padding-left: 1rem; }
+            .bottom-nav { grid-area: nav; }
+
+            .bottom-nav {
+                flex-direction: column;
+                justify-content: flex-start;
+                gap: 15px;
+                padding: 15px;
+                margin-top: 0;
+                background-color: transparent;
+            }
+
+            .nav-item {
+                flex-direction: row;
+                justify-content: flex-start;
+                align-items: center;
+                gap: 10px;
+                padding: 10px;
+                border-radius: 10px;
+                width: 100%;
+                opacity: 0.8;
+            }
+            .nav-item.active {
+                background-color: var(--bg-dark-alpha);
+                transform: scale(1.02);
+            }
+            .nav-item i { font-size: 20px; }
+            .nav-item span { font-size: 14px; }
+
+            .card-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="game-screen">
+            <!-- 1. CABEÇALHO SUPERIOR -->
+            <header class="game-header">
+                <div class="xp-bar-container">
+                    <span class="player-level">3</span>
+                    <div class="xp-bar">
+                        <div id="xp-fill" class="xp-fill"></div>
+                        <span id="xp-text" class="xp-text">73/100</span>
+                    </div>
+                </div>
+                <div class="resources">
+                    <div class="resource-item">
+                        <i class="fas fa-coins"></i>
+                        <span id="gold-amount">47</span>
+                        <i class="fas fa-plus-circle add-icon"></i>
+                    </div>
+                    <div class="resource-item">
+                        <i class="fas fa-gem"></i>
+                        <span id="gems-amount">109</span>
+                        <i class="fas fa-plus-circle add-icon"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 2. CONTEÚDO DA TELA -->
+            <main class="screen-content">
+
+                <!-- TELA 1: BATALHA -->
+                <section id="battle-screen" class="screen active">
+                    <div class="player-info-container">
+                        <div class="player-profile">
+                            <i class="fas fa-user-circle profile-icon"></i>
+                            <div>
+                                <span class="player-name">Paulo.zip</span>
+                                <span class="clan-name">Sem clã</span>
+                            </div>
+                        </div>
+                        <div class="trophies"><i class="fas fa-trophy"></i> <span id="trophy-count">526</span></div>
+                        <div class="settings"><i class="fas fa-cog"></i></div>
+                    </div>
+                    <div class="timed-chests">
+                        <div class="timed-chest" id="free-chest"><i class="fas fa-box"></i><div><span>Baú grátis</span><strong id="free-chest-timer"></strong></div></div>
+                        <div class="timed-chest" id="crown-chest"><i class="fas fa-crown"></i><div><span>Baú da coroa</span><strong id="crown-chest-timer"></strong></div></div>
+                    </div>
+                    <div class="arena-section">
+                        <div class="arena-display"><i class="fas fa-chess-rook arena-icon"></i><h2>Arena 2</h2></div>
+                        <button class="battle-button">Batalha</button>
+                    </div>
+                    <div class="chest-slots" id="chest-slots-container"></div>
+                </section>
+
+                <!-- TELA 2: LOJA -->
+                <section id="shop-screen" class="screen">
+                    <h3>Ofertas Diárias</h3>
+                    <div class="shop-grid">
+                        <div class="shop-item gold"><i class="item-icon fas fa-coins"></i><span class="item-name">Saco de Ouro</span><span class="item-price">100 Gemas</span><button class="action-button">Comprar</button></div>
+                        <div class="shop-item chest"><i class="item-icon fas fa-box-archive"></i><span class="item-name">Baú de Ouro</span><span class="item-price">80 Gemas</span><button class="action-button">Comprar</button></div>
+                    </div>
+                    <h3>Baús</h3>
+                    <div class="shop-grid">
+                        <div class="shop-item chest"><i class="item-icon fas fa-bolt"></i><span class="item-name">Baú Relâmpago</span><span class="item-price">250 Gemas</span><button class="action-button">Comprar</button></div>
+                        <div class="shop-item chest"><i class="item-icon fas fa-wand-magic-sparkles"></i><span class="item-name">Baú Mágico</span><span class="item-price">800 Gemas</span><button class="action-button">Comprar</button></div>
+                    </div>
+                </section>
+
+                <!-- TELA 3: CARTAS -->
+                <section id="cards-screen" class="screen">
+                    <div class="deck-info">
+                        <span>Deck de Batalha</span>
+                        <span>Custo Médio: <strong>3.8</strong> <i class="fas fa-droplet"></i></span>
+                    </div>
+                    <div class="card-grid">
+                        <div class="card-item"><i class="card-icon fas fa-knight"></i><span class="card-name">Cavaleiro</span><span class="card-level">Nvl 3</span></div>
+                        <div class="card-item"><i class="card-icon fas fa-archway"></i><span class="card-name">Arqueiras</span><span class="card-level">Nvl 3</span></div>
+                        <div class="card-item"><i class="card-icon fas fa-bomb"></i><span class="card-name">Bombardeiro</span><span class="card-level">Nvl 2</span></div>
+                        <div class="card-item"><i class="card-icon fas fa-fire"></i><span class="card-name">Bola de Fogo</span><span class="card-level">Nvl 1</span></div>
+                        <div class="card-item"><i class="card-icon fas fa-person-military-pointing"></i><span class="card-name">Gigante</span><span class="card-level">Nvl 2</span></div>
+                        <div class="card-item"><i class="card-icon fas fa-gun"></i><span class="card-name">Mosqueteira</span><span class="card-level">Nvl 1</span></div>
+                        <div class="card-item"><i class="card-icon fas fa-baby"></i><span class="card-name">Bebê Dragão</span><span class="card-level">Nvl 1</span></div>
+                        <div class="card-item"><i class="card-icon fas fa-skull"></i><span class="card-name">Exército de Esqueletos</span><span class="card-level">Nvl 1</span></div>
+                    </div>
+                     <h3>Coleção</h3>
+                     <div class="card-grid">
+                        <div class="card-item"><i class="card-icon fas fa-person-running"></i><span class="card-name">Goblins</span><span class="card-level">Nvl 4</span></div>
+                        <div class="card-item"><i class="card-icon fas fa-tower-broadcast"></i><span class="card-name">Tesla</span><span class="card-level">Nvl 2</span></div>
+                     </div>
+                </section>
+
+                <!-- TELA 4: SOCIAL (CLÃ) -->
+                <section id="social-screen" class="screen">
+                    <h3>Encontrar um Clã</h3>
+                    <div class="clan-search">
+                        <input type="text" placeholder="Buscar clã...">
+                        <button class="action-button"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="clan-list">
+                        <div class="clan-item">
+                            <i class="clan-badge fas fa-shield-halved"></i>
+                            <div class="clan-info">
+                                <strong>Guerreiros BR</strong>
+                                <div class="clan-stats"><i class="fas fa-trophy"></i> 45000 | <i class="fas fa-users"></i> 48/50</div>
+                            </div>
+                            <button class="action-button">Entrar</button>
+                        </div>
+                        <div class="clan-item">
+                            <i class="clan-badge fas fa-dragon"></i>
+                            <div class="clan-info">
+                                <strong>Fúria do Dragão</strong>
+                                <div class="clan-stats"><i class="fas fa-trophy"></i> 32000 | <i class="fas fa-users"></i> 35/50</div>
+                            </div>
+                            <button class="action-button">Entrar</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TELA 5: EVENTOS (TV ROYALE) -->
+                <section id="events-screen" class="screen">
+                    <h3>Eventos Atuais</h3>
+                    <div class="events-list">
+                        <div class="event-item">
+                            <i class="event-icon fas fa-infinity"></i>
+                            <div class="event-details">
+                                <span class="event-title">Desafio de Elixir Infinito</span>
+                                <p class="event-desc">Ganhe 8 batalhas para uma recompensa épica!</p>
+                            </div>
+                            <button class="action-button">Jogar</button>
+                        </div>
+                        <div class="event-item">
+                            <i class="event-icon fas fa-trophy"></i>
+                             <div class="event-details">
+                                <span class="event-title">Torneio Global</span>
+                                <p class="event-desc">Recompensas grátis e bônus disponíveis.</p>
+                            </div>
+                            <button class="action-button">Jogar</button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- 3. BARRA DE NAVEGAÇÃO INFERIOR -->
+            <nav class="bottom-nav">
+                <a class="nav-item" data-target="shop-screen"><i class="fas fa-store"></i><span>Loja</span></a>
+                <a class="nav-item" data-target="cards-screen"><i class="fas fa-clone"></i><span>Cartas</span></a>
+                <a class="nav-item active" data-target="battle-screen"><i class="fas fa-swords"></i><span>Batalha</span></a>
+                <a class="nav-item" data-target="social-screen"><i class="fas fa-users"></i><span>Social</span></a>
+                <a class="nav-item" data-target="events-screen"><i class="fas fa-tv"></i><span>Eventos</span></a>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- JavaScript (sem alterações) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let gameState = { gold: 47, gems: 109, xp: 73, xpMax: 100, trophies: 526, timers: { freeChest: 3353, crownChest: 57540 }, chestSlots: [ { type: 'Prata', arena: 2, status: 'unlocking', totalTime: 10800, remainingTime: 731 }, { type: 'Ouro', arena: 1, status: 'locked', totalTime: 28800, remainingTime: 28800 }, { type: 'Mágico', arena: 2, status: 'locked', totalTime: 43200, remainingTime: 43200 }, { type: 'Prata', arena: 1, status: 'locked', totalTime: 10800, remainingTime: 10800 }, ], isUnlocking: true };
+            const formatTime = (s) => { if (s <= 0) return "Pronto!"; const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60; return h > 0 ? `${h}H ${m}MIN` : m > 0 ? `${m}MIN ${sec}SEG` : `${sec}SEG`; };
+            const getChestIcon = (t) => `fas ${{Ouro: 'fa-box-archive', Mágico: 'fa-wand-magic-sparkles', Prata: 'fa-box'}[t] || 'fa-box'}`;
+            const updateDynamicUI = () => { document.getElementById('gold-amount').innerText = gameState.gold; document.getElementById('gems-amount').innerText = gameState.gems; document.getElementById('trophy-count').innerText = gameState.trophies; document.getElementById('xp-fill').style.width = `${(gameState.xp / gameState.xpMax) * 100}%`; document.getElementById('xp-text').innerText = `${gameState.xp}/${gameState.xpMax}`; const fct = document.getElementById('free-chest-timer'); fct.innerText = gameState.timers.freeChest > 0 ? `Próximo em: ${formatTime(gameState.timers.freeChest)}` : 'COLETAR!'; document.getElementById('free-chest').classList.toggle('ready', gameState.timers.freeChest <= 0); const cct = document.getElementById('crown-chest-timer'); cct.innerText = gameState.timers.crownChest > 0 ? `Próximo em: ${formatTime(gameState.timers.crownChest)}` : 'COLETAR!'; document.getElementById('crown-chest').classList.toggle('ready', gameState.timers.crownChest <= 0); const cont = document.getElementById('chest-slots-container'); cont.innerHTML = ''; gameState.chestSlots.forEach((c, i) => { const s = document.createElement('div'); s.className = 'chest-slot'; s.dataset.index = i; if (c) { s.innerHTML = `<i class="${getChestIcon(c.type)} fa-2x"></i><span>${c.type}</span><span>Arena ${c.arena}</span><strong>${formatTime(c.remainingTime)}</strong>`; s.classList.add(c.status); if (c.status === 'ready') s.innerHTML += `<button class="open-btn">Abrir</button>`; } else { s.innerHTML = `<span>Vazio</span>`; } cont.appendChild(s); }); };
+            setInterval(() => { if (gameState.timers.freeChest > 0) gameState.timers.freeChest--; if (gameState.timers.crownChest > 0) gameState.timers.crownChest--; gameState.chestSlots.forEach(c => { if (c && c.status === 'unlocking' && c.remainingTime > 0) { c.remainingTime--; if (c.remainingTime === 0) { c.status = 'ready'; gameState.isUnlocking = false; } } }); updateDynamicUI(); }, 1000);
+            const navItems = document.querySelectorAll('.nav-item'), screens = document.querySelectorAll('.screen'); const switchScreen = (id) => { screens.forEach(s => s.classList.remove('active')); navItems.forEach(i => i.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelector(`.nav-item[data-target="${id}"]`).classList.add('active'); };
+            document.querySelector('.game-screen').addEventListener('click', (e) => { const l = e.target.closest('.nav-item'); if (l) { e.preventDefault(); switchScreen(l.dataset.target); } const t = e.target; const cs = t.closest('#battle-screen .chest-slot'); if (cs) { const i = cs.dataset.index, c = gameState.chestSlots[i]; if (c && c.status === 'locked' && !gameState.isUnlocking) { c.status = 'unlocking'; gameState.isUnlocking = true; alert(`Começando a desbloquear o Baú de ${c.type}!`); } else if (c && c.status === 'locked' && gameState.isUnlocking) { alert('Outro baú já está sendo desbloqueado!'); } } if (t.classList.contains('open-btn')) { const i = t.closest('.chest-slot').dataset.index; gameState.gold += 50; gameState.gems += 1; alert(`Você ganhou 50 de ouro e 1 gema!`); gameState.chestSlots[i] = null; } if (t.matches('#battle-screen .battle-button')) { const i = gameState.chestSlots.findIndex(s => s === null); if (i === -1) { alert('Seus espaços de baú estão cheios!'); } else { alert('Buscando oponente... Vitória!'); gameState.chestSlots[i] = { type: 'Prata', arena: 2, status: 'locked', totalTime: 10800, remainingTime: 10800 }; } } if (t.closest('.action-button')) { if (t.closest('#shop-screen')) alert('Compra realizada com sucesso!'); if (t.closest('#social-screen')) alert('Pedido de entrada enviado!'); if (t.closest('#events-screen')) alert('Iniciando o evento...'); } });
+            updateDynamicUI();
+        });
+    </script>
+</body>
+</html>

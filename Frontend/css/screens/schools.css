@@ -1,0 +1,40 @@
+
+.clan-search {
+    display: flex;
+    gap: 0.6rem;
+    margin: 1rem 0;
+}
+.clan-search input {
+    flex-grow: 1;
+    background: var(--bg-darker-alpha);
+    border: 1px solid var(--secondary-blue);
+    border-radius: 0.5rem;
+    padding: 0.6rem;
+    color: var(--text-light);
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+}
+.clan-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+.clan-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--bg-dark-alpha);
+    padding: 0.6rem;
+    border-radius: 0.6rem;
+}
+.clan-badge {
+    font-size: 2rem;
+    color: var(--accent-yellow);
+}
+.clan-info {
+    flex-grow: 1;
+}
+.clan-stats {
+    font-size: 0.8em;
+    opacity: 0.8;
+}

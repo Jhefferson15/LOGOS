@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logos - O Jogo da Filosofia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="game-screen">
+            <!-- 1. CABEÇALHO SUPERIOR -->
+            <header class="game-header">
+                <div class="xp-bar-container">
+                    <span class="player-level">1</span>
+                    <div class="xp-bar">
+                        <div id="xp-fill" class="xp-fill"></div>
+                        <span id="xp-text" class="xp-text">0/100</span>
+                    </div>
+                </div>
+                <div class="resources">
+                    <div class="resource-item">
+                        <i class="fas fa-scroll"></i>
+                        <span id="scroll-amount">0</span>
+                        <i class="fas fa-plus-circle add-icon"></i>
+                    </div>
+                    <div class="resource-item">
+                        <i class="fas fa-book-open"></i>
+                        <span id="book-amount">0</span>
+                        <i class="fas fa-plus-circle add-icon"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 2. CONTEÚDO DA TELA -->
+            <main class="screen-content" id="screen-content">
+                <!-- O conteúdo da tela será carregado aqui -->
+            </main>
+
+            <!-- 3. BARRA DE NAVEGAÇÃO INFERIOR -->
+            <nav class="bottom-nav">
+                <a class="nav-item" data-target="library"><i class="fas fa-book-open"></i><span>Biblioteca</span></a>
+                <a class="nav-item" data-target="philosophers"><i class="fas fa-users"></i><span>Filósofos</span></a>
+                <a class="nav-item active" data-target="play"><i class="fas fa-brain"></i><span>Debater</span></a>
+                <a class="nav-item" data-target="schools"><i class="fas fa-landmark"></i><span>Escolas</span></a>
+                <a class="nav-item" data-target="symposium"><i class="fas fa-comments"></i><span>Simpósio</span></a>
+            </nav>
+        </div>
+    </div>
+
+    <div id="game-board" style="display: none;">
+        </div>
+
+    <!-- Modals -->
+    <div id="timeline-modal" class="modal">
+        </div>
+    <div id="info-modal" class="modal">
+        </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

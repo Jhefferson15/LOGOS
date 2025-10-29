@@ -1,0 +1,13 @@
+/* MODALS */
+.modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: none; justify-content: center; align-items: center;
+    z-index: 1000;
+}
+.modal-content {
+    background: #fff; color: var(--text-dark);
+    padding: 30px; border-radius: 15px; width: 90%;
+    max-width: 600px; max-height: 80vh; overflow-y: auto;
+}
+.modal-content h2 { margin-top: 0; }

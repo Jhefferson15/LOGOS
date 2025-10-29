@@ -1,0 +1,132 @@
+
+.player-info-container, .timed-chests {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.6rem;
+    border-radius: 0.6rem;
+    margin-top: 1rem;
+}
+.player-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.profile-icon {
+    font-size: 2.2rem;
+}
+.player-name {
+    font-weight: bold;
+}
+.clan-name {
+    font-size: 0.8em;
+    opacity: 0.8;
+}
+.trophies {
+    background-color: var(--bg-dark-alpha);
+    padding: 0.4rem 1rem;
+    border-radius: 1rem;
+    font-weight: bold;
+}
+.trophies .fa-trophy {
+    color: var(--accent-yellow);
+}
+.settings {
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+.timed-chests {
+    gap: 0.6rem;
+}
+.timed-chest {
+    flex: 1;
+    background: var(--bg-dark-alpha);
+    padding: 0.6rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.8rem;
+}
+.timed-chest.ready {
+    background: var(--green);
+    cursor: pointer;
+    animation: pulse 1.s infinite;
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+}
+.arena-section {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.arena-icon {
+    font-size: 5rem;
+}
+.arena-section h2 {
+    margin: 0.6rem 0 0;
+    font-size: 1.5rem;
+}
+.battle-button {
+    background-color: var(--accent-yellow);
+    color: var(--text-dark);
+    border: none;
+    font-size: 1.8rem;
+    font-weight: bold;
+    padding: 1rem 4rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #c78f1e;
+    transition: all 0.1s ease;
+    margin: 1.25rem 0;
+}
+.battle-button:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #c78f1e;
+}
+.chest-slots {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+}
+.chest-slot {
+    background-color: var(--bg-dark-alpha);
+    min-height: 6rem;
+    border-radius: 0.6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0.3rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: 2px solid transparent;
+    font-size: 0.8rem;
+}
+.chest-slot:hover {
+    transform: scale(1.05);
+}
+.chest-slot.unlocking {
+    border-color: var(--accent-yellow);
+}
+.chest-slot.ready {
+    border-color: var(--green);
+    animation: pulse 1.5s infinite;
+}
+.chest-slot button {
+    background: var(--green);
+    color: white;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    margin-top: 0.3rem;
+    cursor: pointer;
+}

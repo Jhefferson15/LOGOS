@@ -1,0 +1,95 @@
+/* ESTILO DAS CARTAS */
+.card {
+    width: var(--card-width);
+    height: var(--card-height);
+    min-width: 60px; /* Evita que fiquem pequenas demais */
+    min-height: 84px;
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    position: relative;
+}
+
+/* Carta virada para baixo (oponentes) */
+.card-back { display: flex; justify-content: center; align-items: center; }
+.card-back::after {
+    content: '';
+    width: 1.5vmin; height: 1.5vmin;
+    background: var(--accent-yellow);
+    border-radius: 50%;
+    box-shadow: 0 0 0.8vmin var(--accent-yellow);
+}
+.card-back.logo span {
+    position: absolute;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 1.2vmin;
+    font-weight: bold;
+    color: #ccc;
+}
+#player-top-area .card-back.logo span { writing-mode: horizontal-tb; top: 0.5vmin; }
+#player-left-area .card-back.logo span { left: 0.5vmin; }
+#player-right-area .card-back.logo span { right: 0.5vmin; }
+
+/* Carta virada para cima (jogador, descarte) */
+.philosopher-card {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 1vmin;
+    border-width: 4px;
+}
+.philosopher-card .name { font-size: var(--font-size-card-name); font-weight: 700; line-height: 1.2; }
+.philosopher-card .school { font-size: var(--font-size-card-school); opacity: 0.7; position: absolute; bottom: 0.5vmin; }
+#player-hand .philosopher-card:hover { transform: translateY(-2vmin) scale(1.1); z-index: 10; }
+
+.card.c-escola-grega { border-color: var(--c-escola-grega); }
+.card.c-escola-racionalismo { border-color: var(--c-escola-racionalismo); }
+.card.c-escola-empirismo { border-color: var(--c-escola-empirismo); }
+.card.c-escola-existencialismo { border-color: var(--c-escola-existencialismo); }
+.card.c-escola-pos-estruturalismo { border-color: var(--c-escola-pos-estruturalismo); }
+
+/* PAINEL DE CONCEITOS */
+#concept-panel {
+    display: flex;
+    gap: 1vmin;
+    justify-content: center;
+    margin-top: 2vh;
+}
+
+.concept-card {
+    background-color: var(--card-bg);
+    border: 2px solid var(--accent-green);
+    border-radius: 8px;
+    padding: 1vmin;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.concept-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px var(--accent-green);
+}
+
+.concept-card .name {
+    font-size: 1.2vmin;
+    font-weight: 700;
+}
+
+.concept-card .points {
+    font-size: 1.5vmin;
+    font-weight: 700;
+    color: var(--accent-yellow);
+}
+
+.concept-card.used {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: var(--card-border);
+}
