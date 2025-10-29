@@ -1,17 +1,19 @@
-import { LogosGame } from './game/Game.js';
-import { initPlayScreen, handlePlayScreenClick } from './screens/play.js';
-import { initLibraryScreen, handleLibraryScreenClick } from './screens/library.js';
-import { initPhilosophersScreen } from './screens/philosophers.js'; // No click handler yet
-import { initSchoolsScreen, handleSchoolsScreenClick } from './screens/schools.js';
-import { initSymposiumScreen, handleSymposiumScreenClick } from './screens/symposium.js';
+import { LogosGame } from './game/Game.js';                                                                                                                                                
+import { initPlayScreen, handlePlayScreenClick } from './screens/play.js';                                                                                                                 
+import { initLibraryScreen, handleLibraryScreenClick } from './screens/library.js';                                                                                                        
+import { initPhilosophersScreen } from './screens/philosophers.js'; // No click handler yet                                                                                                
+import { initSchoolsScreen, handleSchoolsScreenClick } from './screens/schools.js';                                                                                                        
+import { initSymposiumScreen, handleSymposiumScreenClick } from './screens/symposium.js'; 
 import { toast } from './ui/Toast.js';
+import { gameState } from './data/gameState.js';
+import { popupManager } from './ui/PopupManager.js';
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const screenContent = document.getElementById('screen-content');
     const navItems = document.querySelectorAll('.nav-item');
     const gameScreen = document.querySelector('.game-screen');
 
-    let gameState = { scrolls: 0, books: 0, xp: 0, xpMax: 100, trophies: 0, timers: { freeChest: 3353, crownChest: 57540 }, chestSlots: [ { type: 'Papiro', arena: 1, status: 'unlocking', totalTime: 10800, remainingTime: 731 }, { type: 'Tomo', arena: 1, status: 'locked', totalTime: 28800, remainingTime: 28800 }, { type: 'Obra Rara', arena: 2, status: 'locked', totalTime: 43200, remainingTime: 43200 }, { type: 'Papiro', arena: 1, status: 'locked', totalTime: 10800, remainingTime: 10800 }, ], isUnlocking: true };
     let currentScreenName = ''; // To keep track of the active screen
 
     const formatTime = (s) => { if (s <= 0) return "Pronto!"; const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60; return h > 0 ? `${h}H ${m}MIN` : m > 0 ? `${m}MIN ${sec}SEG` : `${sec}SEG`; };
@@ -142,6 +144,15 @@ document.addEventListener('DOMContentLoaded', () => {
             default:
                 // console.log(`Click on ${currentScreenName} screen:`, e.target);
                 break;
+        }
+    });
+    const gameHeader = document.querySelector('.game-header'); // Certifique-se que o seletor está correto
+
+
+    // Adicione este listener para o header
+    gameHeader.addEventListener('click', (e) => {
+        if (e.target.closest('.xp-bar-container')) {
+            popupManager.open('level-xp');
         }
     });
 
