@@ -1,4 +1,4 @@
-import { LogosGame } from './game/Game.js';                                                                                                                                                
+import { Game } from './game/Game.js';                                                                                                                                                
 import { initPlayScreen, handlePlayScreenClick } from './screens/play.js';                                                                                                                 
 import { initLibraryScreen, handleLibraryScreenClick } from './screens/library.js';                                                                                                        
 import { initPhilosophersScreen } from './screens/philosophers.js'; // No click handler yet                                                                                                
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Delegate clicks to the appropriate screen handler
         switch (currentScreenName) {
             case 'play':
-                handlePlayScreenClick(e, gameState, updateDynamicUI, toast, LogosGame);
+                handlePlayScreenClick(e, gameState, updateDynamicUI, toast);
                 break;
             case 'library':
                 handleLibraryScreenClick(e, gameState, updateDynamicUI, toast);

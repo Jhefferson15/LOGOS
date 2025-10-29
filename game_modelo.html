@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logos - O Jogo Filosófico</title>
+    <style>
+        :root {
+            /* Mapeamento de Cores por Escola */
+            --school-grega: #a67b5b; /* Terra Cota */
+            --school-estoicismo: #6a7374; /* Cinza Pedra */
+            --school-escolastica: #800000; /* Vinho */
+            --school-racionalismo: #0077b6; /* Azul Sábio */
+            --school-empirismo: #d4a373; /* Bege Areia */
+            --school-iluminismo: #fca311; /* Amarelo Ouro */
+            --school-idealismo-alemao: #14213d; /* Azul Marinho Profundo */
+            --school-materialismo: #b22222; /* Vermelho Tijolo */
+            --school-existencialismo: #4a4e69; /* Roxo Sombrio */
+            --school-pos-estruturalismo: #6c757d; /* Cinza Moderno */
+            --school-escola-de-frankfurt: #4d4d4d; /* Grafite */
+            --color-black: #2e2e2e;
+            --card-width: 100px;
+            --card-height: 150px;
+            --wood-bg: #8c5a3c;
+            --wood-grain: #633f2b;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Roboto:wght@400;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #333;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #game-table {
+            position: relative;
+            width: 95%;
+            max-width: 1400px;
+            height: 95vh;
+            max-height: 900px;
+            background-color: var(--wood-bg);
+            background-image: linear-gradient(45deg, var(--wood-grain) 25%, transparent 25%), 
+                              linear-gradient(-45deg, var(--wood-grain) 25%, transparent 25%), 
+                              linear-gradient(45deg, transparent 75%, var(--wood-grain) 75%), 
+                              linear-gradient(-45deg, transparent 75%, var(--wood-grain) 75%);
+            background-size: 20px 20px;
+            border-radius: 50px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), inset 0 0 100px rgba(0,0,0,0.3);
+            display: grid;
+            grid-template-areas:
+                "top top top"
+                "center center center"
+                "player player player";
+            grid-template-rows: 1.2fr 2fr 1.5fr;
+            grid-template-columns: 1fr;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .player-area {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #opponent-top-area { grid-area: top; }
+        #player-area { grid-area: player; }
+        #center-area { 
+            grid-area: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .player-info {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .player-info.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px 5px gold;
+        }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid white; }
+        .card-count { font-size: 16px; font-weight: bold; }
+        .player-name { font-weight: bold; font-size: 16px; }
+
+        #opponent-top-area .player-info { top: 10px; }
+        #player-area .player-info { bottom: 10px; }
+        #player-score { font-size: 18px; font-weight: bold; color: #fca311; }
+        
+        .hand {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #player-hand { position: absolute; bottom: 20px; }
+        #opponent-top-area .hand { position: absolute; top: 60px; transform: rotate(180deg); }
+        
+        .card {
+            width: var(--card-width);
+            height: var(--card-height);
+            border-radius: 8px;
+            border: 4px solid #f0e6d2;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            position: relative;
+            font-family: 'Cinzel', serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            padding: 8px;
+            box-sizing: border-box;
+            transition: transform 0.2s ease-out, box-shadow 0.2s;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+        }
+        .card-back {
+            background: linear-gradient(135deg, #4a3f35, #2a231d);
+            border-color: #4a3f35;
+        }
+        .card-back::after {
+            content: 'LOGOS';
+            font-size: 24px;
+            color: #fca311;
+            text-shadow: 0 0 5px #000;
+        }
+        #player-hand .card { cursor: pointer; margin: 0 -40px; }
+        #player-hand .card:hover { transform: translateY(-25px) scale(1.1); z-index: 100; }
+        #player-hand .card.playable { border-color: #66ff66; box-shadow: 0 0 20px #66ff66; }
+        .opponent-hand .card { margin: 0 -75px; }
+
+        .card-name { font-size: 14px; font-weight: bold; flex-grow: 1; display: flex; align-items: center;}
+        .card-school { font-size: 10px; font-style: italic; background: rgba(0,0,0,0.4); padding: 2px 5px; border-radius: 5px; width: 100%;}
+        
+        /* Card Colors by School */
+        .school-grega { background-color: var(--school-grega); }
+        .school-estoicismo { background-color: var(--school-estoicismo); }
+        .school-escolástica { background-color: var(--school-escolastica); }
+        .school-racionalismo { background-color: var(--school-racionalismo); }
+        .school-empirismo { background-color: var(--school-empirismo); }
+        .school-iluminismo { background-color: var(--school-iluminismo); }
+        .school-idealismo-alemão { background-color: var(--school-idealismo-alemao); }
+        .school-materialismo-histórico { background-color: var(--school-materialismo); }
+        .school-existencialismo { background-color: var(--school-existencialismo); }
+        .school-fenomenologia { background-color: var(--school-pos-estruturalismo); } /* Reusing for demo */
+        .school-escola-de-frankfurt { background-color: var(--school-escola-de-frankfurt); }
+        .school-estruturalismo { background-color: var(--school-pos-estruturalismo); } /* Reusing for demo */
+        .school-pós-estruturalismo { background-color: var(--school-pos-estruturalismo); }
+
+        #draw-pile, #discard-pile { cursor: pointer; }
+        #draw-pile .card, #discard-pile .card { position: absolute; }
+        
+        /* Concept Panel */
+        #concepts-panel {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            box-sizing: border-box;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            border-left: 2px solid gold;
+        }
+        #concepts-panel h3 { text-align: center; margin-top: 0; font-family: 'Cinzel', serif; }
+        .concept-card {
+            background: #444;
+            border: 1px solid #666;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .concept-card.used { background: #222; color: #777; cursor: not-allowed; pointer-events: none;}
+        .concept-card.active-prompt:hover { background-color: #fca311; color: black; transform: scale(1.05); }
+        .concept-card-header { display: flex; justify-content: space-between; font-weight: bold; }
+        .concept-name { font-size: 14px; }
+        .concept-points { font-size: 14px; color: #fca311; }
+        .concept-description { font-size: 12px; margin-top: 5px; color: #ccc; }
+
+        /* Modals */
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            display: none; /* Initially hidden */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #f0e6d2;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 20px;
+            color: #333;
+            border: 5px solid var(--wood-grain);
+        }
+        .modal-content h2 { margin-top: 0; font-family: 'Cinzel', serif; }
+        .modal-content button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            margin: 10px;
+            background-color: var(--wood-grain);
+        }
+        #notification-modal .modal-content { font-size: 24px; font-weight: bold; }
+        #notification-modal .correct { color: #2e7d32; }
+        #notification-modal .incorrect { color: #c62828; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="game-table">
+            <div id="opponent-top-area" class="player-area">
+                <div id="player-info-2" class="player-info"></div>
+                <div id="opponent-hand-2" class="hand opponent-hand"></div>
+            </div>
+            
+            <div id="center-area">
+                <div id="draw-pile"></div>
+                <div id="discard-pile"></div>
+            </div>
+
+            <div id="player-area" class="player-area">
+                <div id="player-info-1" class="player-info"></div>
+                <div id="player-hand" class="hand"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="concepts-panel">
+        <h3>Seus Conceitos</h3>
+        <div id="concepts-list"></div>
+    </div>
+
+    <!-- Modals -->
+    <div id="concept-prompt-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="concept-prompt-philosopher"></h2>
+            <p>Escolha um conceito para aplicar ou pule.</p>
+            <button id="skip-concept-btn">Pular</button>
+        </div>
+    </div>
+    <div id="notification-modal" class="modal">
+        <div class="modal-content">
+            <p id="notification-message"></p>
+        </div>
+    </div>
+    <div id="game-over-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="winner-message"></h2>
+            <button onclick="location.reload()">Jogar Novamente</button>
+        </div>
+    </div>
+
+<script>
+// --- START OF DATA FILES (philosophers.js & concepts.js) ---
+
+const SCHOOLS = {
+    GREGA: 'Grega', ESTOICISMO: 'Estoicismo', ESCOLASTICA: 'Escolástica', RACIONALISMO: 'Racionalismo', EMPIRISMO: 'Empirismo', ILUMINISMO: 'Iluminismo', IDEALISMO_ALEMAO: 'Idealismo Alemão', MATERIALISMO: 'Materialismo Histórico', EXISTENCIALISMO: 'Existencialismo', FENOMENOLOGIA: 'Fenomenologia', ESCOLA_DE_FRANKFURT: 'Escola de Frankfurt', ESTRUTURALISMO: 'Estruturalismo', POS_ESTRUTURALISMO: 'Pós-Estruturalismo',
+};
+
+const PHILOSOPHERS_DATA = {
+    1: { name: 'Sócrates', school: SCHOOLS.GREGA, era: 'Antiga', predecessors: [], keyConcepts: [101, 102], description: 'O mestre do questionamento, que acreditava que a virtude é conhecimento.' },
+    2: { name: 'Platão', school: SCHOOLS.GREGA, era: 'Antiga', predecessors: [1], keyConcepts: [103, 104], description: 'Discípulo de Sócrates, idealizou um mundo de formas perfeitas e imutáveis.' },
+    3: { name: 'Aristóteles', school: SCHOOLS.GREGA, era: 'Antiga', predecessors: [2], keyConcepts: [105, 106], description: 'Fundador da lógica formal e defensor do conhecimento empírico e da ética das virtudes.' },
+    4: { name: 'Sêneca', school: SCHOOLS.ESTOICISMO, era: 'Antiga', predecessors: [], keyConcepts: [107], description: 'Filósofo estóico que ensinava sobre a serenidade da alma diante do destino.' },
+    5: { name: 'Sto. Agostinho', school: SCHOOLS.ESCOLASTICA, era: 'Medieval', predecessors: [2], keyConcepts: [201], description: 'Teólogo que fundiu a filosofia platônica com o cristianismo.' },
+    6: { name: 'Tomás de Aquino', school: SCHOOLS.ESCOLASTICA, era: 'Medieval', predecessors: [3, 5], keyConcepts: [202], description: 'Sintetizou o pensamento aristotélico com a doutrina cristã.' },
+    7: { name: 'Descartes', school: SCHOOLS.RACIONALISMO, era: 'Moderna', predecessors: [], keyConcepts: [301, 302], description: '"Penso, logo existo." O pai da filosofia moderna e do racionalismo.' },
+    8: { name: 'Spinoza', school: SCHOOLS.RACIONALISMO, era: 'Moderna', predecessors: [7], keyConcepts: [303], description: 'Via Deus e a Natureza como uma única substância divina e infinita.' },
+    9: { name: 'John Locke', school: SCHOOLS.EMPIRISMO, era: 'Moderna', predecessors: [], keyConcepts: [304, 305], description: 'Defensor da mente como uma "tábula rasa" e dos direitos naturais do homem.' },
+    10: { name: 'David Hume', school: SCHOOLS.EMPIRISMO, era: 'Moderna', predecessors: [9], keyConcepts: [306], description: 'Levou o empirismo ao seu ceticismo radical, questionando a causalidade.' },
+    11: { name: 'Kant', school: SCHOOLS.ILUMINISMO, era: 'Moderna', predecessors: [7, 10], keyConcepts: [307, 308], description: 'Realizou a "revolução copernicana" na filosofia, unindo racionalismo e empirismo.' },
+    12: { name: 'Hegel', school: SCHOOLS.IDEALISMO_ALEMAO, era: 'Moderna', predecessors: [11], keyConcepts: [309], description: 'Desenvolveu um sistema dialético para explicar o progresso do Espírito Absoluto na história.' },
+    13: { name: 'Karl Marx', school: SCHOOLS.MATERIALISMO, era: 'Contemporânea', predecessors: [12], keyConcepts: [401, 402], description: 'Crítico do capitalismo que via a história como uma luta de classes.' },
+    14: { name: 'Nietzsche', school: SCHOOLS.EXISTENCIALISMO, era: 'Contemporânea', predecessors: [2, 11], keyConcepts: [403, 404], description: 'Proclamou a "morte de Deus" e exaltou o Super-Homem e a vontade de poder.' },
+    15: { name: 'Sartre', school: SCHOOLS.EXISTENCIALISMO, era: 'Contemporânea', predecessors: [14], keyConcepts: [405, 406], description: 'Defendia que "a existência precede a essência", tornando o homem radicalmente livre.' },
+    16: { name: 'Simone de Beauvoir', school: SCHOOLS.EXISTENCIALISMO, era: 'Contemporânea', predecessors: [15], keyConcepts: [407], description: '"Não se nasce mulher, torna-se." Pioneira do feminismo existencialista.' },
+    17: { name: 'Foucault', school: SCHOOLS.POS_ESTRUTURALISMO, era: 'Contemporânea', predecessors: [14], keyConcepts: [408, 409], description: 'Analisou as relações entre poder, conhecimento e discurso na sociedade.' },
+    18: { name: 'Derrida', school: SCHOOLS.POS_ESTRUTURALISMO, era: 'Contemporânea', predecessors: [17], keyConcepts: [410], description: 'Criador do desconstrucionismo, que desafia as oposições binárias do pensamento ocidental.' },
+    19: { name: 'Adorno', school: SCHOOLS.ESCOLA_DE_FRANKFURT, era: 'Contemporânea', predecessors: [13, 12], keyConcepts: [411], description: 'Crítico da "indústria cultural" e da razão instrumental na sociedade de massas.' },
+    20: { name: 'Byung-Chul Han', school: SCHOOLS.POS_ESTRUTURALISMO, era: 'Contemporânea', predecessors: [17, 19], keyConcepts: [412], description: 'Analisa a "sociedade do cansaço", onde a exploração agora é autoimposta.' },
+};
+
+const CONCEPTS_DATA = {
+    101: { name: 'Maiêutica', points: 30, description: 'O método socrático de "dar à luz" às ideias por meio de perguntas.' }, 102: { name: 'Ironia Socrática', points: 20, description: 'Postura de fingir ignorância para levar o interlocutor a contradições.' }, 103: { name: 'Mundo das Ideias', points: 35, description: 'A teoria platônica de que existe um reino de formas perfeitas e imutáveis.' }, 104: { name: 'Alegoria da Caverna', points: 25, description: 'Metáfora sobre a jornada do filósofo do mundo das aparências para o do conhecimento.' }, 105: { name: 'Ética das Virtudes', points: 30, description: 'Foco no caráter e na busca pela "vida boa" (eudaimonia) através da mediania.' }, 106: { name: 'Potência e Ato', points: 25, description: 'A distinção aristotélica entre o que uma coisa pode ser e o que ela atualmente é.' }, 107: { name: 'Estoicismo', points: 20, description: 'Filosofia que prega a aceitação do destino e o controle sobre as próprias paixões.' }, 201: { name: 'Cidade de Deus', points: 25, description: 'A distinção agostiniana entre a cidade terrena (pecado) e a cidade celestial (salvação).' }, 202: { name: 'As Cinco Vias', points: 30, description: 'Os argumentos de Tomás de Aquino para provar a existência de Deus pela razão.' }, 301: { name: 'Dúvida Metódica', points: 25, description: 'O processo cartesiano de duvidar de tudo para encontrar uma certeza fundamental.' }, 302: { name: 'Cogito, Ergo Sum', points: 35, description: '"Penso, logo existo." A primeira certeza inabalável de Descartes.' }, 303: { name: 'Panteísmo', points: 20, description: 'A crença de que Deus e o universo são a mesma coisa (Deus sive Natura).' }, 304: { name: 'Tábula Rasa', points: 20, description: 'A ideia de que a mente humana nasce como uma "folha em branco", sem ideias inatas.' }, 305: { name: 'Direitos Naturais', points: 25, description: 'Direitos inalienáveis (vida, liberdade, propriedade) que precedem o governo.' }, 306: { name: 'Ceticismo Radical', points: 30, description: 'A conclusão de Hume de que não podemos ter certeza sobre relações de causa e efeito.' }, 307: { name: 'Imperativo Categórico', points: 40, description: 'O princípio moral de Kant: "Aja de tal forma que sua ação possa ser uma lei universal."' }, 308: { name: 'Juízo Sintético a Priori', points: 35, description: 'O conhecimento que é universal (a priori) mas que também expande nosso saber (sintético).' }, 309: { name: 'Dialética Hegeliana', points: 30, description: 'O processo histórico de Tese, Antítese e Síntese que move o Espírito.' }, 401: { name: 'Luta de Classes', points: 25, description: 'O motor da história, segundo Marx, impulsionado pelo conflito entre burguesia e proletariado.' }, 402: { name: 'Alienação', points: 20, description: 'A separação do trabalhador do produto de seu trabalho no sistema capitalista.' }, 403: { name: 'Vontade de Poder', points: 30, description: 'A força fundamental que impulsiona todos os seres a se expandirem e dominarem.' }, 404: { name: 'Eterno Retorno', points: 35, description: 'O teste existencial de viver cada momento de sua vida como se fosse repeti-lo para sempre.' }, 405: { name: 'Angústia Existencial', points: 25, description: 'O sentimento de responsabilidade total que vem da liberdade radical do ser humano.' }, 406: { name: 'Má-fé', points: 20, description: 'A autoenganação de negar a própria liberdade e agir como um objeto determinado.' }, 407: { name: 'O Segundo Sexo', points: 30, description: 'A análise da condição da mulher como o "Outro" na sociedade patriarcal.' }, 408: { name: 'Microfísica do Poder', points: 30, description: 'A ideia de que o poder não é centralizado, mas sim difuso e exercido em todas as relações sociais.' }, 409: { name: 'Sociedade Disciplinar', points: 25, description: 'Uma sociedade baseada na vigilância e normalização dos corpos em instituições como prisões e escolas.' }, 410: { name: 'Desconstrução', points: 35, description: 'Método de análise que revela as hierarquias e pressupostos ocultos nos textos.' }, 411: { name: 'Indústria Cultural', points: 25, description: 'A padronização da arte e da cultura como mercadorias para o consumo em massa.' }, 412: { name: 'Sociedade do Desempenho', points: 30, description: 'A evolução da sociedade disciplinar para uma onde o indivíduo se torna seu próprio explorador.' },
+};
+
+// --- END OF DATA FILES ---
+
+class Game {
+    constructor() {
+        this.players = [
+            { id: 1, name: 'Você', hand: [], isAI: false, score: 0 },
+            { id: 2, name: 'IA: Aristóteles', hand: [], isAI: true, score: 0 },
+        ];
+        this.playerConcepts = [];
+        this.deck = [];
+        this.discardPile = [];
+        this.currentPlayerIndex = 0;
+        this.topCard = null;
+
+        // DOM Elements
+        this.drawPileEl = document.getElementById('draw-pile');
+        this.discardPileEl = document.getElementById('discard-pile');
+        this.conceptsListEl = document.getElementById('concepts-list');
+        this.conceptPromptModal = document.getElementById('concept-prompt-modal');
+        this.skipConceptBtn = document.getElementById('skip-concept-btn');
+        this.notificationModal = document.getElementById('notification-modal');
+        
+        this.drawPileEl.addEventListener('click', () => this.handleDrawClick());
+    }
+
+    // 1. SETUP
+    init() {
+        this.createDeck();
+        this.shuffleDeck();
+        this.dealCards();
+        this.dealConcepts();
+        this.startDiscardPile();
+        this.renderAll();
+        this.startTurn();
+    }
+
+    createDeck() {
+        this.deck = Object.keys(PHILOSOPHERS_DATA).map(id => ({
+            id: parseInt(id),
+            ...PHILOSOPHERS_DATA[id]
+        }));
+    }
+
+    shuffleDeck() {
+        for (let i = this.deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
+        }
+    }
+
+    dealCards() {
+        for (let i = 0; i < 7; i++) {
+            for (const player of this.players) {
+                player.hand.push(this.deck.pop());
+            }
+        }
+    }
+    
+    dealConcepts() {
+        const allConcepts = Object.keys(CONCEPTS_DATA).map(id => ({
+            id: parseInt(id),
+            ...CONCEPTS_DATA[id],
+            used: false
+        }));
+        
+        // Shuffle and pick 10 concepts for the player
+        for (let i = allConcepts.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allConcepts[i], allConcepts[j]] = [allConcepts[j], allConcepts[i]];
+        }
+        this.playerConcepts = allConcepts.slice(0, 10);
+    }
+
+    startDiscardPile() {
+        this.discardPile.push(this.deck.pop());
+        this.topCard = this.discardPile[this.discardPile.length - 1];
+    }
+    
+    // 2. RENDERING
+    renderAll() {
+        this.players.forEach(player => {
+            if (player.isAI) {
+                this.renderOpponentHand(player);
+            } else {
+                this.renderPlayerHand(player);
+                this.renderConceptsPanel();
+            }
+            this.renderPlayerInfo(player);
+        });
+        this.renderPiles();
+    }
+
+    createCardElement(card, isFaceUp = true) {
+        const cardEl = document.createElement('div');
+        cardEl.classList.add('card');
+        
+        if (!isFaceUp) {
+            cardEl.classList.add('card-back');
+            return cardEl;
+        }
+
+        const schoolClass = `school-${card.school.toLowerCase().replace(/ /g, '-')}`;
+        cardEl.classList.add(schoolClass);
+        cardEl.dataset.id = card.id;
+
+        cardEl.innerHTML = `
+            <div class="card-name">${card.name}</div>
+            <div class="card-school">${card.school}</div>
+        `;
+        return cardEl;
+    }
+
+    renderPlayerHand(player) {
+        const handEl = document.getElementById('player-hand');
+        handEl.innerHTML = '';
+        player.hand.forEach(card => {
+            const cardEl = this.createCardElement(card);
+            if (this.isValidPlay(card)) {
+                cardEl.classList.add('playable');
+            }
+            cardEl.addEventListener('click', () => this.handleCardClick(card));
+            handEl.appendChild(cardEl);
+        });
+    }
+
+    renderOpponentHand(player) {
+        const handEl = document.getElementById(`opponent-hand-${player.id}`);
+        handEl.innerHTML = '';
+        for (let i = 0; i < player.hand.length; i++) {
+            handEl.appendChild(this.createCardElement(null, false));
+        }
+    }
+
+    renderPlayerInfo(player) {
+        const infoEl = document.getElementById(`player-info-${player.id}`);
+        infoEl.innerHTML = `
+            <div class="player-details">
+                <div class="player-name">${player.name}</div>
+                <div class="card-count">${player.hand.length} Cartas</div>
+                ${!player.isAI ? `<div id="player-score">Pontos: ${player.score}</div>` : ''}
+            </div>
+        `;
+        if (this.players[this.currentPlayerIndex].id === player.id) {
+            infoEl.classList.add('active');
+        } else {
+            infoEl.classList.remove('active');
+        }
+    }
+    
+    renderPiles() {
+        this.drawPileEl.innerHTML = '';
+        if(this.deck.length > 0) {
+            this.drawPileEl.appendChild(this.createCardElement(null, false));
+        }
+
+        this.discardPileEl.innerHTML = '';
+        this.topCard = this.discardPile[this.discardPile.length - 1];
+        if (this.topCard) {
+            this.discardPileEl.appendChild(this.createCardElement(this.topCard));
+        }
+    }
+    
+    renderConceptsPanel() {
+        this.conceptsListEl.innerHTML = '';
+        this.playerConcepts.forEach(concept => {
+            const conceptEl = document.createElement('div');
+            conceptEl.classList.add('concept-card');
+            if (concept.used) conceptEl.classList.add('used');
+            conceptEl.innerHTML = `
+                <div class="concept-card-header">
+                    <span class="concept-name">${concept.name}</span>
+                    <span class="concept-points">${concept.points} pts</span>
+                </div>
+                <p class="concept-description">${concept.description}</p>
+            `;
+            conceptEl.addEventListener('click', () => this.handleConceptClick(concept));
+            this.conceptsListEl.appendChild(conceptEl);
+        });
+    }
+
+    // 3. GAME LOGIC
+    startTurn() {
+        this.renderAll();
+        const currentPlayer = this.players[this.currentPlayerIndex];
+        if (currentPlayer.isAI) {
+            setTimeout(() => this.executeAITurn(currentPlayer), 1500);
+        }
+    }
+    
+    endTurn() {
+        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+        this.startTurn();
+    }
+    
+    isValidPlay(card) {
+        // Rule 1: Same school
+        if (card.school === this.topCard.school) return true;
+        // Rule 2: Predecessor
+        if (card.predecessors.includes(this.topCard.id)) return true;
+        return false;
+    }
+
+    handleCardClick(card) {
+        const player = this.players[this.currentPlayerIndex];
+        if (player.isAI || !this.isValidPlay(card)) return;
+
+        player.hand = player.hand.filter(c => c.id !== card.id);
+        this.discardPile.push(card);
+        
+        this.renderAll();
+
+        if (player.hand.length === 0) {
+            this.endGame(player);
+            return;
+        }
+
+        this.promptForConcept(card);
+    }
+    
+    promptForConcept(playedCard) {
+        document.getElementById('concept-prompt-philosopher').textContent = `Você jogou ${playedCard.name}`;
+        this.conceptPromptModal.style.display = 'flex';
+        
+        // Add active class to make concepts hoverable
+        this.conceptsListEl.querySelectorAll('.concept-card:not(.used)').forEach(el => el.classList.add('active-prompt'));
+
+        const skipHandler = () => {
+            this.finishConceptPhase();
+            this.skipConceptBtn.removeEventListener('click', skipHandler);
+        };
+        this.skipConceptBtn.addEventListener('click', skipHandler);
+    }
+
+    handleConceptClick(concept) {
+        if (!this.conceptPromptModal.style.display || this.conceptPromptModal.style.display === 'none' || concept.used) return;
+        
+        const playedCard = this.discardPile[this.discardPile.length - 1];
+        const player = this.players[0]; // Assuming player is always at index 0
+        let pointsChange = 0;
+        let message = '';
+        
+        if (playedCard.keyConcepts.includes(concept.id)) {
+            pointsChange = concept.points;
+            player.score += pointsChange;
+            message = `<span class="correct">CORRETO! +${pointsChange} pontos!</span><br><small>${concept.name} é um conceito chave de ${playedCard.name}.</small>`;
+        } else {
+            pointsChange = -Math.floor(concept.points / 2);
+            player.score += pointsChange;
+            message = `<span class="incorrect">INCORRETO! ${pointsChange} pontos!</span><br><small>${concept.name} não é um conceito chave de ${playedCard.name}.</small>`;
+        }
+        
+        concept.used = true;
+        this.showNotification(message, 2000);
+        this.finishConceptPhase();
+    }
+    
+    finishConceptPhase() {
+        this.conceptPromptModal.style.display = 'none';
+        this.conceptsListEl.querySelectorAll('.concept-card').forEach(el => el.classList.remove('active-prompt'));
+        this.renderAll();
+        setTimeout(() => this.endTurn(), 500);
+    }
+    
+    showNotification(message, duration) {
+        const msgEl = document.getElementById('notification-message');
+        msgEl.innerHTML = message;
+        this.notificationModal.style.display = 'flex';
+        setTimeout(() => {
+            this.notificationModal.style.display = 'none';
+        }, duration);
+    }
+    
+    handleDrawClick() {
+        const player = this.players[this.currentPlayerIndex];
+        if (player.isAI) return;
+        
+        this.drawCard(player);
+        this.renderPlayerHand(player);
+        this.renderPlayerInfo(player);
+        this.endTurn(); // Drawing a card ends the turn in this version
+    }
+
+    drawCard(player) {
+        if (this.deck.length === 0) {
+            this.reshuffleDiscardPile();
+        }
+        if (this.deck.length > 0) {
+            player.hand.push(this.deck.pop());
+        }
+    }
+    
+    reshuffleDiscardPile() {
+        if (this.discardPile.length <= 1) return;
+        const top = this.discardPile.pop();
+        this.deck = [...this.discardPile];
+        this.discardPile = [top];
+        this.shuffleDeck();
+        this.showNotification('Baralho reembaralhado!', 1500);
+    }
+
+    // 4. AI LOGIC
+    executeAITurn(player) {
+        let playableCard = player.hand.find(card => this.isValidPlay(card));
+
+        if (playableCard) {
+            setTimeout(() => {
+                player.hand = player.hand.filter(c => c.id !== playableCard.id);
+                this.discardPile.push(playableCard);
+                this.renderAll();
+                
+                if (player.hand.length === 0) {
+                    this.endGame(player);
+                    return;
+                }
+                this.endTurn();
+            }, 1000);
+        } else {
+            setTimeout(() => {
+                this.drawCard(player);
+                this.renderAll();
+                this.endTurn();
+            }, 1000);
+        }
+    }
+    
+    // 5. GAME END
+    endGame(winner) {
+        const modal = document.getElementById('game-over-modal');
+        document.getElementById('winner-message').textContent = `${winner.name} venceu!`;
+        modal.style.display = 'flex';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const game = new Game();
+    game.init();
+});
+</script>
+
+</body>
+</html>

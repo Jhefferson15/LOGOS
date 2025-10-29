@@ -1,0 +1,44 @@
+    <div id="game-container">
+        <a href="#" id="back-to-main" class="floating-back-button"><i class="fas fa-arrow-left"></i></a>
+        <div id="game-table">
+            <div id="opponent-top-area" class="player-area">
+                <div id="player-info-2" class="player-info"></div>
+                <div id="opponent-hand-2" class="hand opponent-hand"></div>
+            </div>
+            
+            <div id="center-area">
+                <div id="draw-pile"></div>
+                <div id="discard-pile"></div>
+            </div>
+
+            <div id="player-area" class="player-area">
+                <div id="player-info-1" class="player-info"></div>
+                <div id="player-hand" class="hand"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="concepts-panel">
+        <h3>Seus Conceitos</h3>
+        <div id="concepts-list"></div>
+    </div>
+
+    <!-- Modals -->
+    <div id="concept-prompt-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="concept-prompt-philosopher"></h2>
+            <p>Escolha um conceito para aplicar ou pule.</p>
+            <button id="skip-concept-btn">Pular</button>
+        </div>
+    </div>
+    <div id="notification-modal" class="modal">
+        <div class="modal-content">
+            <p id="notification-message"></p>
+        </div>
+    </div>
+    <div id="game-over-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="winner-message"></h2>
+            <button onclick="location.reload()">Jogar Novamente</button>
+        </div>
+    </div>
