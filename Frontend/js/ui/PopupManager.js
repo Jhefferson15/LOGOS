@@ -55,6 +55,15 @@ class PopupManager {
                 title = data.type === 'free' ? 'Conceito Grátis' : 'Coroa da Sabedoria';
                 contentHTML = this._renderTimedChestInfoPopup(data.type);
                 break;
+            case 'philosopher-details':
+                const philosopher = PHILOSOPHERS_DATA[data.philosopherId];
+                if (!philosopher) {
+                    console.error(`Filósofo com ID ${data.philosopherId} não encontrado.`);
+                    return;
+                }
+                title = philosopher.name; // O título do modal será o nome do filósofo
+                contentHTML = this._renderPhilosopherCardPopup(philosopher, data.philosopherState);
+                break;
             default:
                 console.error(`Popup com ID "${popupId}" não encontrado.`);
                 return;
@@ -63,10 +72,85 @@ class PopupManager {
         this.titleElement.innerText = title;
         this.bodyElement.innerHTML = contentHTML;
         this.container.classList.add('active');
+        this._addInternalListeners(popupId, data); // Passar 'data' para os listeners internos
 
         // Adiciona listeners para funcionalidades internas do popup, se necessário
         this._addInternalListeners(popupId);
     }
+     _renderPhilosopherCardPopup(philosopher, state) {
+        // Gera o HTML para os conceitos-chave
+        const keyConceptsHTML = philosopher.keyConcepts.map(conceptId => {
+            const concept = CONCEPTS_DATA[conceptId];
+            return `
+                <div class="concept-chip">
+                    <strong>${concept.name}</strong> (${concept.points} pts)
+                    <p>${concept.description}</p>
+                </div>
+            `;
+        }).join('');
+
+        // Gera o HTML para os predecessores (links para outros filósofos)
+        const predecessorsHTML = philosopher.predecessors.length > 0
+            ? philosopher.predecessors.map(id => {
+                const pred = PHILOSOPHERS_DATA[id];
+                // Adicionamos um data-id para poder, no futuro, clicar e abrir o popup deles
+                return `<span class="philosopher-link" data-philosopher-id="${id}">${pred.name}</span>`;
+              }).join(', ')
+            : '<span>Nenhum direto (pensador original)</span>';
+
+        const nextLevelPergaminhos = state.level * 10; // Exemplo de cálculo
+
+        return `
+            <div class="philosopher-popup">
+                <div class="popup-header">
+                    <img src="${philosopher.image}" alt="${philosopher.name}" class="philosopher-image-large">
+                    <div class="header-info">
+                        <span class="philosopher-era">${philosopher.era}</span>
+                        <h2 class="philosopher-school">${philosopher.school}</h2>
+                        <p class="philosopher-description">${philosopher.description}</p>
+                    </div>
+                </div>
+
+                <div class="popup-stats">
+                    <div class="stat-item">
+                        <span>Nível</span>
+                        <strong>${state.level}</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Poder de Argumento</span>
+                        <strong>${state.level * 15}</strong>
+                    </div>
+                     <div class="stat-item">
+                        <span>Custo de Aprimoramento</span>
+                        <strong><i class="fas fa-coins"></i> ${state.level * 100}</strong>
+                    </div>
+                </div>
+
+                <div class="popup-upgrade-section">
+                    <div class="upgrade-bar">
+                        <div class="upgrade-fill" style="width: ${(state.count / nextLevelPergaminhos) * 100}%"></div>
+                        <span class="upgrade-text">${state.count} / ${nextLevelPergaminhos} Pergaminhos</span>
+                    </div>
+                    <button class="action-button ${state.count >= nextLevelPergaminhos ? '' : 'disabled'}" id="upgrade-philosopher-btn">
+                        Aprimorar
+                    </button>
+                </div>
+
+                <div class="popup-section">
+                    <h3>Conceitos-Chave</h3>
+                    <div class="concepts-container">
+                        ${keyConceptsHTML}
+                    </div>
+                </div>
+
+                <div class="popup-section">
+                    <h3>Influenciado Por</h3>
+                    <p class="predecessors-list">${predecessorsHTML}</p>
+                </div>
+            </div>
+        `;
+    }
+
 
     close() {
         this.container.classList.remove('active');
@@ -244,6 +328,17 @@ class PopupManager {
                  toast.show('Customização de avatar em breve!', 'info');
             });
         }
+         if (popupId === 'philosopher-details') {
+            const upgradeBtn = this.bodyElement.querySelector('#upgrade-philosopher-btn');
+            if (upgradeBtn && !upgradeBtn.classList.contains('disabled')) {
+                upgradeBtn.addEventListener('click', () => {
+                    // Lógica de aprimoramento aqui (a ser implementada)
+                    toast.show(`Aprimorando ${PHILOSOPHERS_DATA[data.philosopherId].name}...`, 'success');
+                    // Aqui você atualizaria o gameState e re-renderizaria a tela
+                    this.close();
+                });
+            }
+         }
     }
 }
 

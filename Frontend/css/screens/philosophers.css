@@ -1,43 +1,40 @@
-
 .deck-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--bg-dark-alpha);
-    padding: 0.6rem;
-    border-radius: 0.6rem;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(74, 63, 53, 0.05); padding: 0.6rem; border-radius: 0.6rem;
     margin: 1rem 0;
 }
 .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: 0.6rem;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 0.8rem;
 }
 .card-item {
-    background: var(--bg-dark-alpha);
-    border-radius: 0.5rem;
-    padding: 0.6rem;
-    aspect-ratio: 3/4;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    background: var(--bg-paper); border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-sm); padding: 0.5rem; aspect-ratio: 3/4.2;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: var(--box-shadow-light); position: relative; overflow: hidden;
 }
-.card-item .card-icon {
-    font-size: 2rem;
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
+.card-item:hover { transform: translateY(-4px); box-shadow: var(--box-shadow-strong); }
+
+.card-item.locked {
+    background: #e0dace; justify-content: center;
 }
-.card-item .card-name {
-    font-size: 0.8em;
-    font-weight: bold;
+.card-item.locked .card-icon-locked { font-size: 2.5rem; color: var(--text-secondary-light); }
+.card-item.locked .card-name { color: var(--text-secondary-light); }
+.card-item.locked .card-level { background: var(--text-secondary-light); color: var(--bg-paper); }
+
+.card-image {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+    z-index: 1;
+    /* Adiciona um gradiente para o texto ficar legível */
+    -webkit-mask-image: linear-gradient(to top, black 60%, transparent 100%);
+    mask-image: linear-gradient(to top, black 60%, transparent 100%);
 }
-.card-item .card-level {
-    font-size: 0.7em;
-    background: var(--secondary-blue);
-    padding: 2px 5px;
-    border-radius: 5px;
-    margin-top: 0.3rem;
+.card-name {
+    font-size: 0.8em; font-weight: bold; z-index: 2;
+    color: var(--text-dark-roast); margin-top: auto;
+}
+.card-level {
+    font-size: 0.7em; background: var(--accent-sepia); color: var(--bg-paper);
+    padding: 2px 6px; border-radius: 5px; margin-top: 0.3rem; z-index: 2;
 }

@@ -102,3 +102,30 @@
 
 .settings-popup input[type="range"]::-webkit-slider-runnable-track { background: #E0DACE; border: 1px solid var(--border-light); }
 .settings-popup input[type="range"]::-webkit-slider-thumb { background: var(--accent-sepia); border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
+/* --- ESTILOS PARA O POPUP DO FILÓSOFO --- */
+.philosopher-popup { display: flex; flex-direction: column; gap: 1rem; }
+.philosopher-popup .popup-header { display: flex; gap: 1rem; align-items: flex-start; }
+.philosopher-image-large { width: 100px; height: 100px; object-fit: cover; border-radius: var(--border-radius-sm); border: 2px solid var(--border-light); }
+.header-info { flex: 1; }
+.header-info .philosopher-era { font-size: 0.8rem; color: var(--text-secondary-light); }
+.header-info .philosopher-school { font-family: var(--font-headings); color: var(--accent-sepia); margin: 0.2rem 0; }
+.header-info .philosopher-description { font-size: 0.9rem; }
+
+.popup-stats { display: flex; justify-content: space-around; background: rgba(74, 63, 53, 0.05); padding: 0.8rem; border-radius: var(--border-radius-sm); }
+.popup-stats .stat-item { text-align: center; }
+.popup-stats .stat-item span { font-size: 0.8rem; color: var(--text-secondary-light); }
+.popup-stats .stat-item strong { display: block; font-size: 1.1rem; }
+
+.popup-upgrade-section { display: flex; flex-direction: column; gap: 0.5rem; }
+.upgrade-bar { width: 100%; height: 2rem; background-color: #e0dace; border-radius: 1rem; position: relative; overflow: hidden; }
+.upgrade-fill { background: linear-gradient(90deg, var(--action-green), var(--action-green-dark)); height: 100%; transition: width 0.3s; }
+.upgrade-text { position: absolute; top: 0; left: 0; width: 100%; text-align: center; line-height: 2rem; color: white; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+.action-button.disabled { background: var(--text-secondary-light); cursor: not-allowed; }
+
+.popup-section h3 { font-family: var(--font-headings); font-size: 1.2rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border-light); padding-bottom: 0.3rem; }
+.concepts-container { display: flex; flex-direction: column; gap: 0.5rem; }
+.concept-chip { background: rgba(74, 63, 53, 0.05); padding: 0.5rem; border-radius: var(--border-radius-sm); }
+.concept-chip strong { color: var(--accent-sepia); }
+.concept-chip p { font-size: 0.8rem; margin-top: 0.2rem; }
+.predecessors-list .philosopher-link { color: var(--action-green); font-weight: bold; cursor: pointer; }
+.predecessors-list .philosopher-link:hover { text-decoration: underline; }
