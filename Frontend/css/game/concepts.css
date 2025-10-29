@@ -1,0 +1,32 @@
+#concepts-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    padding: 20px;
+    box-sizing: border-box;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    border-left: 2px solid gold;
+}
+#concepts-panel h3 { text-align: center; margin-top: 0; font-family: 'Cinzel', serif; }
+.concept-card {
+    background: #444;
+    border: 1px solid #666;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+.concept-card.used { background: #222; color: #777; cursor: not-allowed; pointer-events: none;}
+.concept-card.active-prompt:hover { background-color: #fca311; color: black; transform: scale(1.05); }
+.concept-card-header { display: flex; justify-content: space-between; font-weight: bold; }
+.concept-name { font-size: 14px; }
+.concept-points { font-size: 14px; color: #fca311; }
+.concept-description { font-size: 12px; margin-top: 5px; color: #ccc; }

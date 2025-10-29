@@ -1,0 +1,2 @@
+#draw-pile, #discard-pile { cursor: pointer; }
+#draw-pile .card, #discard-pile .card { position: absolute; }

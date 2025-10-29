@@ -1,5 +1,5 @@
 import { arenas } from '../../js/data/arenas.js';
-import { Game } from '../../js/game/Game.js';
+import { Game } from '../../js/game/index.js';
 import { popupManager } from '../../js/ui/PopupManager.js'; // Importe o popupManager
 
 

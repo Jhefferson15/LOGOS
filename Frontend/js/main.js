@@ -1,4 +1,4 @@
-import { Game } from './game/Game.js';                                                                                                                                                
+import { Game } from './game/index.js';                                                                                                                                                
 import { initPlayScreen, handlePlayScreenClick } from './screens/play.js';                                                                                                                 
 import { initLibraryScreen, handleLibraryScreenClick } from './screens/library.js';                                                                                                        
 import { initPhilosophersScreen } from './screens/philosophers.js'; // No click handler yet                                                                                                

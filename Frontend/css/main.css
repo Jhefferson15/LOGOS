@@ -149,6 +149,18 @@ body {
 
 /* --- CONTROLE DE TELAS --- */
 .screen-content { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; min-height: 0; }
+#game-board {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #333; /* A default background for the game */
+    z-index: 999; /* Ensure it's above other content */
+    display: none; /* Hidden by default, controlled by JS */
+    justify-content: center;
+    align-items: center;
+}
 .screen-content::-webkit-scrollbar { width: 6px; }
 .screen-content::-webkit-scrollbar-track { background: transparent; }
 .screen-content::-webkit-scrollbar-thumb { background: var(--accent-sepia); border-radius: 10px; }
