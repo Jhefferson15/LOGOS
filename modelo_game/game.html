@@ -9,47 +9,54 @@
 </head>
 <body>
 
+    <!-- TELA PRINCIPAL DO JOGO -->
     <div id="game-screen">
         <div id="game-board-container">
             
             <!-- ÁREA CENTRAL DO TABULEIRO -->
-            <!-- Implementado no Passo 6 -->
             <div id="table-center">
-                <!-- Deck de Compra -->
-                <div id="draw-deck">
-                    <div class="card-back"></div>
-                    <div id="deck-count"></div>
+                <!-- Deck de Compra (Passo 19) -->
+                <div id="draw-deck" class="card-pile">
+                    <div class="cr-card back"></div>
+                    <!-- Contador de Cartas (Passo 20) -->
+                    <span id="draw-deck-counter" class="deck-counter"></span>
                 </div>
                 
-                <!-- Pilha de Descarte (Área Central) -->
-                <!-- Implementado no Passo 1 -->
-                <div id="center-area"></div>
+                <!-- Pilha de Descarte (Renomeado do Passo 1) -->
+                <div id="discard-pile" class="card-pile">
+                    <!-- Contador de Cartas (Passo 20) -->
+                    <span id="discard-pile-counter" class="deck-counter"></span>
+                </div>
             </div>
             
             <!-- ÁREAS DOS JOGADORES OPONENTES -->
-            <!-- Estrutura de nome adicionada no Passo 4 -->
-            <div id="player-nietzsche" class="player-area">
+            <!-- Classe 'pre-enter' adicionada no Passo 15 para animação de entrada -->
+            <div id="player-nietzsche" class="player-area pre-enter">
+                <!-- Indicador de Status (Passo 14) -->
+                <div class="status-effects-container"></div>
                 <div class="avatar"></div>
-                <div class="player-name"></div>
-                <div class="opponent-hand"></div>
+                <div class="player-name">Nietzsche</div>
+                <div class="opponent-hand">7</div>
             </div>
-            <div id="player-hipatia" class="player-area">
+            <div id="player-hipatia" class="player-area pre-enter">
+                <!-- Indicador de Status (Passo 14) -->
+                <div class="status-effects-container"></div>
                 <div class="avatar"></div>
-                <div class="player-name"></div>
-                <div class="opponent-hand"></div>
+                <div class="player-name">Hipátia</div>
+                <div class="opponent-hand">7</div>
             </div>
-            <div id="player-confucio" class="player-area">
+            <div id="player-confucio" class="player-area pre-enter">
+                <!-- Indicador de Status (Passo 14) -->
+                <div class="status-effects-container"></div>
                 <div class="avatar"></div>
-                <div class="player-name"></div>
-                <div class="opponent-hand"></div>
+                <div class="player-name">Confúcio</div>
+                <div class="opponent-hand">7</div>
             </div>
             
-            <!-- Mão principal do jogador (curvada) -->
-            <div id="curved-hand-container"></div>
-
             <!-- ÁREA DO JOGADOR PRINCIPAL -->
-            <!-- Implementado no Passo 2 -->
             <div id="player-main" class="player-area">
+                <!-- Indicador de Status (Passo 14) -->
+                <div class="status-effects-container"></div>
                 <div class="avatar"></div>
                 <div class="player-name">Você</div>
             </div>
@@ -63,7 +70,6 @@
                 <div id="cr-hand"></div>
                 <div id="elixir-bar-container">
                     <div id="elixir-bar-fill"></div>
-                    <!-- Texto numérico adicionado no Passo 5 -->
                     <span id="elixir-text"></span>
                 </div>
             </div>
@@ -72,11 +78,62 @@
             </div>
         </div>
 
-        <!-- TOOLTIP PARA DETALHES DA CARTA -->
-        <!-- Implementado no Passo 9 -->
-        <div id="card-tooltip" class="hidden">
+        <!-- LOG DE EVENTOS DO JOGO (Passo 10) -->
+        <div id="game-log">
+            <ul id="log-list"></ul>
+        </div>
+
+        <!-- BOTÃO DE PAUSA (Passo 16) -->
+        <div id="pause-button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="4" x2="6" y2="20"></line><line x1="18" y1="4" x2="18" y2="20"></line></svg>
+        </div>
+
+        <!-- TOOLTIP PARA DETALHES DA CARTA (Passo 9) -->
+        <div id="card-tooltip">
             <h3 id="tooltip-title"></h3>
             <p id="tooltip-description"></p>
+        </div>
+    </div>
+
+    <!-- OVERLAYS (Fora da #game-screen para cobrir a tela inteira) -->
+
+    <!-- OVERLAY DO MENU DE PAUSA (Passo 16) -->
+    <div id="pause-menu-overlay" class="hidden">
+        <div id="pause-menu">
+            <h2>Pausado</h2>
+            <button id="resume-button" class="menu-button">Continuar</button>
+            <button id="restart-button" class="menu-button">Reiniciar Partida</button>
+            <div class="menu-option">
+                <span>Som</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="sound-toggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <button id="quit-button" class="menu-button secondary">Sair</button>
+        </div>
+    </div>
+
+    <!-- OVERLAY DE FIM DE JOGO (Passo 17) -->
+    <div id="game-over-overlay" class="hidden">
+        <div id="game-over-menu">
+            <h2 id="game-over-title">Vitória!</h2>
+            <p id="game-over-message">Você jogou sua última carta!</p>
+            <div id="game-over-winner-avatar"></div>
+            <button id="play-again-button" class="menu-button">Jogar Novamente</button>
+        </div>
+    </div>
+
+    <!-- OVERLAY DE SELEÇÃO DE COR (Passo 23) -->
+    <div id="color-picker-overlay" class="hidden">
+        <div id="color-picker">
+            <h3>Escolha uma cor</h3>
+            <div class="color-options">
+                <div class="color-option" data-color="red"></div>
+                <div class="color-option" data-color="green"></div>
+                <div class="color-option" data-color="blue"></div>
+                <div class="color-option" data-color="yellow"></div>
+            </div>
         </div>
     </div>
 
