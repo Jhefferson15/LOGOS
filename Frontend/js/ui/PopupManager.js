@@ -1,6 +1,8 @@
 import { gameState } from '../data/gameState.js';
 import { arenas } from '../data/arenas.js';
 import { toast } from './Toast.js'; // Importar o toast para usar nos placeholders
+import { PHILOSOPHERS_DATA } from '../data/philosophers.js';
+import { CONCEPTS_DATA } from '../data/concepts.js';
 
 class PopupManager {
     constructor() {
@@ -73,9 +75,6 @@ class PopupManager {
         this.bodyElement.innerHTML = contentHTML;
         this.container.classList.add('active');
         this._addInternalListeners(popupId, data); // Passar 'data' para os listeners internos
-
-        // Adiciona listeners para funcionalidades internas do popup, se necessário
-        this._addInternalListeners(popupId);
     }
      _renderPhilosopherCardPopup(philosopher, state) {
         // Gera o HTML para os conceitos-chave
@@ -239,6 +238,7 @@ class PopupManager {
             <div class="settings-popup">
                 <div class="settings-section">
                     <h4><i class="fas fa-volume-up"></i> Áudio</h4>
+                    <!-- ... outras configurações de áudio ... -->
                     <div class="setting-item">
                         <span>Música</span>
                         <div class="range-slider">
@@ -254,19 +254,27 @@ class PopupManager {
                 </div>
                 <div class="settings-section">
                     <h4><i class="fas fa-user-circle"></i> Conta</h4>
+                    <!-- ... outras configurações de conta ... -->
                     <button class="action-button-secondary"><i class="fab fa-google"></i> Vincular ao Google</button>
                     <button class="action-button-secondary"><i class="fab fa-facebook"></i> Vincular ao Facebook</button>
                 </div>
                 <div class="settings-section">
-                     <h4><i class="fas fa-info-circle"></i> Outros</h4>
+                    <h4><i class="fas fa-info-circle"></i> Outros</h4>
+                    
+                    <!-- BOTÃO DE TELA CHEIA ADICIONADO AQUI -->
+                    <button id="fullscreen-btn" class="action-button-secondary">
+                        <i class="fas fa-expand"></i> 
+                        <span>Tela Cheia</span>
+                    </button>
+                    
                     <button class="action-button-secondary">Termos de Serviço</button>
                     <button class="action-button-secondary">Política de Privacidade</button>
-                    <button class="action-button red">Sair da Conta</button>
+                    <button id="logout-btn" class="action-button red">Sair da Conta</button>
                 </div>
             </div>
         `;
     }
-    
+        
     _renderChestInfoPopup(chest) {
         const formatTime = (s) => { const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60); return `${h}h ${m}m`; };
         return `
@@ -286,7 +294,7 @@ class PopupManager {
             </div>
         `;
     }
-
+    
     _renderTimedChestInfoPopup(type) {
         const chest = type === 'free' ? gameState.timers.freeChest : gameState.timers.crownChest;
         const isReady = chest <= 0;
@@ -309,7 +317,9 @@ class PopupManager {
         `;
     }
 
-    _addInternalListeners(popupId) {
+    _addInternalListeners(popupId, data) {
+       
+       
         if (popupId === 'full-profile') {
             const tabs = this.bodyElement.querySelectorAll('.tab-btn');
             const contents = this.bodyElement.querySelectorAll('.tab-content');
@@ -339,7 +349,53 @@ class PopupManager {
                 });
             }
          }
+        if (popupId === 'settings') {
+            this._setupFullscreenButton();
+            const logoutBtn = this.bodyElement.querySelector('#logout-btn');
+            if(logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    localStorage.removeItem('isLoggedIn');
+                    window.location.href = 'login.html';
+                });
+            }
+        }
+        
     }
+     _setupFullscreenButton() { 
+            const fullscreenButton = document.getElementById('fullscreen-btn');
+            if (!fullscreenButton) return;
+
+            const buttonIcon = fullscreenButton.querySelector('i');
+            const buttonText = fullscreenButton.querySelector('span');
+
+            function updateButtonUI() {
+                if (document.fullscreenElement) {
+                    buttonIcon.classList.remove('fa-expand');
+                    buttonIcon.classList.add('fa-compress');
+                    buttonText.textContent = 'Sair da Tela Cheia';
+                } else {
+                    buttonIcon.classList.remove('fa-compress');
+                    buttonIcon.classList.add('fa-expand');
+                    buttonText.textContent = 'Tela Cheia';
+                }
+            }
+
+            fullscreenButton.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.error(`Erro ao tentar entrar em modo tela cheia: ${err.message}`);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            });
+
+            document.addEventListener('fullscreenchange', updateButtonUI);
+            updateButtonUI();
+        }
 }
+
+
+
 
 export const popupManager = new PopupManager();

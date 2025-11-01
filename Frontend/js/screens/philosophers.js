@@ -8,19 +8,19 @@ export function initPhilosophersScreen(gameState, updateDynamicUI, toast) {
 
     cardGrid.innerHTML = ''; // Limpa o grid para renderizar novamente
 
-    const sortedPhilosophers = Object.values(PHILOSOPHERS_DATA).sort((a, b) => a.name.localeCompare(b.name));
+    const sortedPhilosophers = Object.entries(PHILOSOPHERS_DATA)
+        .map(([id, philosopher]) => ({ ...philosopher, id: parseInt(id) }))
+        .sort((a, b) => a.name.localeCompare(b.name));
 
     sortedPhilosophers.forEach(philosopher => {
-        // CORREÇÃO: O fallback para um filósofo não encontrado na coleção é level: 0
+        const isDiscovered = gameState.discoveredPhilosophers.includes(philosopher.id);
         const philosopherState = gameState.collection.philosophers[philosopher.id] || { level: 0, count: 0 };
-        
-        const isUnlocked = philosopherState.level > 0;
 
         const cardElement = document.createElement('div');
-        cardElement.className = `card-item ${isUnlocked ? 'unlocked' : 'locked'}`;
-        cardElement.dataset.philosopherId = philosopher.id; 
+        cardElement.className = `card-item ${isDiscovered ? 'unlocked' : 'locked'}`;
+        cardElement.dataset.philosopherId = philosopher.id;
 
-        if (isUnlocked) {
+        if (isDiscovered) {
             cardElement.innerHTML = `
                 <img src="${philosopher.image}" alt="${philosopher.name}" class="card-image">
                 <span class="card-name">${philosopher.name}</span>
@@ -45,13 +45,14 @@ export function handlePhilosophersScreenClick(e, gameState, updateDynamicUI, toa
     
     if (cardItem && cardItem.dataset.philosopherId) {
         const philosopherId = cardItem.dataset.philosopherId;
-        const philosopherState = gameState.collection.philosophers[philosopherId] || { level: 0, count: 0 };
+        const isDiscovered = gameState.discoveredPhilosophers.includes(parseInt(philosopherId));
 
-        if (philosopherState.level === 0) {
-            toast.show('Desbloqueie este filósofo em baús para ver seus detalhes!', 'info');
+        if (!isDiscovered) {
+            toast.show('Este filósofo ainda não foi descoberto!', 'info');
             return;
         }
 
+        const philosopherState = gameState.collection.philosophers[philosopherId] || { level: 0, count: 0 };
         popupManager.open('philosopher-details', { 
             philosopherId: philosopherId,
             philosopherState: philosopherState

@@ -48,7 +48,6 @@
 
 .modal-close-btn:hover {
     color: var(--accent-sepia); border-color: var(--accent-sepia);
-    transform: rotate(90deg) scale(1.1);
 }
 
 .modal-body { padding: 1.5rem; max-height: 70vh; overflow-y: auto; }
@@ -102,10 +101,27 @@
 
 .settings-popup input[type="range"]::-webkit-slider-runnable-track { background: #E0DACE; border: 1px solid var(--border-light); }
 .settings-popup input[type="range"]::-webkit-slider-thumb { background: var(--accent-sepia); border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
+#fullscreen-btn {
+    display: flex; /* Alinha o ícone e o texto */
+    align-items: center;
+    justify-content: center; /* Centraliza o conteúdo */
+    gap: 0.5rem; /* Espaço entre o ícone e o texto */
+    width: 100%; /* Ocupa a largura toda como os outros botões */
+}
+
+/* Transição suave para o ícone quando ele mudar */
+#fullscreen-btn i {
+    transition: transform 0.3s ease;
+}
+
+/* Efeito de hover para dar feedback ao usuário */
+#fullscreen-btn:hover i {
+    transform: scale(1.1);
+}
 /* --- ESTILOS PARA O POPUP DO FILÓSOFO --- */
 .philosopher-popup { display: flex; flex-direction: column; gap: 1rem; }
 .philosopher-popup .popup-header { display: flex; gap: 1rem; align-items: flex-start; }
-.philosopher-image-large { width: 100px; height: 100px; object-fit: cover; border-radius: var(--border-radius-sm); border: 2px solid var(--border-light); }
+.philosopher-image-large { width: 90px; height: 150px; object-fit: contain; border-radius: var(--border-radius-sm);  }
 .header-info { flex: 1; }
 .header-info .philosopher-era { font-size: 0.8rem; color: var(--text-secondary-light); }
 .header-info .philosopher-school { font-family: var(--font-headings); color: var(--accent-sepia); margin: 0.2rem 0; }

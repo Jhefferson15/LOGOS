@@ -1,7 +1,7 @@
 import { Game } from './game/index.js';                                                                                                                                                
 import { initPlayScreen, handlePlayScreenClick } from './screens/play.js';                                                                                                                 
 import { initLibraryScreen, handleLibraryScreenClick } from './screens/library.js';                                                                                                        
-import { initPhilosophersScreen } from './screens/philosophers.js'; // No click handler yet                                                                                                
+import { initPhilosophersScreen, handlePhilosophersScreenClick } from './screens/philosophers.js';                                                                                                
 import { initSchoolsScreen, handleSchoolsScreenClick } from './screens/schools.js';                                                                                                        
 import { initSymposiumScreen, handleSymposiumScreenClick } from './screens/symposium.js'; 
 import { toast } from './ui/Toast.js';
@@ -10,6 +10,10 @@ import { popupManager } from './ui/PopupManager.js';
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    if (!localStorage.getItem('isLoggedIn')) {
+        window.location.href = 'login.html';
+        return;
+    }
     const screenContent = document.getElementById('screen-content');
     const navItems = document.querySelectorAll('.nav-item');
     const gameScreen = document.querySelector('.game-screen');
@@ -139,6 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'symposium':
                 handleSymposiumScreenClick(e, gameState, updateDynamicUI, toast);
+                break;
+            case 'philosophers':
+                handlePhilosophersScreenClick(e, gameState, updateDynamicUI, toast);
                 break;
             // Philosophers screen has no click handler yet
             default:

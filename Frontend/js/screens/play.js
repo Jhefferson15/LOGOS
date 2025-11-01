@@ -4,11 +4,11 @@ import { popupManager } from '../../js/ui/PopupManager.js'; // Importe o popupMa
 
 
 export function initPlayScreen(gameState, updateDynamicUI, toast) {
-    const arena = arenas[Math.floor(Math.random() * arenas.length)];
+    const arena = arenas[0];
     const arenaSection = document.querySelector('.arena-section');
     if (arenaSection) {
-        const arenaDisplay = arenaSection.querySelector('.arena-display');
-        arenaDisplay.innerHTML = `<img src="${arena.image}" alt="${arena.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 0.6rem;">`;
+        // Altera o background da seção em vez de injetar uma imagem
+        arenaSection.style.backgroundImage = `url('${arena.image}')`;
 
         const arenaName = arenaSection.querySelector('.arena-name');
         if (arenaName) {
@@ -53,7 +53,8 @@ export function handlePlayScreenClick(e, gameState, updateDynamicUI, toast, load
             popupManager.open('settings');
             return;
         }
-        if (t.closest('.arena-display')) {
+        // Alterado para detectar o clique na seção da arena
+        if (t.closest('.arena-section') && !t.matches('.battle-button')) {
             popupManager.open('arena-timeline');
             return;
         }

@@ -1,4 +1,6 @@
-
+html, body {
+    overflow: hidden; 
+}
 .player-info-container, .timed-chests {
     display: flex;
     justify-content: space-between;
@@ -59,34 +61,62 @@
     70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
     100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
 }
+
+/* --- ESTILOS ATUALIZADOS --- */
+
 .arena-section {
-    flex-grow: 1;
     display: flex;
-    flex-direction: column;
+    /* Alinha o texto no topo e no centro */
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     text-align: center;
+    
+    position: relative;
+    border-radius: 0.6rem;
+    overflow: hidden;
+    cursor: pointer;
+    
+    /* Altura e margem para espaçamento */
+    min-height: 200px; /* Damos uma altura mínima para a imagem aparecer bem */
+    height: 45vh; /* 45% da altura da tela */
+
+    margin-top: 1rem;
+    padding-top: 1.5rem; /* Empurra o texto um pouco para baixo do topo */
+
+    /* Estilos do background */
+    background-size: contain;
+    background-position: center; /* Você pode usar 'top center' se preferir focar no topo da imagem */
+    background-repeat: no-repeat;
+    color: white;
 }
-.arena-icon {
-    font-size: 5rem;
-}
+
 .arena-section h2 {
-    margin: 0.6rem 0 0;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
+    /* Removemos margens para o posicionamento ser controlado pelo pai */
+    margin: 0; 
 }
+
 .battle-button {
-    background-color: var(--accent-yellow);
+    display: block; /* Para ocupar a largura e permitir margem auto */
+    width: 90%; /* Ocupa 90% da largura da tela */
+    margin: 1rem auto; /* Cria a "separação" vertical e centraliza horizontalmente */
+
+    background-color:#E0DDD8;
     color: var(--text-dark);
     border: none;
     font-size: 1.8rem;
     font-weight: bold;
-    padding: 1rem 4rem;
+    padding: 1rem 0; /* Ajustado padding para o novo tamanho */
     border-radius: 1rem;
     cursor: pointer;
     box-shadow: 0 5px 0 #c78f1e;
     transition: all 0.1s ease;
-    margin: 1.25rem 0;
 }
+
+/* --- FIM DAS ATUALIZAÇÕES --- */
+
 .battle-button:active {
     transform: translateY(3px);
     box-shadow: 0 2px 0 #c78f1e;
@@ -112,7 +142,9 @@
     font-size: 0.8rem;
 }
 .chest-slot:hover {
-    transform: scale(1.05);
+    position: relative;
+    z-index: 10;
+    transform-origin: center bottom; 
 }
 .chest-slot.unlocking {
     border-color: var(--accent-yellow);

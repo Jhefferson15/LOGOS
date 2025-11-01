@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ágora Filosófica - Autenticação</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <style>
+        /* --- Variáveis e Estilos Globais --- */
+        :root {
+            --color-background: #F8F5F1;
+            --color-primary: #8B6F4E;
+            --color-primary-dark: #7a6144;
+            --color-text: #3D3A36;
+            --color-text-light: #7f7a74;
+            --color-border: #D6D2CD;
+            --color-card-bg: #FFFFFF;
+            --color-error: #c0392b;
+            --font-serif: 'Lora', serif;
+            --font-sans: 'Nunito Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--color-background);
+            color: var(--color-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- Container Principal --- */
+        .auth-container {
+            width: 100%;
+            max-width: 420px;
+            background-color: var(--color-card-bg);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.07);
+            border: 1px solid var(--color-border);
+            overflow: hidden; /* Garante que as animações fiquem contidas */
+        }
+        
+        @media (max-width: 480px) {
+            .auth-container {
+                background-color: transparent;
+                border: none;
+                box-shadow: none;
+                padding: 10px 0;
+            }
+        }
+
+        /* --- Sistema de Telas --- */
+        .auth-screen {
+            display: none; /* Escondido por padrão */
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .auth-screen.active {
+            display: block; /* Visível quando ativo */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* --- Elementos Comuns --- */
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h1 {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+        }
+
+        .auth-header p {
+            color: var(--color-text-light);
+            margin-top: 8px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-light);
+            transition: color 0.3s ease;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            background-color: var(--color-background);
+            font-size: 1rem;
+            color: var(--color-text);
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(139, 111, 78, 0.2);
+        }
+        
+        .input-field:focus + i {
+            color: var(--color-primary);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background-color: var(--color-primary);
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .btn-primary:hover { background-color: var(--color-primary-dark); }
+        .btn-primary:active { transform: scale(0.98); }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.95rem;
+            color: var(--color-text-light);
+        }
+
+        .auth-footer a, .link {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        
+        .auth-footer a:hover, .link:hover { text-decoration: underline; }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--color-text-light);
+            margin: 25px 0;
+            font-size: 0.9rem;
+        }
+        .separator::before, .separator::after {
+            content: ''; flex: 1; border-bottom: 1px solid var(--color-border);
+        }
+        .separator:not(:empty)::before { margin-right: 1em; }
+        .separator:not(:empty)::after { margin-left: 1em; }
+
+        /* --- Estilos Específicos --- */
+        .login-options {
+            text-align: right;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .social-login {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-login-btn {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .social-login-btn:hover { background-color: #f0f0f0; }
+        .fa-google { color: #DB4437; }
+        .fa-apple { color: #000000; }
+        
+    </style>
+</head>
+<body>
+
+    <main class="auth-container">
+
+        <!-- ======================= TELA DE LOGIN ======================= -->
+        <div id="login-screen" class="auth-screen active">
+            <header class="auth-header">
+                <h1>Bem-vindo de volta</h1>
+                <p>Entre para continuar sua jornada filosófica.</p>
+            </header>
+
+            <form>
+                <div class="input-group">
+                    <input type="email" class="input-field" placeholder="Email ou Nome de Usuário" required>
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" class="input-field" placeholder="Senha" required>
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <div class="login-options">
+                    <a href="#" class="link" data-target-screen="forgot-password-screen">Esqueceu a senha?</a>
+                </div>
+                <button type="submit" class="btn-primary">Entrar na Ágora</button>
+            </form>
+
+            <div class="separator">ou</div>
+
+            <div class="social-login">
+                <button class="social-login-btn"><i class="fab fa-google"></i></button>
+                <button class="social-login-btn"><i class="fab fa-apple"></i></button>
+            </div>
+
+            <footer class="auth-footer">
+                Ainda não é um filósofo? <a href="#" class="link" data-target-screen="signup-screen">Crie sua conta</a>
+            </footer>
+        </div>
+
+        <!-- ======================= TELA DE INSCRIÇÃO ======================= -->
+        <div id="signup-screen" class="auth-screen">
+            <header class="auth-header">
+                <h1>Junte-se à Academia</h1>
+                <p>Comece sua jornada de conhecimento hoje mesmo.</p>
+            </header>
+
+            <form>
+                <div class="input-group">
+                    <input type="text" class="input-field" placeholder="Nome de Filósofo" required>
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div class="input-group">
+                    <input type="email" class="input-field" placeholder="Email" required>
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" class="input-field" placeholder="Senha" required>
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                 <div class="input-group">
+                    <input type="password" class="input-field" placeholder="Confirmar Senha" required>
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <button type="submit" class="btn-primary">Criar Conta</button>
+            </form>
+
+            <footer class="auth-footer">
+                Já possui uma conta? <a href="#" class="link" data-target-screen="login-screen">Faça Login</a>
+            </footer>
+        </div>
+
+        <!-- ======================= TELA "ESQUECEU A SENHA" ======================= -->
+        <div id="forgot-password-screen" class="auth-screen">
+            <header class="auth-header">
+                <h1>Recuperar Senha</h1>
+                <p>Enviaremos um código de verificação para seu email.</p>
+            </header>
+
+            <form>
+                <div class="input-group">
+                    <input type="email" class="input-field" placeholder="Digite seu email" required>
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <!-- Este botão navegará para a próxima tela via JS -->
+                <button type="button" class="btn-primary link" data-target-screen="reset-code-screen">Enviar Código</button>
+            </form>
+
+            <footer class="auth-footer">
+                <a href="#" class="link" data-target-screen="login-screen"><i class="fa-solid fa-arrow-left"></i> Voltar para o Login</a>
+            </footer>
+        </div>
+
+        <!-- ======================= TELA DE INSERIR CÓDIGO ======================= -->
+        <div id="reset-code-screen" class="auth-screen">
+            <header class="auth-header">
+                <h1>Verificar Código</h1>
+                <p>Insira o código de 6 dígitos que enviamos para você.</p>
+            </header>
+
+            <form>
+                <div class="input-group">
+                    <input type="text" class="input-field" placeholder="------" maxlength="6" required style="text-align:center; letter-spacing: 0.5em;">
+                    <i class="fa-solid fa-hashtag"></i>
+                </div>
+                <button type="button" class="btn-primary link" data-target-screen="new-password-screen">Verificar</button>
+            </form>
+
+            <footer class="auth-footer">
+                Não recebeu? <a href="#" class="link">Reenviar código</a>
+            </footer>
+        </div>
+        
+        <!-- ======================= TELA DE NOVA SENHA ======================= -->
+        <div id="new-password-screen" class="auth-screen">
+            <header class="auth-header">
+                <h1>Definir Nova Senha</h1>
+                <p>Escolha uma senha forte para proteger sua conta.</p>
+            </header>
+
+            <form>
+                <div class="input-group">
+                    <input type="password" class="input-field" placeholder="Nova Senha" required>
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <div class="input-group">
+                    <input type="password" class="input-field" placeholder="Confirmar Nova Senha" required>
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <!-- Este botão levaria de volta ao login após o sucesso -->
+                <button type="button" class="btn-primary link" data-target-screen="login-screen">Salvar e Entrar</button>
+            </form>
+        </div>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const screenTriggers = document.querySelectorAll('.link[data-target-screen]');
+            const allScreens = document.querySelectorAll('.auth-screen');
+
+            // Função para trocar a tela visível
+            function showScreen(screenId) {
+                // Esconde todas as telas
+                allScreens.forEach(screen => {
+                    screen.classList.remove('active');
+                });
+
+                // Mostra a tela desejada
+                const targetScreen = document.getElementById(screenId);
+                if (targetScreen) {
+                    targetScreen.classList.add('active');
+                }
+            }
+
+            // Adiciona o evento de clique a todos os links/botões de navegação
+            screenTriggers.forEach(trigger => {
+                trigger.addEventListener('click', (event) => {
+                    event.preventDefault(); // Impede o comportamento padrão do link
+                    const targetScreenId = trigger.getAttribute('data-target-screen');
+                    showScreen(targetScreenId);
+                });
+            });
+        });
+    </script>
+
+    <script type="module" src="js/screens/login.js"></script>
+
+</body>
+</html>

@@ -3,7 +3,7 @@ export const arenas = [
     {
         id: 1,
         name: "Ágora de Atenas",
-        image: "assets/arenas/agora.jpg"
+        image: "assets/arenas/Arena_1.png"
     },
     {
         id: 2,

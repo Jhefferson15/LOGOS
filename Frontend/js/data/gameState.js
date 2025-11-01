@@ -25,6 +25,7 @@ export let gameState = {
             // Filósofos que o jogador JÁ DESBLOQUEOU
             '1': { level: 2, count: 18 }, // Sócrates, Nível 2, tem 18/20 pergaminhos para o Nv. 3
             '2': { level: 1, count: 3 },  // Platão, Nível 1, tem 3/10 pergaminhos para o Nv. 2
+            '3': { level: 1, count: 0 },  // Aristóteles, Nível 1, tem 0/10 pergaminhos
             '7': { level: 1, count: 0 },  // Descartes, Nível 1, tem 0/10 pergaminhos
             '17': { level: 3, count: 5 } // Foucault, Nível 3, tem 5/30 pergaminhos
         }
@@ -42,5 +43,6 @@ export let gameState = {
         { type: 'Obra Rara', arena: 2, status: 'locked', totalTime: 43200, remainingTime: 43200 },
         { type: 'Papiro', arena: 1, status: 'locked', totalTime: 10800, remainingTime: 10 },
     ],
-    isUnlocking: true
+    isUnlocking: true,
+    discoveredPhilosophers: [2, 3]
 };
