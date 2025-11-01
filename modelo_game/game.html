@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNO Filosófico - Jogo de Cartas</title>
+    <!-- Link para o arquivo de estilos CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-screen">
+        <div id="game-board-container">
+            
+            <!-- ÁREA CENTRAL DO TABULEIRO -->
+            <!-- Implementado no Passo 6 -->
+            <div id="table-center">
+                <!-- Deck de Compra -->
+                <div id="draw-deck">
+                    <div class="card-back"></div>
+                    <div id="deck-count"></div>
+                </div>
+                
+                <!-- Pilha de Descarte (Área Central) -->
+                <!-- Implementado no Passo 1 -->
+                <div id="center-area"></div>
+            </div>
+            
+            <!-- ÁREAS DOS JOGADORES OPONENTES -->
+            <!-- Estrutura de nome adicionada no Passo 4 -->
+            <div id="player-nietzsche" class="player-area">
+                <div class="avatar"></div>
+                <div class="player-name"></div>
+                <div class="opponent-hand"></div>
+            </div>
+            <div id="player-hipatia" class="player-area">
+                <div class="avatar"></div>
+                <div class="player-name"></div>
+                <div class="opponent-hand"></div>
+            </div>
+            <div id="player-confucio" class="player-area">
+                <div class="avatar"></div>
+                <div class="player-name"></div>
+                <div class="opponent-hand"></div>
+            </div>
+            
+            <!-- Mão principal do jogador (curvada) -->
+            <div id="curved-hand-container"></div>
+
+            <!-- ÁREA DO JOGADOR PRINCIPAL -->
+            <!-- Implementado no Passo 2 -->
+            <div id="player-main" class="player-area">
+                <div class="avatar"></div>
+                <div class="player-name">Você</div>
+            </div>
+
+            <!-- HUD (Heads-Up Display) INFERIOR -->
+            <div id="bottom-hud">
+                <div id="next-card-preview">
+                    <span>Próxima:</span>
+                    <div id="next-card" class="cr-card"></div>
+                </div>
+                <div id="cr-hand"></div>
+                <div id="elixir-bar-container">
+                    <div id="elixir-bar-fill"></div>
+                    <!-- Texto numérico adicionado no Passo 5 -->
+                    <span id="elixir-text"></span>
+                </div>
+            </div>
+            <div id="hud-toggle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+            </div>
+        </div>
+
+        <!-- TOOLTIP PARA DETALHES DA CARTA -->
+        <!-- Implementado no Passo 9 -->
+        <div id="card-tooltip" class="hidden">
+            <h3 id="tooltip-title"></h3>
+            <p id="tooltip-description"></p>
+        </div>
+    </div>
+
+    <!-- Link para o arquivo de lógica JavaScript -->
+    <script src="script.js" defer></script>
+</body>
+</html>
