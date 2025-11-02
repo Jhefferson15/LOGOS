@@ -1,4 +1,3 @@
-import { Game } from './game/index.js';                                                                                                                                                
 import { initPlayScreen, handlePlayScreenClick } from './screens/play.js';                                                                                                                 
 import { initLibraryScreen, handleLibraryScreenClick } from './screens/library.js';                                                                                                        
 import { initPhilosophersScreen, handlePhilosophersScreenClick } from './screens/philosophers.js';                                                                                                

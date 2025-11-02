@@ -1,31 +1,445 @@
-@import url('../game/_variables.css');
-@import url('../game/layout.css');
-@import url('../game/card.css');
-@import url('../game/player.css');
-@import url('../game/piles.css');
-@import url('../game/concepts.css');
-@import url('../game/modals.css');
+/* ==========================================================================
+   STYLE.CSS - VERSÃO FINAL COMPLETA (LAYOUT CORRIGIDO)
+   ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Roboto:wght@400;700&display=swap');
+/* --- 1. CONFIGURAÇÃO GLOBAL E VARIÁVEIS (TEMA CLARO RESTAURADO) --- */
+:root {
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    
+    /* Paleta de Cores da UI (Tema Claro da Versão Antiga) */
+    --bg-main: #f4f1ea;
+    --bg-panel: #e0ddd8;
+    --bg-hud: rgba(224, 221, 216, 0.85);
+    --text-primary: #5d4037;
+    --text-secondary: #8d6e63;
+    --accent-gold: #c78f1e;
+    --accent-green: #4caf50;
+    --accent-purple: #7b55c7;
+    --border-color: #c5bcae;
+    --shadow-color: rgba(93, 64, 55, 0.2);
+    --border-radius: 12px;
+    
+    /* Paleta de Cores para Cartas (Mantida da Versão Nova) */
+    --card-red: #d92d20;
+    --card-green: #28a745;
+    --card-blue: #007bff;
+    --card-yellow: #ffc107;
+    --card-wild-bg: linear-gradient(135deg, #6e45e2 0%, #88d3ce 100%);
+    --card-text-light: #ffffff;
+    --card-text-dark: #212529;
+}
 
-.floating-back-button {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    width: 50px;
-    height: 50px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border-radius: 50%;
+/* --- ALTERAÇÃO AQUI (INÍCIO) --- */
+/* O seletor 'body' agora contém apenas estilos base. O fundo foi movido para #game-screen. */
+/* Isso é importante para que, ao carregar o jogo dinamicamente, não tentemos estilizar o 'body' principal da SPA. */
+body {
+    margin: 0;
+    font-family: var(--font-family);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-main); /* Cor de fallback mantida, útil para carregamento direto do HTML */
+}
+/* --- ALTERAÇÃO AQUI (FIM) --- */
+
+
+/* --- 2. LAYOUT GERAL DO JOGO --- */
+/* --- ALTERAÇÃO AQUI (INÍCIO) --- */
+/* As propriedades de background-image foram movidas para cá. */
+/* Agora, o próprio container do jogo é responsável pelo seu fundo. */
+#game-screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    
+    /* Propriedades de fundo que antes estavam no 'body' */
+    background-image: url('/Frontend/assets/game/images/background/atenas.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--bg-main); /* Cor de fallback caso a imagem não carregue */
+}
+/* --- ALTERAÇÃO AQUI (FIM) --- */
+
+
+/* --- 3. ELEMENTOS DO TABULEIRO (MESA CENTRAL) --- */
+#table-center {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    z-index: 100;
+}
+
+.card-pile {
+    position: relative;
+    width: 90px;
+    height: 125px;
+    transition: transform 0.3s ease-out;
+}
+
+#draw-deck {
+    cursor: pointer;
+}
+
+#draw-deck .cr-card.back {
+    width: 100%;
+    height: 100%;
+    background: var(--text-primary);
+    border: 4px solid white;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px;
-    text-decoration: none;
-    z-index: 1001;
-    transition: background-color 0.3s;
+    color: var(--bg-panel);
+    font-family: 'Arial Rounded MT Bold', sans-serif;
+    box-shadow: 0 2px 4px var(--shadow-color), -3px 3px 0px rgba(0,0,0,0.08), -6px 6px 0px rgba(0,0,0,0.04);
+}
+#draw-deck .cr-card.back::after {
+    content: 'UNO';
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
-.floating-back-button:hover {
-    background-color: rgba(0, 0, 0, 0.8);
+#discard-pile .cr-card {
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+#discard-pile.droppable {
+    outline: 4px dashed var(--accent-green);
+    outline-offset: 8px;
+    transform: scale(1.1);
+}
+#discard-pile.invalid-drop {
+    outline: 4px dashed var(--card-red);
+}
+
+.deck-counter {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--accent-gold);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    pointer-events: none;
+    border: 2px solid white;
+}
+
+
+/* --- 4. COMPONENTE: ÁREA DOS JOGADORES (POSICIONAMENTO RESTAURADO) --- */
+.player-area {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    transform: translate(-50%, -50%); /* Centraliza o elemento em suas coordenadas */
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease-out;
+}
+/* Coordenadas da versão antiga */
+#player-main { top: 88%; left: 50%; }
+#player-nietzsche { top: 15%; left: 50%; }
+#player-hipatia { top: 35%; left: 15%; }
+#player-confucio { top: 35%; left: 85%; }
+
+.player-area.pre-enter { opacity: 0; }
+#player-nietzsche.pre-enter { transform: translate(-50%, -50%) translateY(-50px); }
+#player-hipatia.pre-enter { transform: translate(-50%, -50%) translateX(-50px); }
+#player-confucio.pre-enter { transform: translate(-50%, -50%) translateX(50px); }
+
+
+.avatar { 
+    width: 60px; height: 60px; 
+    border-radius: 50%; 
+    border: 3px solid var(--accent-gold); 
+    background: var(--bg-panel); 
+    display: flex; justify-content: center; align-items: center;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+.avatar svg { width: 60%; height: 60%; stroke: var(--text-primary); stroke-width: 1.5; }
+
+.player-name {
+    font-weight: bold;
+    color: var(--text-primary);
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.6);
+    padding: 2px 10px;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    transition: color 0.3s;
+}
+
+.opponent-hand { 
+    width: 40px; height: 40px; 
+    background-color: var(--bg-panel); 
+    border-radius: var(--border-radius); 
+    border: 2px solid var(--border-color); 
+    display: flex; justify-content: center; align-items: center; 
+    font-size: 18px; font-weight: bold;
+    color: var(--text-primary);
+    box-shadow: 0 2px 5px var(--shadow-color);
+}
+
+.player-area.active-turn .avatar {
+    transform: scale(1.15);
+    border-color: var(--accent-green);
+    box-shadow: 0 0 15px var(--accent-green), 0 0 25px var(--accent-green);
+}
+.player-area.active-turn .player-name { color: var(--accent-green); }
+
+.status-effects-container {
+    position: absolute;
+    top: 0; left: -35px;
+    display: flex; flex-direction: column; gap: 5px; z-index: 10;
+}
+.status-effect {
+    width: 30px; height: 30px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transform: scale(0);
+    animation: pop-in 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background-size: 60%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.effect-skipped {
+    background-color: var(--card-red);
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>');
+}
+
+
+/* --- 5. COMPONENTE: HUD INFERIOR (POSICIONAMENTO RESTAURADO) --- */
+#bottom-hud {
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 100%; height: 20%;
+    background: var(--bg-hud);
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -5px 25px var(--shadow-color);
+    transition: transform 0.4s ease-in-out;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    z-index: 1000;
+}
+
+#hud-toggle {
+    position: absolute;
+    left: 50%; bottom: 20%;
+    transform: translateX(-50%);
+    width: 60px; height: 30px;
+    background-color: var(--bg-hud);
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    color: var(--text-primary);
+    display: flex; justify-content: center; align-items: center;
+    cursor: pointer; z-index: 1001;
+    transition: bottom 0.4s ease-in-out;
+}
+#hud-toggle svg { transition: transform 0.4s; stroke-width: 3; }
+
+/* Coordenadas internas do HUD da versão antiga */
+#cr-hand { 
+    position: absolute; 
+    left: 57%; top: 50%;
+    width: 80%; height: 90%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+#next-card-preview { 
+    position: absolute; 
+    left: 10%; top: 65%;
+    width: 70px; height: 85px;
+    transform: translate(-50%, -50%);
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: var(--text-primary); font-size: 10px; font-weight: bold;
+}
+#next-card-preview #next-card {
+    width: 100%;
+    height: 100%;
+}
+#elixir-bar-container { 
+    position: absolute; 
+    left: 50%; top: 95%;
+    width: 85%; height: 20px; /* Altura fixa para consistência */
+    transform: translate(-50%, -50%);
+    background-color: rgba(93, 64, 55, 0.2); 
+    border-radius: 10px; border: 2px solid var(--border-color);
+    overflow: hidden; display: flex; align-items: center;
+    transition: transform 0.4s, box-shadow 0.4s;
+}
+#elixir-bar-fill { height: 100%; background: linear-gradient(to right, var(--accent-purple), #a57ee9); border-radius: 8px; transition: width 0.2s linear; }
+#elixir-text { position: absolute; width: 100%; text-align: center; color: white; font-weight: bold; font-size: 14px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); pointer-events: none; }
+
+
+/* --- 6. COMPONENTE: CARTAS --- */
+.cr-card {
+    box-sizing: border-box;
+    background: var(--bg-panel);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--border-color);
+    box-shadow: 0 4px 6px var(--shadow-color);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', Arial, sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s, border-color 0.3s;
+    width: 70px; /* Tamanho fixo para as cartas da mão */
+    height: 85px;
+}
+#cr-hand .cr-card {
+    color: var(--card-text-dark); /* Texto escuro por padrão, cores alteram */
+}
+
+.card-value { font-size: 2em; font-weight: bold; line-height: 1; }
+.card-icon { width: 50%; height: 50%; }
+.card-icon svg { width: 100%; height: 100%; }
+.card-cost { position: absolute; top: -5px; left: -5px; background: var(--accent-purple); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; border: 2px solid rgba(255, 255, 255, 0.7); box-shadow: 0 0 5px rgba(0,0,0,0.3); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+
+.cr-card[data-color="red"] { background-color: var(--card-red); color: var(--card-text-light); }
+.cr-card[data-color="green"] { background-color: var(--card-green); color: var(--card-text-light); }
+.cr-card[data-color="blue"] { background-color: var(--card-blue); color: var(--card-text-light); }
+.cr-card[data-color="yellow"] { background-color: var(--card-yellow); color: var(--card-text-dark); }
+.cr-card[data-color="wild"] { background: var(--card-wild-bg); color: var(--card-text-light); }
+.chosen-color-indicator { position: absolute; bottom: 5px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; }
+
+.cr-card.dragging { opacity: 0; }
+.drag-clone { position: fixed !important; pointer-events: none; z-index: 5000; transform: scale(1.15) rotate(5deg) !important; box-shadow: 0 15px 30px rgba(0,0,0,0.5) !important; transition: none !important; }
+
+
+/* --- 7. COMPONENTES ADICIONAIS DE UI --- */
+#card-tooltip { position: fixed; background-color: rgba(40, 40, 40, 0.9); color: #f0f0f0; padding: 12px 16px; border-radius: var(--border-radius); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); width: 220px; z-index: 6000; pointer-events: none; opacity: 0; transform: translateY(0); transition: opacity 0.2s, transform 0.2s; }
+#card-tooltip.visible { opacity: 1; transform: translateY(-10px); }
+#card-tooltip h3 { margin: 0 0 8px 0; font-size: 16px; color: var(--accent-gold); border-bottom: 1px solid rgba(255, 255, 255, 0.2); padding-bottom: 6px; }
+#card-tooltip p { margin: 0; font-size: 14px; line-height: 1.4; }
+
+#game-log { position: fixed; top: 20px; left: 20px; width: 280px; height: 150px; background-color: rgba(0, 0, 0, 0.1); border-radius: var(--border-radius); padding: 8px; box-shadow: 0 2px 5px var(--shadow-color); overflow: hidden; z-index: 500; }
+#log-list { list-style: none; padding: 0; margin: 0; height: 100%; overflow-y: auto; display: flex; flex-direction: column-reverse; }
+#log-list::-webkit-scrollbar { width: 6px; }
+#log-list::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.3); border-radius: 3px; }
+#log-list li { padding: 6px 10px; font-size: 13px; color: var(--text-primary); text-shadow: 0 1px 1px white; opacity: 0; transform: translateX(-20px); animation: slide-in 0.4s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94); margin-top: 4px; }
+#log-list li .player-name { font-weight: bold; }
+#log-list li[data-event-type="play-card"] .player-name { color: var(--accent-gold); }
+#log-list li[data-event-type="draw-card"] .player-name { color: var(--card-blue); }
+#log-list li[data-event-type="game-event"] { font-style: italic; color: var(--accent-green); }
+
+#pause-button { position: fixed; top: 20px; right: 20px; width: 44px; height: 44px; background-color: rgba(255, 255, 255, 0.3); border-radius: 50%; border: 2px solid var(--border-color); display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1500; transition: background-color 0.2s, transform 0.2s; }
+#pause-button:hover { background-color: rgba(255, 255, 255, 0.5); transform: scale(1.1); }
+#pause-button svg { width: 24px; height: 24px; stroke: var(--text-primary); }
+
+#pause-menu-overlay, #game-over-overlay, #color-picker-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 4000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease-in-out; }
+#pause-menu-overlay.hidden, #game-over-overlay.hidden, #color-picker-overlay.hidden { display: none; }
+#pause-menu-overlay:not(.hidden), #game-over-overlay:not(.hidden), #color-picker-overlay:not(.hidden) { opacity: 1; pointer-events: all; }
+
+#pause-menu, #game-over-menu { background-color: var(--bg-hud); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 30px 40px; width: 300px; box-shadow: 0 10px 30px var(--shadow-color); text-align: center; color: var(--text-primary); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+#pause-menu-overlay:not(.hidden) #pause-menu, #game-over-overlay:not(.hidden) #game-over-menu { transform: scale(1); }
+#pause-menu h2 { margin: 0 0 25px 0; font-size: 28px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+.menu-button { display: block; width: 100%; padding: 12px; margin-bottom: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; border: 2px solid var(--accent-gold); background-color: var(--accent-gold); color: #fff; cursor: pointer; transition: transform 0.2s, background-color 0.2s; }
+.menu-button:hover { transform: translateY(-2px); background-color: #e0a024; }
+.menu-button.secondary { background-color: transparent; border-color: var(--border-color); color: var(--text-secondary); }
+.menu-button.secondary:hover { background-color: rgba(0, 0, 0, 0.05); color: var(--text-primary); }
+.menu-option { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; margin-bottom: 15px; }
+.toggle-switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+.toggle-switch input { display: none; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 28px; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; border-radius: 50%; transition: .4s; }
+input:checked + .slider { background-color: var(--accent-green); }
+input:checked + .slider:before { transform: translateX(22px); }
+
+#game-over-menu { border-color: var(--accent-gold); box-shadow: 0 0 50px var(--accent-gold); width: 350px; }
+#game-over-menu h2 { font-size: 42px; margin: 0; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 2px; }
+#game-over-menu p { font-size: 16px; margin: 10px 0 25px 0; color: var(--text-secondary); }
+#game-over-winner-avatar { width: 100px; height: 100px; margin: 0 auto 25px auto; border-radius: 50%; border: 4px solid var(--accent-gold); background-color: rgba(0,0,0,0.1); }
+#game-over-winner-avatar svg { width: 100%; height: 100%; stroke: var(--accent-gold); }
+
+#color-picker { background-color: var(--bg-hud); border-radius: var(--border-radius); padding: 20px; text-align: center; }
+#color-picker h3 { margin: 0 0 20px 0; color: var(--text-primary); }
+.color-options { display: flex; gap: 15px; }
+.color-option { width: 60px; height: 60px; border-radius: 50%; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.color-option:hover { transform: scale(1.1); box-shadow: 0 0 15px currentColor; }
+.color-option[data-color="red"] { background-color: var(--card-red); }
+.color-option[data-color="green"] { background-color: var(--card-green); }
+.color-option[data-color="blue"] { background-color: var(--card-blue); }
+.color-option[data-color="yellow"] { background-color: var(--card-yellow); }
+
+
+/* --- 8. ANIMAÇÕES, ESTADOS E EFEITOS --- */
+#bottom-hud.collapsed { transform: translateY(calc(100% - 30px)) !important; }
+#bottom-hud.collapsed + #hud-toggle { bottom: 0; }
+#bottom-hud.collapsed + #hud-toggle svg { transform: rotate(180deg); }
+
+#cr-hand .cr-card:hover { transform: translateY(-10px) scale(1.05); box-shadow: 0 8px 15px var(--shadow-color); cursor: pointer; z-index: 10; }
+
+.cr-card.playable { border-color: var(--accent-green); animation: pulse-glow 2.5s infinite ease-in-out; }
+.cr-card.playable:hover { transform: translateY(-20px) scale(1.15); animation-play-state: paused; box-shadow: 0 8px 30px var(--shadow-color); }
+.cr-card.invalid-shake { animation: invalid-shake 0.5s ease-in-out; border-color: var(--card-red); }
+
+#elixir-bar-container.pulse-elixir-gain { animation: pulse-elixir 0.4s ease-out; }
+.animated-card-fly { position: fixed; z-index: 3000; pointer-events: none; transition: transform 0.6s cubic-bezier(0.2, 0.5, 0.3, 1), top 0.6s cubic-bezier(0.2, 0.5, 0.3, 1), left 0.6s cubic-bezier(0.2, 0.5, 0.3, 1); }
+
+.vfx-particle { position: fixed; width: 10px; height: 10px; border-radius: 50%; pointer-events: none; z-index: 3500; animation: particle-burst 0.7s ease-out forwards; }
+.shuffling-card { position: fixed; transition: transform 0.5s, top 0.5s, left 0.5s; z-index: 4000; }
+
+@keyframes slide-in { to { opacity: 1; transform: translateX(0); } }
+@keyframes pop-in { to { transform: scale(1); } }
+@keyframes pulse-elixir { 0% { transform: scale(1); box-shadow: 0 0 5px rgba(123, 85, 199, 0.4); } 50% { transform: scale(1.05); box-shadow: 0 0 15px rgba(165, 126, 233, 0.8), 0 0 25px rgba(165, 126, 233, 0.6); } 100% { transform: scale(1); box-shadow: 0 0 5px rgba(123, 85, 199, 0.4); } }
+@keyframes pulse-glow { 0% { box-shadow: 0 0 8px rgba(76, 175, 80, 0.5); } 50% { box-shadow: 0 0 20px rgba(76, 175, 80, 1), 0 0 30px rgba(76, 175, 80, 0.7); } 100% { box-shadow: 0 0 8px rgba(76, 175, 80, 0.5); } }
+@keyframes invalid-shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
+@keyframes particle-burst { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: var(--transform-end) scale(0); opacity: 0; } }
+
+
+/* --- 9. LAYOUT RESPONSIVO --- */
+@media (max-width: 768px) {
+    .avatar { width: 50px; height: 50px; }
+    .opponent-hand { width: 30px; height: 30px; font-size: 14px; }
+    #table-center { gap: 15px; }
+    .card-pile, .card-pile .cr-card { width: 75px; height: 105px; }
+    #cr-hand .cr-card { width: 60px; height: 80px; }
+    .card-value { font-size: 1.8em; }
+    .card-cost { width: 22px; height: 22px; font-size: 12px; }
+    #bottom-hud { height: 25%; }
+    #game-log { width: 220px; font-size: 12px; }
+    #pause-button { top: 10px; right: 10px; }
+}
+
+@media (max-width: 480px) {
+    .player-area { gap: 2px; }
+    .player-name { font-size: 12px; padding: 1px 6px; }
+    #player-hipatia { left: 15%; top: 50%; }
+    #player-confucio { left: 85%; top: 50%; }
+    #player-nietzsche { top: 12%; }
+    #table-center { top: 45%; }
+    
+    #bottom-hud { height: 30%; }
+    /* Removemos o grid para manter o posicionamento absoluto que funciona melhor */
+    #cr-hand, #next-card-preview, #elixir-bar-container { position: absolute; }
+    #cr-hand { width: 100%; left: 50%; top: 40%; }
+    #next-card-preview { display: none; } /* Esconde a próxima carta por falta de espaço */
+    #elixir-bar-container { width: 95%; top: 85%; }
+
+    #hud-toggle { bottom: 30%; }
+    #bottom-hud.collapsed { transform: translateY(calc(100% - 30px)) !important; }
+    #bottom-hud.collapsed + #hud-toggle { bottom: 0; }
+    
+    #pause-menu, #game-over-menu { width: 90%; padding: 20px; }
 }

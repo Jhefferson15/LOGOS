@@ -38,6 +38,14 @@ body {
     width: 100vw;
     background-color: var(--bg-main); /* Fundo claro restaurado */
     background-image: none; /* Removemos o gradiente escuro da nova versão */
+        
+    /* --- INÍCIO DA ALTERAÇÃO --- */
+    background-image: url('img/atenas.png'); /* Define a imagem de fundo */
+    background-size: cover;                      /* Faz a imagem cobrir toda a tela */
+    background-position: center;                 /* Centraliza a imagem */
+    background-repeat: no-repeat;                /* Impede que a imagem se repita */
+    background-color: var(--bg-main);            /* Cor de fallback caso a imagem não carregue */
+    /* --- FIM DA ALTERAÇÃO --- */
 }
 
 
