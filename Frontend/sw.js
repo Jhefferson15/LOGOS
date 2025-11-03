@@ -1,10 +1,10 @@
 const CACHE_NAME = 'logos-cache-v1';
 const urlsToCache = [
   '/',
-  '/index.html',
-  '/css/main.css',
-  '/js/main.js',
-  '/assets/LOGOS.ico'
+  './index.html',
+  './css/main.css',
+  './js/main.js',
+  './assets/LOGOS.ico'
 ];
 
 self.addEventListener('install', event => {

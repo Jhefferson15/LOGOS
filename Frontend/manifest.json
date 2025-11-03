@@ -1,7 +1,7 @@
 {
   "name": "Logos - O Jogo da Filosofia",
   "short_name": "Logos",
-  "start_url": "/index.html",
+  "start_url": "LOGOS/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
