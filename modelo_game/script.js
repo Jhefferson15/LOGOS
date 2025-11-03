@@ -1,13 +1,13 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
+
     // =================================================================================
-    // --- MÓDULO DE ÁUDIO ---
+    // --- MÓULO DE ÁUDIO ---
     // =================================================================================
     const SoundManager = {
         isMuted: false,
         sounds: {},
-        // NOTA: Você precisará criar uma pasta 'sfx' e adicionar estes arquivos de áudio.
         soundFiles: {
             play_card: 'sfx/play_card.wav',
             draw_card: 'sfx/draw_card.wav',
@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
             shuffle: 'sfx/shuffle.wav',
             win: 'sfx/win_game.mp3',
             lose: 'sfx/lose_game.mp3',
-            error: 'sfx/error.wav'
+            error: 'sfx/error.wav',
+            power_activate: 'sfx/power_up.wav'
         },
         init() {
             for (const key in this.soundFiles) {
@@ -28,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         play(soundName) {
             if (this.isMuted || !this.sounds[soundName]) return;
-            // Clona o nó de áudio para permitir que o mesmo som toque várias vezes rapidamente
             const sound = this.sounds[soundName].cloneNode();
             sound.play().catch(e => console.error(`Erro ao tocar o som ${soundName}:`, e));
         }
@@ -38,10 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // =================================================================================
     // --- CONSTANTES E DADOS DO JOGO ---
     // =================================================================================
+    const PLAYER_COUNT = 4;
     const ELIXIR_TICK_RATE = 280;
     const OPPONENT_PLAY_DELAY = 1500;
     const MAX_ELIXIR = 10;
     const ELIXIR_PER_TICK = 0.1;
+    const PLAYER_POWER_SLOTS = 4;
 
     const CardColors = { RED: 'red', GREEN: 'green', BLUE: 'blue', YELLOW: 'yellow', WILD: 'wild' };
 
@@ -66,13 +68,114 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const PLAYER_DATA = {
-        'player-main': { name: 'Você', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="10" r="3"></circle><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"></path></svg>' },
-        'player-nietzsche': { name: 'Nietzsche', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
-        'player-hipatia': { name: 'Hipátia', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
-        'player-confucio': { name: 'Confúcio', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' }
+    const MAIN_PLAYER_DATA = {
+        id: 'player-main',
+        name: 'Você',
+        avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="10" r="3"></circle><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"></path></svg>'
     };
+    
+    const OPPONENT_POOL = [
+        { name: 'Nietzsche', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        { name: 'Hipátia', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        { name: 'Confúcio', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        { name: 'S. Beauvoir', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        { name: 'Aristóteles', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        { name: 'Sun Tzu', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        { name: 'Sêneca', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        { name: 'Maquiavel', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
+        { name: 'Platão', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' }
+    ];
 
+    const POWERS_DATA = {
+        'clarividencia': {
+            id: 'clarividencia', name: 'Clarividência', description: 'Espia a carta de maior custo na mão de um oponente aleatório.', cost: 3,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path></svg>`,
+            handler: function(gameUI) { gameUI.logEvent(`usou Clarividência!`, 'game-event', gameUI.state.playersData['player-main'].name); gameUI.triggerVFX(window.innerWidth / 2, window.innerHeight / 2, 'wild'); }
+        },
+        'barreira_filosofica': {
+            id: 'barreira_filosofica', name: 'Barreira Filosófica', description: 'Anula o efeito da próxima carta de +2 ou +4 jogada contra você.', cost: 5,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+            handler: function(gameUI) {
+                gameUI.state.game.players['player-main'].statusEffects.push({ id: 'shielded' });
+                gameUI.logEvent(`ergueu uma Barreira Filosófica!`, 'game-event', gameUI.state.playersData['player-main'].name);
+                gameUI.renderStatusEffects();
+                const playerEl = document.getElementById('player-main'); const rect = playerEl.getBoundingClientRect();
+                gameUI.triggerVFX(rect.left + rect.width / 2, rect.top + rect.height / 2, 'blue');
+            }
+        },
+        'troca_subita': {
+            id: 'troca_subita', name: 'Troca Súbita', description: 'Troque uma de suas cartas com uma carta aleatória de um oponente.', cost: 7,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`,
+            handler: function(gameUI) {
+                gameUI.logEvent(`ativou a Troca Súbita!`, 'game-event', gameUI.state.playersData['player-main'].name);
+                const playerEl = document.getElementById('player-main');
+                const opponentEl = document.querySelector('.player-area.opponent'); 
+                if (opponentEl) {
+                    gameUI.animateCardFly(playerEl, opponentEl, {color: 'red'}, false);
+                    gameUI.animateCardFly(opponentEl, playerEl, {color: 'blue'}, true);
+                }
+            }
+        },
+        'premonicao': { 
+            id: 'premonicao', name: 'Premonição', description: 'Olhe a carta do topo do baralho de compra.', cost: 2,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`,
+            handler: function(gameUI) {
+                const topCard = gameUI.state.game.drawDeck[gameUI.state.game.drawDeck.length - 1];
+                gameUI.logEvent(`previu a próxima carta: um ${topCard.value} ${topCard.color}.`, 'game-event', gameUI.state.playersData['player-main'].name);
+                gameUI.elements.drawDeck.classList.add('pulse-elixir-gain');
+                setTimeout(() => gameUI.elements.drawDeck.classList.remove('pulse-elixir-gain'), 800);
+            }
+        },
+        'reflexao_socratica': {
+            id: 'reflexao_socratica', name: 'Reflexão Socrática', description: 'Pule sua vez para comprar duas cartas.', cost: 3,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>`,
+            handler: async function(gameUI) {
+                gameUI.logEvent(`entrou em Reflexão Socrática...`, 'game-event', gameUI.state.playersData['player-main'].name);
+                await gameUI.playerDrawsCard(false); // Draw without advancing turn
+                await gameUI.playerDrawsCard(true); // Draw and advance turn
+            }
+        },
+        'dilema_de_seneca': {
+            id: 'dilema_de_seneca', name: 'Dilema de Sêneca', description: 'Escolha um oponente. Ele deverá jogar uma carta de valor 5 ou maior, ou comprará uma carta.', cost: 6,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+            handler: function(gameUI) {
+                const opponentId = gameUI.state.game.playerOrder.find(id => id !== 'player-main');
+                if (opponentId) {
+                    gameUI.logEvent(`impôs um dilema a ${gameUI.state.playersData[opponentId].name}.`, 'game-event', 'player-main');
+                    document.getElementById(opponentId).classList.add('pulse-elixir-gain');
+                    setTimeout(() => document.getElementById(opponentId).classList.remove('pulse-elixir-gain'), 800);
+                }
+            }
+        },
+        'furia_de_aquiles': {
+            id: 'furia_de_aquiles', name: 'Fúria de Aquiles', description: 'O próximo jogador compra uma carta imediatamente.', cost: 4,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
+            handler: async function(gameUI) {
+                 const nextPlayerIndex = (gameUI.state.game.currentPlayerIndex + 1) % gameUI.state.game.playerOrder.length;
+                 const nextPlayerId = gameUI.state.game.playerOrder[nextPlayerIndex];
+                 const card = await gameUI.drawCardFromDeck();
+                 if(card){
+                    gameUI.state.game.players[nextPlayerId].hand.push(card);
+                    gameUI.logEvent(`forçou ${gameUI.state.playersData[nextPlayerId].name} a comprar uma carta!`, 'game-event', 'player-main');
+                    gameUI.render();
+                 }
+            }
+        },
+        'paradoxo_de_zenon': {
+            id: 'paradoxo_de_zenon', name: 'Paradoxo de Zenão', description: 'Embaralha a pilha de descarte de volta ao baralho de compra.', cost: 8,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>`,
+            handler: async function(gameUI) {
+                 await gameUI.animateShuffle();
+                 const discard = gameUI.state.game.discardPile;
+                 const topCard = discard.pop();
+                 gameUI.state.game.drawDeck = gameUI.shuffleArray([...gameUI.state.game.drawDeck, ...discard]);
+                 gameUI.state.game.discardPile = [topCard];
+                 gameUI.logEvent(`invocou o Paradoxo de Zenão, reiniciando o baralho!`, 'game-event', 'player-main');
+                 gameUI.render();
+            }
+        }
+    };
+    
     // =================================================================================
     // --- MÓDULO PRINCIPAL DO JOGO ---
     // =================================================================================
@@ -85,15 +188,26 @@ document.addEventListener('DOMContentLoaded', () => {
         init() {
             this.cacheDOMElements();
             this.bindEventListeners();
-            this.restartGame(); // A inicialização agora é feita pelo restart
+            this.restartGame(); 
         },
 
         initializeState() {
-            const playerIds = ['player-main', 'player-hipatia', 'player-nietzsche', 'player-confucio'];
+            const opponentsToCreate = Math.max(1, Math.min(9, PLAYER_COUNT - 1));
+            const opponentData = this.shuffleArray([...OPPONENT_POOL]).slice(0, opponentsToCreate);
+
+            const playerIds = [MAIN_PLAYER_DATA.id];
+            const playersData = { [MAIN_PLAYER_DATA.id]: { name: MAIN_PLAYER_DATA.name, avatarSVG: MAIN_PLAYER_DATA.avatarSVG } };
+
+            opponentData.forEach((opponent, i) => {
+                const opponentId = `opponent-${i}`;
+                playerIds.push(opponentId);
+                playersData[opponentId] = { name: opponent.name, avatarSVG: opponent.avatarSVG };
+            });
+
             const gameDeck = this.shuffleArray([...CARD_DECK_BASE, ...CARD_DECK_BASE]);
             
             let firstCardOnPile;
-            do { // Garante que a primeira carta não seja um Curinga
+            do { 
                 firstCardOnPile = gameDeck.pop();
             } while (firstCardOnPile.color === CardColors.WILD);
 
@@ -103,6 +217,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 isGameOver: false,
                 logMessages: [],
                 dragState: { isDragging: false },
+                roundSummary: {
+                    isActive: false,
+                    startPlayerId: null,
+                    powersUsed: []
+                },
+                playersData: playersData,
                 game: {
                     lastPlayedCard: firstCardOnPile,
                     drawDeck: gameDeck,
@@ -116,13 +236,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 bottomHud: { elixir: 0, lastWholeElixir: 0, handCards: [] }
             };
 
-            // Distribui cartas e inicializa o estado de cada jogador
             playerIds.forEach(id => {
                 this.state.game.players[id] = {
                     hand: this.state.game.drawDeck.splice(0, 7),
-                    statusEffects: []
+                    statusEffects: [],
+                    powers: [],
+                    powerDeck: []
                 };
             });
+            
+            const mainPlayer = this.state.game.players['player-main'];
+            const allPowerIds = this.shuffleArray(Object.keys(POWERS_DATA));
+            mainPlayer.powers = allPowerIds.splice(0, PLAYER_POWER_SLOTS).map(id => POWERS_DATA[id]);
+            mainPlayer.powerDeck = allPowerIds.map(id => POWERS_DATA[id]);
+            
             this.state.bottomHud.handCards = this.state.game.players['player-main'].hand;
         },
 
@@ -132,14 +259,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 crHandContainer: document.getElementById('cr-hand'),
                 drawDeck: document.getElementById('draw-deck'),
                 discardPile: document.getElementById('discard-pile'),
-                playerAreas: document.querySelectorAll('.player-area'),
-                
                 elixirBarContainer: document.getElementById('elixir-bar-container'),
                 elixirBarFill: document.getElementById('elixir-bar-fill'),
                 elixirText: document.getElementById('elixir-text'),
                 drawDeckCounter: document.getElementById('draw-deck-counter'),
                 discardPileCounter: document.getElementById('discard-pile-counter'),
-                
                 tooltip: document.getElementById('card-tooltip'),
                 tooltipTitle: document.getElementById('tooltip-title'),
                 tooltipDescription: document.getElementById('tooltip-description'),
@@ -156,13 +280,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 playAgainButton: document.getElementById('play-again-button'),
                 colorPickerOverlay: document.getElementById('color-picker-overlay'),
                 colorOptions: document.querySelector('.color-options'),
-                // Adicionamos elementos que não existiam antes para não quebrar o código
-                hudToggle: document.getElementById('hud-toggle')
+                powersContainer: document.getElementById('powers-container'),
+                hudToggle: document.getElementById('hud-toggle'),
+                gameLog: document.getElementById('game-log'),
+                logToggle: document.getElementById('log-toggle'),
+                nextPowerPreview: document.getElementById('next-power-preview'),
+                nextPowerCard: document.getElementById('next-power-card')
             };
         },
 
         bindEventListeners() {
-            // Drag and Drop
             this.elements.crHandContainer.addEventListener('mousedown', e => this.onDragStart(e));
             window.addEventListener('mousemove', e => this.onDragMove(e));
             window.addEventListener('mouseup', e => this.onDragEnd(e));
@@ -170,25 +297,13 @@ document.addEventListener('DOMContentLoaded', () => {
             this.elements.drawDeck.addEventListener('click', () => {
                 SoundManager.play('button_click');
                 if (this.state.game.currentPlayerId === 'player-main' && !this.state.isAnimating) {
-                    this.playerDrawsCard();
+                    this.playerDrawsCard(true);
                 }
             });
-            this.elements.pauseButton.addEventListener('click', () => {
-                SoundManager.play('button_click');
-                this.togglePause(true);
-            });
-            this.elements.resumeButton.addEventListener('click', () => {
-                SoundManager.play('button_click');
-                this.togglePause(false);
-            });
-            this.elements.restartButton.addEventListener('click', () => {
-                SoundManager.play('button_click');
-                this.restartGame();
-            });
-            this.elements.playAgainButton.addEventListener('click', () => {
-                SoundManager.play('button_click');
-                this.restartGame();
-            });
+            this.elements.pauseButton.addEventListener('click', () => { SoundManager.play('button_click'); this.togglePause(true); });
+            this.elements.resumeButton.addEventListener('click', () => { SoundManager.play('button_click'); this.togglePause(false); });
+            this.elements.restartButton.addEventListener('click', () => { SoundManager.play('button_click'); this.restartGame(); });
+            this.elements.playAgainButton.addEventListener('click', () => { SoundManager.play('button_click'); this.restartGame(); });
             this.elements.soundToggle.addEventListener('change', e => SoundManager.toggleMute(!e.target.checked));
             this.elements.colorOptions.addEventListener('click', e => {
                 const colorOption = e.target.closest('.color-option');
@@ -197,14 +312,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.onColorPicked(colorOption.dataset.color);
                 }
             });
-            window.addEventListener('keydown', e => {
-                if (e.key === 'Escape') this.togglePause(!this.state.isPaused);
-            });
-
-            // Lógica do botão de toggle do HUD
+            window.addEventListener('keydown', e => { if (e.key === 'Escape') this.togglePause(!this.state.isPaused); });
             const bottomHud = document.getElementById('bottom-hud');
-            this.elements.hudToggle.addEventListener('click', () => {
-                bottomHud.classList.toggle('collapsed');
+            this.elements.hudToggle.addEventListener('click', () => { bottomHud.classList.toggle('collapsed'); });
+            this.elements.logToggle.addEventListener('click', () => {
+                this.elements.gameLog.classList.toggle('collapsed');
             });
         },
         
@@ -228,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.state.game.discardPile = [topCard];
                 this.render();
             }
-            if(this.state.game.drawDeck.length === 0) return null; // No cards left at all
+            if(this.state.game.drawDeck.length === 0) return null; 
             return this.state.game.drawDeck.pop();
         },
 
@@ -256,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const playedCard = player.hand.splice(cardIndex, 1)[0];
             this.state.game.discardPile.push(playedCard);
             this.state.game.lastPlayedCard = playedCard;
-            this.logEvent(`jogou um ${playedCard.value} ${playedCard.color}.`, 'play-card', PLAYER_DATA[playerId].name);
+            this.logEvent(`jogou um ${playedCard.value} ${playedCard.color}.`, 'play-card', playerId);
 
             const discardRect = this.elements.discardPile.getBoundingClientRect();
             this.triggerVFX(discardRect.left + discardRect.width / 2, discardRect.top + discardRect.height / 2, playedCard.color === CardColors.WILD ? 'wild' : playedCard.color);
@@ -283,23 +395,25 @@ document.addEventListener('DOMContentLoaded', () => {
         onColorPicked(color) {
             if (!this.state.game.isAwaitingColorChoice) return;
             this.state.game.lastPlayedCard.chosenColor = color;
-            this.logEvent(`escolheu a cor ${color}.`, 'game-event', PLAYER_DATA[this.state.game.currentPlayerId].name);
+            this.logEvent(`escolheu a cor ${color}.`, 'game-event', this.state.game.currentPlayerId);
             this.state.game.isAwaitingColorChoice = false;
             this.elements.colorPickerOverlay.classList.add('hidden');
             this.render();
             this.advanceTurn();
         },
 
-        async playerDrawsCard() {
+        async playerDrawsCard(shouldAdvanceTurn) {
             if (this.state.isAnimating) return;
             const newCard = await this.drawCardFromDeck();
             if (newCard) {
                 SoundManager.play('draw_card');
                 await this.animateCardFly(this.elements.drawDeck, this.elements.crHandContainer, newCard);
                 this.state.game.players['player-main'].hand.push(newCard);
-                this.logEvent(`comprou uma carta.`, 'draw-card', PLAYER_DATA['player-main'].name);
+                this.logEvent(`comprou uma carta.`, 'draw-card', 'player-main');
                 this.render();
-                this.advanceTurn();
+                if (shouldAdvanceTurn) {
+                    this.advanceTurn();
+                }
             }
         },
 
@@ -308,12 +422,18 @@ document.addEventListener('DOMContentLoaded', () => {
             let currentId = game.currentPlayerId;
             game.players[currentId].statusEffects = [];
 
+            if (this.state.roundSummary.isActive && game.currentPlayerId === this.state.roundSummary.startPlayerId) {
+                this.showRoundSummaryAndReset();
+            }
+
             game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.playerOrder.length;
             let nextPlayerId = game.currentPlayerId;
             
+            this.elements.playerAreas = document.querySelectorAll('.player-area');
+            
             const skippedEffect = game.players[nextPlayerId].statusEffects.find(e => e.id === 'skipped');
             if (skippedEffect) {
-                this.logEvent(`${PLAYER_DATA[nextPlayerId].name} perdeu a vez.`, 'game-event');
+                this.logEvent(`perdeu a vez.`, 'game-event', nextPlayerId);
                 this.render();
                 setTimeout(() => this.advanceTurn(), 1000);
                 return;
@@ -325,7 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        simulateOpponentTurn() {
+        async simulateOpponentTurn() {
             if (this.state.isGameOver || this.state.isPaused) return;
 
             const opponentId = this.state.game.currentPlayerId;
@@ -335,14 +455,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (playableCardIndex !== -1) {
                 this.playCard(playableCardIndex, true, opponentId);
             } else {
-                this.drawCardFromDeck().then(newCard => {
-                    if (newCard) {
-                        opponent.hand.push(newCard);
-                        this.logEvent(`comprou uma carta.`, 'draw-card', PLAYER_DATA[opponentId].name);
-                        this.render();
-                    }
-                    this.advanceTurn();
-                });
+                const newCard = await this.drawCardFromDeck();
+                if (newCard) {
+                    opponent.hand.push(newCard);
+                    this.logEvent(`comprou uma carta.`, 'draw-card', opponentId);
+                    this.render();
+                }
+                this.advanceTurn();
             }
         },
         
@@ -364,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
         endGame(winnerId) {
             this.state.isGameOver = true;
             this.stopDynamicUpdates();
-            const winnerData = PLAYER_DATA[winnerId];
+            const winnerData = this.state.playersData[winnerId];
             const isPlayerWinner = winnerId === 'player-main';
             SoundManager.play(isPlayerWinner ? 'win' : 'lose');
             
@@ -378,7 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
         restartGame() {
             this.stopDynamicUpdates();
             this.initializeState();
-            this.renderPlayers();
+            this.renderPlayerAreas();
             this.render();
             document.getElementById('pause-menu-overlay').classList.add('hidden');
             document.getElementById('game-over-overlay').classList.add('hidden');
@@ -393,11 +512,63 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.isPaused) this.stopDynamicUpdates();
             else this.startDynamicUpdates();
         },
+        
+        onActivatePower(power, powerEl) {
+            if (this.state.isAnimating || this.state.isPaused) return;
+            const elixir = this.state.bottomHud.elixir;
+            if (elixir < power.cost) {
+                SoundManager.play('error');
+                powerEl.classList.add('invalid-shake');
+                setTimeout(() => powerEl.classList.remove('invalid-shake'), 500);
+                return;
+            }
+
+            if (!this.state.roundSummary.isActive) {
+                this.state.roundSummary.isActive = true;
+                this.state.roundSummary.startPlayerId = this.state.game.currentPlayerId;
+            }
+            this.state.roundSummary.powersUsed.push({
+                playerId: 'player-main',
+                powerId: power.id
+            });
+
+            this.state.bottomHud.elixir -= power.cost;
+            SoundManager.play('power_activate');
+            
+            powerEl.classList.add('vanishing');
+            if(power.handler) { power.handler(this); }
+            
+            setTimeout(() => {
+                const player = this.state.game.players['player-main'];
+                const powerIndex = player.powers.findIndex(p => p.id === power.id);
+
+                if (player.powerDeck.length === 0) {
+                    this.replenishPowerDeck();
+                }
+
+                const newPower = player.powerDeck.shift();
+                if (powerIndex !== -1 && newPower) {
+                    player.powers[powerIndex] = newPower;
+                }
+                
+                this.render();
+            }, 500);
+        },
+        
+        replenishPowerDeck() {
+            const player = this.state.game.players['player-main'];
+            this.logEvent('Seu deck de poderes foi reembaralhado!', 'game-event');
+            const currentPowerIds = new Set(player.powers.map(p => p.id));
+            const allPowerIds = Object.keys(POWERS_DATA);
+            const availablePowers = allPowerIds.filter(id => !currentPowerIds.has(id));
+            
+            player.powerDeck = this.shuffleArray(availablePowers).map(id => POWERS_DATA[id]);
+        },
 
         onDragStart(e) {
             if (this.state.isAnimating || this.state.game.currentPlayerId !== 'player-main' || this.state.isPaused) return;
             const cardEl = e.target.closest('.cr-card');
-            if (!cardEl) return;
+            if (!cardEl || !this.elements.crHandContainer.contains(cardEl)) return;
 
             SoundManager.play('button_click');
             const cardIndex = parseInt(cardEl.dataset.index);
@@ -447,7 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.playCard(draggedCardIndex);
             }
 
-            draggedElement.classList.remove('dragging');
+            if (draggedElement) draggedElement.classList.remove('dragging');
             if (cloneElement) cloneElement.remove();
             this.elements.discardPile.classList.remove('droppable', 'invalid-drop');
             this.state.dragState = { isDragging: false };
@@ -523,6 +694,54 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
         
+        showRoundSummaryAndReset() {
+            const summary = this.state.roundSummary;
+            if (summary.powersUsed.length === 0) {
+                this.state.roundSummary = { isActive: false, startPlayerId: null, powersUsed: [] };
+                this.renderUsedPowerIndicators();
+                return;
+            }
+
+            if (this.elements.gameLog.classList.contains('collapsed')) {
+                this.elements.gameLog.classList.remove('collapsed');
+            }
+
+            const summaryHtml = `
+                <div id="round-summary-card">
+                    <h3>Poderes da Rodada</h3>
+                    <ul>
+                        ${summary.powersUsed.map(usage => {
+                            const playerData = this.state.playersData[usage.playerId];
+                            const powerData = POWERS_DATA[usage.powerId];
+                            return `
+                                <li>
+                                    <div class="power-icon">${powerData.icon}</div>
+                                    <span class="player-name">${playerData.name}:</span>
+                                    <span>${powerData.name}</span>
+                                </li>`;
+                        }).join('')}
+                    </ul>
+                </div>
+            `;
+            
+            this.elements.gameLog.insertAdjacentHTML('beforeend', summaryHtml);
+            requestAnimationFrame(() => {
+                this.elements.gameLog.classList.add('showing-summary');
+            });
+
+            setTimeout(() => {
+                const summaryCard = document.getElementById('round-summary-card');
+                this.elements.gameLog.classList.remove('showing-summary');
+
+                if (summaryCard) {
+                    summaryCard.addEventListener('transitionend', () => summaryCard.remove(), { once: true });
+                }
+
+                this.state.roundSummary = { isActive: false, startPlayerId: null, powersUsed: [] };
+                this.renderUsedPowerIndicators();
+            }, 3000);
+        },
+
         render() {
             this.renderOpponentHands();
             this.renderTurnIndicator();
@@ -532,15 +751,42 @@ document.addEventListener('DOMContentLoaded', () => {
             this.renderElixir();
             this.renderStatusEffects();
             this.renderLog();
+            this.renderUsedPowerIndicators();
         },
-        renderPlayers() {
-            Object.keys(PLAYER_DATA).forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.querySelector('.avatar').innerHTML = PLAYER_DATA[id].avatarSVG;
-                    el.querySelector('.player-name').textContent = PLAYER_DATA[id].name;
-                }
+        renderPlayerAreas() {
+            const container = document.getElementById('game-board-container');
+            container.querySelectorAll('.player-area.opponent').forEach(el => el.remove());
+
+            const opponentIds = this.state.game.playerOrder.filter(id => id !== 'player-main');
+            const numOpponents = opponentIds.length;
+
+            const centerX = 50, centerY = 40, radiusX = 42, radiusY = 28;
+            const startAngle = -160, endAngle = -20;
+            const totalAngle = endAngle - startAngle;
+            const angleStep = numOpponents > 1 ? totalAngle / (numOpponents - 1) : 0;
+
+            opponentIds.forEach((id, i) => {
+                const playerData = this.state.playersData[id];
+                const el = document.createElement('div');
+                el.id = id;
+                el.className = 'player-area opponent pre-enter';
+                el.innerHTML = `
+                    <div class="status-effects-container"></div>
+                    <div class="used-power-indicator"></div> 
+                    <div class="avatar">${playerData.avatarSVG}</div>
+                    <div class="player-name">${playerData.name}</div>
+                    <div class="opponent-hand">7</div>`;
+                
+                let currentAngle = startAngle + (i * angleStep);
+                if (numOpponents === 1) currentAngle = -90;
+
+                const angleRad = currentAngle * (Math.PI / 180);
+                el.style.left = `${centerX + Math.cos(angleRad) * radiusX}%`;
+                el.style.top = `${centerY + Math.sin(angleRad) * radiusY}%`;
+
+                container.appendChild(el);
             });
+            this.elements.playerAreas = document.querySelectorAll('.player-area');
         },
         renderOpponentHands() {
             Object.keys(this.state.game.players).forEach(id => {
@@ -551,13 +797,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
         renderTurnIndicator() {
-            this.elements.playerAreas.forEach(area => area.classList.toggle('active-turn', area.id === this.state.game.currentPlayerId));
+            if (this.elements.playerAreas) {
+                this.elements.playerAreas.forEach(area => area.classList.toggle('active-turn', area.id === this.state.game.currentPlayerId));
+            }
         },
         renderDiscardPile() {
             const cardData = this.state.game.lastPlayedCard;
             const discardPileEl = this.elements.discardPile;
             if (cardData) {
-                discardPileEl.innerHTML = `<div class="cr-card" style="width:100%; height:100%;">${this.renderCardContent(cardData)}</div>`;
+                discardPileEl.innerHTML = `<div class="cr-card" data-color="${cardData.color}" style="width:100%; height:100%;">${this.renderCardContent(cardData)}</div>`;
                 if (cardData.chosenColor) {
                     const indicator = document.createElement('div');
                     indicator.className = 'chosen-color-indicator';
@@ -569,9 +817,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         renderBottomHud() {
+            this.renderPlayerHandArc();
+            this.renderPowers();
+            this.renderNextPowerPreview();
+        },
+        renderPlayerHandArc() {
             const handContainer = this.elements.crHandContainer;
             handContainer.innerHTML = '';
-            this.state.bottomHud.handCards.forEach((cardData, index) => {
+            const cards = this.state.bottomHud.handCards;
+            const numCards = cards.length;
+            const maxAngle = Math.min(numCards * 10, 80);
+            const anglePerCard = numCards > 1 ? maxAngle / (numCards - 1) : 0;
+            const startAngle = -maxAngle / 2;
+            const liftDistance = 120;
+            
+            cards.forEach((cardData, index) => {
                 const cardEl = document.createElement('div');
                 cardEl.className = 'cr-card';
                 cardEl.dataset.index = index;
@@ -580,9 +840,64 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.state.game.currentPlayerId === 'player-main' && this.isCardPlayable(cardData)) {
                     cardEl.classList.add('playable');
                 }
+                const angle = startAngle + (index * anglePerCard);
+                const transformValue = `rotate(${angle}deg) translateY(-${liftDistance}px)`;
+                cardEl.style.transform = transformValue;
+                cardEl.style.setProperty('--original-transform', transformValue);
                 cardEl.addEventListener('mouseenter', () => this.showTooltip(cardData, cardEl));
                 cardEl.addEventListener('mouseleave', () => this.hideTooltip());
                 handContainer.appendChild(cardEl);
+            });
+        },
+        renderPowers() {
+            const powersContainer = this.elements.powersContainer;
+            powersContainer.innerHTML = '';
+            const playerPowers = this.state.game.players['player-main'].powers;
+            playerPowers.forEach(power => {
+                const powerEl = document.createElement('div');
+                powerEl.className = 'cr-card power-card';
+                powerEl.dataset.powerId = power.id;
+                const elixir = this.state.bottomHud.elixir;
+                if(elixir < power.cost) {
+                    powerEl.classList.add('unaffordable');
+                }
+                powerEl.innerHTML = `<div class="card-icon">${power.icon}</div><div class="card-cost">${power.cost}</div>`;
+                const transformValue = 'none';
+                powerEl.style.transform = transformValue;
+                powerEl.style.setProperty('--original-transform', transformValue);
+                powerEl.addEventListener('dblclick', () => this.onActivatePower(power, powerEl));
+                powerEl.addEventListener('mouseenter', () => this.showTooltip({ value: power.name, color: `Poder (Custo: ${power.cost})`, description: power.description }, powerEl));
+                powerEl.addEventListener('mouseleave', () => this.hideTooltip());
+                powersContainer.appendChild(powerEl);
+            });
+        },
+        renderNextPowerPreview() {
+            const nextPowerCardEl = this.elements.nextPowerCard;
+            const nextPower = this.state.game.players['player-main'].powerDeck[0];
+            if(nextPower) {
+                nextPowerCardEl.innerHTML = `<div class="card-icon">${nextPower.icon}</div><div class="card-cost">${nextPower.cost}</div>`;
+                 nextPowerCardEl.addEventListener('mouseenter', () => this.showTooltip({ value: nextPower.name, color: `Poder (Custo: ${nextPower.cost})`, description: nextPower.description }, nextPowerCardEl));
+                 nextPowerCardEl.addEventListener('mouseleave', () => this.hideTooltip());
+            } else {
+                nextPowerCardEl.innerHTML = '';
+            }
+        },
+        renderUsedPowerIndicators() {
+            document.querySelectorAll('.player-area .used-power-indicator').forEach(el => {
+                el.innerHTML = '';
+                el.classList.remove('visible');
+            });
+            
+            this.state.roundSummary.powersUsed.forEach(usage => {
+                const playerEl = document.getElementById(usage.playerId);
+                if (playerEl) {
+                    const indicatorEl = playerEl.querySelector('.used-power-indicator');
+                    const powerData = POWERS_DATA[usage.powerId];
+                    if (indicatorEl && powerData) {
+                        indicatorEl.innerHTML = powerData.icon;
+                        indicatorEl.classList.add('visible');
+                    }
+                }
             });
         },
         renderCardContent(cardData) {
@@ -601,7 +916,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         renderStatusEffects() {
             this.state.game.playerOrder.forEach(id => {
-                const container = document.getElementById(id).querySelector('.status-effects-container');
+                const playerEl = document.getElementById(id);
+                if (!playerEl) return;
+                const container = playerEl.querySelector('.status-effects-container');
                 container.innerHTML = '';
                 this.state.game.players[id].statusEffects.forEach(effect => {
                     const el = document.createElement('div');
@@ -621,18 +938,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const rect = targetElement.getBoundingClientRect();
             this.elements.tooltipTitle.textContent = `${cardData.value} (${cardData.color})`;
             this.elements.tooltipDescription.textContent = cardData.description;
-
             const tooltipEl = this.elements.tooltip;
-            tooltipEl.classList.add('visible'); // Usa a classe 'visible' para animar
+            tooltipEl.classList.add('visible');
             const tooltipRect = tooltipEl.getBoundingClientRect();
-
             tooltipEl.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
             tooltipEl.style.top = `${rect.top - tooltipRect.height - 10}px`;
         },
         hideTooltip() {
             this.elements.tooltip.classList.remove('visible');
         },
-        logEvent(message, type = 'generic', playerName = '') {
+        logEvent(message, type = 'generic', playerId = '') {
+            const playerName = playerId && this.state.playersData[playerId] ? this.state.playersData[playerId].name : '';
             this.state.logMessages.unshift({ message, type, playerName });
             if (this.state.logMessages.length > 20) this.state.logMessages.pop();
             this.renderLog();

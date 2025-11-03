@@ -40,13 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (xpText) xpText.innerText = `${gameState.xp}/${gameState.xpMax}`;
 
         const freeChestTimer = document.getElementById('free-chest-timer');
-        if(freeChestTimer) freeChestTimer.innerText = gameState.timers.freeChest > 0 ? `Próximo em: ${formatTime(gameState.timers.freeChest)}` : 'COLETAR!';
+        if(freeChestTimer) freeChestTimer.innerText = gameState.timers.freeChest > 0 ? `Em: ${formatTime(gameState.timers.freeChest)}` : 'COLETAR!';
 
         const freeChest = document.getElementById('free-chest');
         if(freeChest) freeChest.classList.toggle('ready', gameState.timers.freeChest <= 0);
 
         const crownChestTimer = document.getElementById('crown-chest-timer');
-        if(crownChestTimer) crownChestTimer.innerText = gameState.timers.crownChest > 0 ? `Próximo em: ${formatTime(gameState.timers.crownChest)}` : 'COLETAR!';
+        if(crownChestTimer) crownChestTimer.innerText = gameState.timers.crownChest > 0 ? `Em: ${formatTime(gameState.timers.crownChest)}` : 'COLETAR!';
 
         const crownChest = document.getElementById('crown-chest');
         if(crownChest) crownChest.classList.toggle('ready', gameState.timers.crownChest <= 0);

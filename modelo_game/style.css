@@ -1,12 +1,18 @@
 /* ==========================================================================
-   STYLE.CSS - VERSÃO FINAL COMPLETA (LAYOUT CORRIGIDO)
+   STYLE.CSS - VERSÃO COMPLETA E FINALIZADA
+   - Arco das cartas com orientação correta.
+   - Layout dinâmico para jogadores.
+   - Animação de uso para poderes.
+   - Indicador de poder usado ao lado de cada jogador.
+   - Log de eventos colapsável.
+   - Resumo da rodada integrado ao painel de log (substituindo o popup).
    ========================================================================== */
 
-/* --- 1. CONFIGURAÇÃO GLOBAL E VARIÁVEIS (TEMA CLARO RESTAURADO) --- */
+/* --- 1. CONFIGURAÇÃO GLOBAL E VARIÁVEIS --- */
 :root {
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     
-    /* Paleta de Cores da UI (Tema Claro da Versão Antiga) */
+    /* Paleta de Cores da UI */
     --bg-main: #f4f1ea;
     --bg-panel: #e0ddd8;
     --bg-hud: rgba(224, 221, 216, 0.85);
@@ -19,7 +25,7 @@
     --shadow-color: rgba(93, 64, 55, 0.2);
     --border-radius: 12px;
     
-    /* Paleta de Cores para Cartas (Mantida da Versão Nova) */
+    /* Paleta de Cores para Cartas */
     --card-red: #d92d20;
     --card-green: #28a745;
     --card-blue: #007bff;
@@ -36,16 +42,11 @@ body {
     overflow: hidden;
     height: 100vh;
     width: 100vw;
-    background-color: var(--bg-main); /* Fundo claro restaurado */
-    background-image: none; /* Removemos o gradiente escuro da nova versão */
-        
-    /* --- INÍCIO DA ALTERAÇÃO --- */
-    background-image: url('img/atenas.png'); /* Define a imagem de fundo */
-    background-size: cover;                      /* Faz a imagem cobrir toda a tela */
-    background-position: center;                 /* Centraliza a imagem */
-    background-repeat: no-repeat;                /* Impede que a imagem se repita */
-    background-color: var(--bg-main);            /* Cor de fallback caso a imagem não carregue */
-    /* --- FIM DA ALTERAÇÃO --- */
+    background-image: url('img/atenas.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--bg-main);
 }
 
 
@@ -95,8 +96,8 @@ body {
     box-shadow: 0 2px 4px var(--shadow-color), -3px 3px 0px rgba(0,0,0,0.08), -6px 6px 0px rgba(0,0,0,0.04);
 }
 #draw-deck .cr-card.back::after {
-    content: 'UNO';
-    font-size: 1.5em;
+    content: 'LOGOS';
+    font-size: 1.2em;
     font-weight: bold;
 }
 
@@ -132,27 +133,27 @@ body {
 }
 
 
-/* --- 4. COMPONENTE: ÁREA DOS JOGADORES (POSICIONAMENTO RESTAURADO) --- */
+/* --- 4. COMPONENTE: ÁREA DOS JOGADORES (LAYOUT DINÂMICO) --- */
 .player-area {
     position: absolute;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 5px;
-    transform: translate(-50%, -50%); /* Centraliza o elemento em suas coordenadas */
+    transform: translate(-50%, -50%);
     transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease-out;
 }
-/* Coordenadas da versão antiga */
-#player-main { top: 88%; left: 50%; }
-#player-nietzsche { top: 15%; left: 50%; }
-#player-hipatia { top: 35%; left: 15%; }
-#player-confucio { top: 35%; left: 85%; }
 
-.player-area.pre-enter { opacity: 0; }
-#player-nietzsche.pre-enter { transform: translate(-50%, -50%) translateY(-50px); }
-#player-hipatia.pre-enter { transform: translate(-50%, -50%) translateX(-50px); }
-#player-confucio.pre-enter { transform: translate(-50%, -50%) translateX(50px); }
+#player-main {
+    top: 70%;
+    left: 15%;
+    z-index: 1010;
+}
 
+.player-area.pre-enter { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0.8);
+}
 
 .avatar { 
     width: 60px; height: 60px; 
@@ -213,11 +214,11 @@ body {
 }
 .effect-skipped {
     background-color: var(--card-red);
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>');
 }
 
 
-/* --- 5. COMPONENTE: HUD INFERIOR (POSICIONAMENTO RESTAURADO) --- */
+/* --- 5. COMPONENTE: HUD INFERIOR E ÁREA DE PODERES --- */
 #bottom-hud {
     position: absolute;
     left: 0; bottom: 0;
@@ -233,7 +234,7 @@ body {
 
 #hud-toggle {
     position: absolute;
-    left: 50%; bottom: 20%;
+    left: 90%; bottom: 20%;
     transform: translateX(-50%);
     width: 60px; height: 30px;
     background-color: var(--bg-hud);
@@ -247,33 +248,57 @@ body {
 }
 #hud-toggle svg { transition: transform 0.4s; stroke-width: 3; }
 
-/* Coordenadas internas do HUD da versão antiga */
+#next-power-preview { 
+    position: absolute; 
+    left: 20%; top: 50%;
+    transform: translate(-120%, -50%);
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: var(--text-primary); font-size: 10px; font-weight: bold;
+    z-index: 1009;
+}
+#next-power-preview #next-power-card {
+    width: 70px;
+    height: 85px;
+    filter: grayscale(50%) opacity(0.8);
+}
+
+#powers-container {
+    position: absolute;
+    left: 28%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 1010;
+}
+
 #cr-hand { 
     position: absolute; 
-    left: 57%; top: 50%;
-    width: 80%; height: 90%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+    bottom: -130px; 
+    left: 50%;
+    width: 1px;
+    height: 1px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 1005;
 }
+
 #next-card-preview { 
     position: absolute; 
-    left: 10%; top: 65%;
-    width: 70px; height: 85px;
-    transform: translate(-50%, -50%);
+    left: 5%; top: 50%;
+    transform: translateY(-50%);
     display: flex; flex-direction: column; align-items: center; gap: 4px;
     color: var(--text-primary); font-size: 10px; font-weight: bold;
 }
 #next-card-preview #next-card {
-    width: 100%;
-    height: 100%;
+    width: 70px;
+    height: 85px;
 }
+
 #elixir-bar-container { 
     position: absolute; 
     left: 50%; top: 95%;
-    width: 85%; height: 20px; /* Altura fixa para consistência */
+    width: 85%; height: 20px;
     transform: translate(-50%, -50%);
     background-color: rgba(93, 64, 55, 0.2); 
     border-radius: 10px; border: 2px solid var(--border-color);
@@ -284,7 +309,7 @@ body {
 #elixir-text { position: absolute; width: 100%; text-align: center; color: white; font-weight: bold; font-size: 14px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); pointer-events: none; }
 
 
-/* --- 6. COMPONENTE: CARTAS --- */
+/* --- 6. COMPONENTE: CARTAS E PODERES --- */
 .cr-card {
     box-sizing: border-box;
     background: var(--bg-panel);
@@ -299,11 +324,17 @@ body {
     flex-direction: column;
     font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', Arial, sans-serif;
     transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s, border-color 0.3s;
-    width: 70px; /* Tamanho fixo para as cartas da mão */
+    width: 70px;
     height: 85px;
 }
+
 #cr-hand .cr-card {
-    color: var(--card-text-dark); /* Texto escuro por padrão, cores alteram */
+    color: var(--card-text-dark);
+    position: absolute;
+    bottom: 250px;
+    pointer-events: all;
+    transform-origin: bottom center;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .card-value { font-size: 2em; font-weight: bold; line-height: 1; }
@@ -318,6 +349,25 @@ body {
 .cr-card[data-color="wild"] { background: var(--card-wild-bg); color: var(--card-text-light); }
 .chosen-color-indicator { position: absolute; bottom: 5px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; }
 
+.power-card {
+    background: var(--card-wild-bg);
+    color: var(--card-text-light);
+    border-color: var(--accent-purple);
+}
+.power-card .card-icon {
+    width: 60%;
+    height: 60%;
+}
+.power-card.unaffordable {
+    filter: grayscale(80%);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+.power-card.vanishing {
+    animation: shrink-and-fade-out 0.5s forwards ease-in;
+    pointer-events: none;
+}
+
 .cr-card.dragging { opacity: 0; }
 .drag-clone { position: fixed !important; pointer-events: none; z-index: 5000; transform: scale(1.15) rotate(5deg) !important; box-shadow: 0 15px 30px rgba(0,0,0,0.5) !important; transition: none !important; }
 
@@ -328,9 +378,9 @@ body {
 #card-tooltip h3 { margin: 0 0 8px 0; font-size: 16px; color: var(--accent-gold); border-bottom: 1px solid rgba(255, 255, 255, 0.2); padding-bottom: 6px; }
 #card-tooltip p { margin: 0; font-size: 14px; line-height: 1.4; }
 
-#game-log { position: fixed; top: 20px; left: 20px; width: 280px; height: 150px; background-color: rgba(0, 0, 0, 0.1); border-radius: var(--border-radius); padding: 8px; box-shadow: 0 2px 5px var(--shadow-color); overflow: hidden; z-index: 500; }
-#log-list { list-style: none; padding: 0; margin: 0; height: 100%; overflow-y: auto; display: flex; flex-direction: column-reverse; }
-#log-list::-webkit-scrollbar { width: 6px; }
+#game-log { position: fixed; top: 10px; left: 10px; width: 220px; height: 150px; background-color: rgba(0, 0, 0, 0.1); border-radius: var(--border-radius); padding: 28px; box-shadow: 0 2px 5px var(--shadow-color); overflow: hidden; z-index: 500; }
+#log-list { list-style: none; padding: 0; margin: 0; height: 100%; overflow-y: auto; display: flex; flex-direction: column-reverse; transition: opacity 0.4s ease-out, transform 0.4s ease-out; }
+#log-list::-webkit-scrollbar { width: 8px; }
 #log-list::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.3); border-radius: 3px; }
 #log-list li { padding: 6px 10px; font-size: 13px; color: var(--text-primary); text-shadow: 0 1px 1px white; opacity: 0; transform: translateX(-20px); animation: slide-in 0.4s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94); margin-top: 4px; }
 #log-list li .player-name { font-weight: bold; }
@@ -346,8 +396,8 @@ body {
 #pause-menu-overlay.hidden, #game-over-overlay.hidden, #color-picker-overlay.hidden { display: none; }
 #pause-menu-overlay:not(.hidden), #game-over-overlay:not(.hidden), #color-picker-overlay:not(.hidden) { opacity: 1; pointer-events: all; }
 
-#pause-menu, #game-over-menu { background-color: var(--bg-hud); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 30px 40px; width: 300px; box-shadow: 0 10px 30px var(--shadow-color); text-align: center; color: var(--text-primary); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-#pause-menu-overlay:not(.hidden) #pause-menu, #game-over-overlay:not(.hidden) #game-over-menu { transform: scale(1); }
+#pause-menu, #game-over-menu, #color-picker { background-color: var(--bg-hud); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 30px 40px; width: 300px; box-shadow: 0 10px 30px var(--shadow-color); text-align: center; color: var(--text-primary); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+#pause-menu-overlay:not(.hidden) #pause-menu, #game-over-overlay:not(.hidden) #game-over-menu, #color-picker-overlay:not(.hidden) #color-picker { transform: scale(1); }
 #pause-menu h2 { margin: 0 0 25px 0; font-size: 28px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
 .menu-button { display: block; width: 100%; padding: 12px; margin-bottom: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; border: 2px solid var(--accent-gold); background-color: var(--accent-gold); color: #fff; cursor: pointer; transition: transform 0.2s, background-color 0.2s; }
 .menu-button:hover { transform: translateY(-2px); background-color: #e0a024; }
@@ -367,10 +417,9 @@ input:checked + .slider:before { transform: translateX(22px); }
 #game-over-winner-avatar { width: 100px; height: 100px; margin: 0 auto 25px auto; border-radius: 50%; border: 4px solid var(--accent-gold); background-color: rgba(0,0,0,0.1); }
 #game-over-winner-avatar svg { width: 100%; height: 100%; stroke: var(--accent-gold); }
 
-#color-picker { background-color: var(--bg-hud); border-radius: var(--border-radius); padding: 20px; text-align: center; }
 #color-picker h3 { margin: 0 0 20px 0; color: var(--text-primary); }
 .color-options { display: flex; gap: 15px; }
-.color-option { width: 60px; height: 60px; border-radius: 50%; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.color-option { width: 60px; height: 60px; border-radius: 50%; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border: 3px solid rgba(255,255,255,0.5); }
 .color-option:hover { transform: scale(1.1); box-shadow: 0 0 15px currentColor; }
 .color-option[data-color="red"] { background-color: var(--card-red); }
 .color-option[data-color="green"] { background-color: var(--card-green); }
@@ -383,11 +432,23 @@ input:checked + .slider:before { transform: translateX(22px); }
 #bottom-hud.collapsed + #hud-toggle { bottom: 0; }
 #bottom-hud.collapsed + #hud-toggle svg { transform: rotate(180deg); }
 
-#cr-hand .cr-card:hover { transform: translateY(-10px) scale(1.05); box-shadow: 0 8px 15px var(--shadow-color); cursor: pointer; z-index: 10; }
-
+#cr-hand .cr-card:hover,
+#powers-container .cr-card:hover {
+    transform: var(--original-transform, rotate(0deg)) scale(1.2) !important;
+    z-index: 100;
+    box-shadow: 0 8px 25px var(--shadow-color);
+    cursor: pointer;
+}
 .cr-card.playable { border-color: var(--accent-green); animation: pulse-glow 2.5s infinite ease-in-out; }
-.cr-card.playable:hover { transform: translateY(-20px) scale(1.15); animation-play-state: paused; box-shadow: 0 8px 30px var(--shadow-color); }
-.cr-card.invalid-shake { animation: invalid-shake 0.5s ease-in-out; border-color: var(--card-red); }
+.cr-card.playable:hover {
+    transform: var(--original-transform, rotate(0deg)) scale(1.25) !important;
+    animation-play-state: paused;
+}
+.power-card.unaffordable:hover {
+    transform: var(--original-transform, rotate(0deg)) !important;
+}
+
+.cr-card.invalid-shake { animation: invalid-shake 0.5s ease-in-out; border-color: var(--card-red) !important; }
 
 #elixir-bar-container.pulse-elixir-gain { animation: pulse-elixir 0.4s ease-out; }
 .animated-card-fly { position: fixed; z-index: 3000; pointer-events: none; transition: transform 0.6s cubic-bezier(0.2, 0.5, 0.3, 1), top 0.6s cubic-bezier(0.2, 0.5, 0.3, 1), left 0.6s cubic-bezier(0.2, 0.5, 0.3, 1); }
@@ -397,44 +458,169 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 @keyframes slide-in { to { opacity: 1; transform: translateX(0); } }
 @keyframes pop-in { to { transform: scale(1); } }
-@keyframes pulse-elixir { 0% { transform: scale(1); box-shadow: 0 0 5px rgba(123, 85, 199, 0.4); } 50% { transform: scale(1.05); box-shadow: 0 0 15px rgba(165, 126, 233, 0.8), 0 0 25px rgba(165, 126, 233, 0.6); } 100% { transform: scale(1); box-shadow: 0 0 5px rgba(123, 85, 199, 0.4); } }
-@keyframes pulse-glow { 0% { box-shadow: 0 0 8px rgba(76, 175, 80, 0.5); } 50% { box-shadow: 0 0 20px rgba(76, 175, 80, 1), 0 0 30px rgba(76, 175, 80, 0.7); } 100% { box-shadow: 0 0 8px rgba(76, 175, 80, 0.5); } }
+@keyframes pulse-elixir { 0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 5px rgba(123, 85, 199, 0.4); } 50% { transform: translate(-50%, -50%) scale(1.05); box-shadow: 0 0 15px rgba(165, 126, 233, 0.8), 0 0 25px rgba(165, 126, 233, 0.6); } 100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 5px rgba(123, 85, 199, 0.4); } }
+@keyframes pulse-glow { 0% { box-shadow: 0 4px 6px var(--shadow-color); border-color: var(--accent-green); } 50% { box-shadow: 0 0 20px var(--accent-green), 0 0 30px var(--accent-green); border-color: #66bb6a; } 100% { box-shadow: 0 4px 6px var(--shadow-color); border-color: var(--accent-green); } }
 @keyframes invalid-shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
 @keyframes particle-burst { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: var(--transform-end) scale(0); opacity: 0; } }
-
-
-/* --- 9. LAYOUT RESPONSIVO --- */
-@media (max-width: 768px) {
-    .avatar { width: 50px; height: 50px; }
-    .opponent-hand { width: 30px; height: 30px; font-size: 14px; }
-    #table-center { gap: 15px; }
-    .card-pile, .card-pile .cr-card { width: 75px; height: 105px; }
-    #cr-hand .cr-card { width: 60px; height: 80px; }
-    .card-value { font-size: 1.8em; }
-    .card-cost { width: 22px; height: 22px; font-size: 12px; }
-    #bottom-hud { height: 25%; }
-    #game-log { width: 220px; font-size: 12px; }
-    #pause-button { top: 10px; right: 10px; }
+@keyframes shrink-and-fade-out {
+    0% {
+        transform: var(--original-transform, rotate(0deg)) scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: var(--original-transform, rotate(0deg)) scale(0);
+        opacity: 0;
+    }
 }
 
-@media (max-width: 480px) {
-    .player-area { gap: 2px; }
-    .player-name { font-size: 12px; padding: 1px 6px; }
-    #player-hipatia { left: 15%; top: 50%; }
-    #player-confucio { left: 85%; top: 50%; }
-    #player-nietzsche { top: 12%; }
-    #table-center { top: 45%; }
-    
-    #bottom-hud { height: 30%; }
-    /* Removemos o grid para manter o posicionamento absoluto que funciona melhor */
-    #cr-hand, #next-card-preview, #elixir-bar-container { position: absolute; }
-    #cr-hand { width: 100%; left: 50%; top: 40%; }
-    #next-card-preview { display: none; } /* Esconde a próxima carta por falta de espaço */
-    #elixir-bar-container { width: 95%; top: 85%; }
+/* --- 9. NOVOS ESTILOS - LOG COLAPSÁVEL E RESUMO INTEGRADO --- */
 
-    #hud-toggle { bottom: 30%; }
-    #bottom-hud.collapsed { transform: translateY(calc(100% - 30px)) !important; }
-    #bottom-hud.collapsed + #hud-toggle { bottom: 0; }
-    
-    #pause-menu, #game-over-menu { width: 90%; padding: 20px; }
+/* LOG COLAPSÁVEL */
+#game-log {
+    transition: height 0.4s ease-in-out;
+    position: relative; /* Necessário para o posicionamento do toggle */
+}
+#log-toggle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 28px;
+    background-color: rgba(93, 64, 55, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    z-index: 501; /* Acima da lista do log */
+}
+#log-toggle svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--text-primary);
+    stroke-width: 2;
+    transition: transform 0.4s;
+}
+
+#game-log.collapsed {
+    height: 28px;
+    padding: 0;
+    background-color: transparent;
+    box-shadow: none;
+}
+#game-log.collapsed #log-list {
+    display: none;
+}
+#game-log.collapsed #log-toggle svg {
+    transform: rotate(180deg);
+}
+#game-log:not(.collapsed) #log-list {
+    padding-top: 30px; /* Espaço para o botão de toggle */
+}
+
+/* INDICADOR DE PODER USADO */
+.used-power-indicator {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translate(10px, -50%) scale(0);
+    width: 36px;
+    height: 36px;
+    background-color: var(--accent-purple);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px;
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
+    z-index: 20;
+}
+.used-power-indicator.visible {
+    transform: translate(10px, -50%) scale(1);
+    opacity: 1;
+}
+.used-power-indicator svg {
+    width: 100%;
+    height: 100%;
+    stroke: white;
+}
+
+/* ESTADO DO LOG QUANDO MOSTRANDO O RESUMO */
+#game-log.showing-summary #log-list {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+/* CARD DE RESUMO DA RODADA */
+#round-summary-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(60, 40, 30, 0.85); /* Cor mais escura para contraste */
+    color: #f0f0f0;
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    pointer-events: none;
+    border-radius: var(--border-radius);
+}
+
+#game-log.showing-summary #round-summary-card {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+#round-summary-card h3 {
+    text-align: center;
+    margin: 0 0 10px 0;
+    color: var(--accent-gold);
+    font-size: 16px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#round-summary-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto; /* Para caso haja muitos poderes */
+}
+#round-summary-card ul::-webkit-scrollbar { width: 4px; }
+#round-summary-card ul::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 2px; }
+
+
+#round-summary-card li {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 13px;
+}
+
+#round-summary-card .player-name {
+    font-weight: bold;
+    flex-grow: 1;
+}
+
+#round-summary-card .power-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+#round-summary-card .power-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: var(--accent-gold);
 }

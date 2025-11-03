@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNO Filosófico - Jogo de Cartas</title>
+    <title>Filosofia - Jogo de Cartas</title>
     <!-- Link para o arquivo de estilos CSS -->
     <link rel="stylesheet" href="/Frontend/css/screens/game.css">
 </head>
@@ -15,47 +15,26 @@
             
             <!-- ÁREA CENTRAL DO TABULEIRO -->
             <div id="table-center">
-                <!-- Deck de Compra (Passo 19) -->
+                <!-- Deck de Compra -->
                 <div id="draw-deck" class="card-pile">
                     <div class="cr-card back"></div>
-                    <!-- Contador de Cartas (Passo 20) -->
+                    <!-- Contador de Cartas -->
                     <span id="draw-deck-counter" class="deck-counter"></span>
                 </div>
                 
-                <!-- Pilha de Descarte (Renomeado do Passo 1) -->
+                <!-- Pilha de Descarte -->
                 <div id="discard-pile" class="card-pile">
-                    <!-- Contador de Cartas (Passo 20) -->
+                    <!-- Contador de Cartas -->
                     <span id="discard-pile-counter" class="deck-counter"></span>
                 </div>
             </div>
             
             <!-- ÁREAS DOS JOGADORES OPONENTES -->
-            <!-- Classe 'pre-enter' adicionada no Passo 15 para animação de entrada -->
-            <div id="player-nietzsche" class="player-area pre-enter">
-                <!-- Indicador de Status (Passo 14) -->
-                <div class="status-effects-container"></div>
-                <div class="avatar"></div>
-                <div class="player-name">Nietzsche</div>
-                <div class="opponent-hand">7</div>
-            </div>
-            <div id="player-hipatia" class="player-area pre-enter">
-                <!-- Indicador de Status (Passo 14) -->
-                <div class="status-effects-container"></div>
-                <div class="avatar"></div>
-                <div class="player-name">Hipátia</div>
-                <div class="opponent-hand">7</div>
-            </div>
-            <div id="player-confucio" class="player-area pre-enter">
-                <!-- Indicador de Status (Passo 14) -->
-                <div class="status-effects-container"></div>
-                <div class="avatar"></div>
-                <div class="player-name">Confúcio</div>
-                <div class="opponent-hand">7</div>
-            </div>
+            <!-- Esta seção agora está vazia. O JavaScript irá gerar e posicionar os oponentes dinamicamente aqui dentro de #game-board-container. -->
             
-            <!-- ÁREA DO JOGADOR PRINCIPAL -->
+            <!-- ÁREA DO JOGADOR PRINCIPAL (única área de jogador fixa no HTML) -->
             <div id="player-main" class="player-area">
-                <!-- Indicador de Status (Passo 14) -->
+                <!-- Indicador de Status -->
                 <div class="status-effects-container"></div>
                 <div class="avatar"></div>
                 <div class="player-name">Você</div>
@@ -63,11 +42,27 @@
 
             <!-- HUD (Heads-Up Display) INFERIOR -->
             <div id="bottom-hud">
+                <!-- Próximo Poder (NOVO) -->
+                <div id="next-power-preview">
+                    <span>Próximo Poder:</span>
+                    <div id="next-power-card" class="cr-card"></div>
+                </div>
+                
+                <!-- ÁREA DE PODERES -->
+                <div id="powers-container">
+                    <!-- Os slots de poder em formato de carta serão gerados dinamicamente pelo JavaScript -->
+                </div>
+
+                <!-- Próxima Carta -->
                 <div id="next-card-preview">
                     <span>Próxima:</span>
                     <div id="next-card" class="cr-card"></div>
                 </div>
+                
+                <!-- Mão do Jogador (Contêiner para o arco de cartas) -->
                 <div id="cr-hand"></div>
+                
+                <!-- Barra de Elixir -->
                 <div id="elixir-bar-container">
                     <div id="elixir-bar-fill"></div>
                     <span id="elixir-text"></span>
@@ -78,17 +73,20 @@
             </div>
         </div>
 
-        <!-- LOG DE EVENTOS DO JOGO (Passo 10) -->
+        <!-- LOG DE EVENTOS DO JOGO (COM BOTÃO DE TOGGLE) -->
         <div id="game-log">
+            <div id="log-toggle">
+                <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+            </div>
             <ul id="log-list"></ul>
         </div>
 
-        <!-- BOTÃO DE PAUSA (Passo 16) -->
+        <!-- BOTÃO DE PAUSA -->
         <div id="pause-button">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="4" x2="6" y2="20"></line><line x1="18" y1="4" x2="18" y2="20"></line></svg>
         </div>
 
-        <!-- TOOLTIP PARA DETALHES DA CARTA (Passo 9) -->
+        <!-- TOOLTIP PARA DETALHES DA CARTA/PODER -->
         <div id="card-tooltip">
             <h3 id="tooltip-title"></h3>
             <p id="tooltip-description"></p>
@@ -97,7 +95,7 @@
 
     <!-- OVERLAYS (Fora da #game-screen para cobrir a tela inteira) -->
 
-    <!-- OVERLAY DO MENU DE PAUSA (Passo 16) -->
+    <!-- OVERLAY DO MENU DE PAUSA -->
     <div id="pause-menu-overlay" class="hidden">
         <div id="pause-menu">
             <h2>Pausado</h2>
@@ -114,7 +112,7 @@
         </div>
     </div>
 
-    <!-- OVERLAY DE FIM DE JOGO (Passo 17) -->
+    <!-- OVERLAY DE FIM DE JOGO -->
     <div id="game-over-overlay" class="hidden">
         <div id="game-over-menu">
             <h2 id="game-over-title">Vitória!</h2>
@@ -124,7 +122,7 @@
         </div>
     </div>
 
-    <!-- OVERLAY DE SELEÇÃO DE COR (Passo 23) -->
+    <!-- OVERLAY DE SELEÇÃO DE COR -->
     <div id="color-picker-overlay" class="hidden">
         <div id="color-picker">
             <h3>Escolha uma cor</h3>

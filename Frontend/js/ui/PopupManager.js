@@ -1,3 +1,4 @@
+
 import { gameState } from '../data/gameState.js';
 import { arenas } from '../data/arenas.js';
 import { toast } from './Toast.js'; // Importar o toast para usar nos placeholders
@@ -75,6 +76,14 @@ class PopupManager {
         this.bodyElement.innerHTML = contentHTML;
         this.container.classList.add('active');
         this._addInternalListeners(popupId, data); // Passar 'data' para os listeners internos
+
+        // Se for o popup da timeline de arenas, rolar para o final
+        if (popupId === 'arena-timeline') {
+            // Pequeno delay para garantir que o conteúdo foi renderizado e o scrollHeight é preciso
+            setTimeout(() => {
+                this.bodyElement.scrollTop = this.bodyElement.scrollHeight;
+            }, 100);
+        }
     }
      _renderPhilosopherCardPopup(philosopher, state) {
         // Gera o HTML para os conceitos-chave
@@ -157,6 +166,150 @@ class PopupManager {
     }
     
     // --- MÉTODOS DE RENDERIZAÇÃO DETALHADOS ---
+
+    _renderArenaTimelinePopup() {
+        const playerTrophies = gameState.trophies;
+
+        // Encontra a arena atual do jogador
+        let currentArena = null;
+        // Itera de trás para frente para encontrar a arena de maior troféu que o jogador alcançou
+        for (let i = arenas.length - 1; i >= 0; i--) {
+            if (playerTrophies >= arenas[i].trophyReq) {
+                currentArena = arenas[i];
+                break;
+            }
+        }
+        // Caso o jogador tenha menos troféus que a primeira arena (improvável com req 0)
+        if (!currentArena) currentArena = arenas[0];
+
+        const arenasHTML = arenas.map(arena => {
+            let stateClass = '';
+            if (playerTrophies >= arena.trophyReq) {
+                // Se o jogador tem troféus suficientes, verifica se é a arena atual ou uma já passada
+                stateClass = (arena.id === currentArena.id) ? 'current' : 'unlocked';
+            } else {
+                // Se não tem troféus suficientes, a arena está bloqueada
+                stateClass = 'locked';
+            }
+            
+            // Formata o nome das escolas para exibição
+            const schoolsText = arena.schools.join(', ').replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+
+            return `
+                <div class="arena-card ${stateClass}" data-trophies="${arena.trophyReq}">
+                    <div class="path-connector">
+                        <div class="trophy-marker">
+                            <i class="fa-solid fa-trophy icon"></i>
+                            <span class="trophy-count">${arena.trophyReq}</span>
+                        </div>
+                    </div>
+                    <div class="arena-content">
+                        <div class="arena-image-wrapper">
+                            <img src="${arena.image}" alt="${arena.name}" class="arena-image">
+                             ${stateClass === 'locked' ? '<i class="fa-solid fa-lock lock-icon"></i>' : ''}
+                        </div>
+                        <div class="arena-info">
+                             ${stateClass === 'current' ? '<span class="current-marker">SUA ARENA</span>' : ''}
+                            <h2>${arena.id}: ${arena.name}</h2>
+                            <div class="unlocks-section">
+                                <h3>Escolas de Pensamento</h3>
+                                <p class="schools-list">${schoolsText}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        const css = `
+            <style>
+            .arena-timeline-popup .arenas-container {
+                display: flex;
+                flex-direction: column-reverse; /* Mostra a primeira arena embaixo */
+                gap: 20px;
+                padding: 10px;
+            }
+            .arena-timeline-popup .arena-card {
+                display: flex;
+                align-items: flex-start;
+                gap: 15px;
+                padding: 15px;
+                background-color: #fff;
+                border: 1px solid var(--color-border);
+                border-radius: 12px;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            }
+            .arena-timeline-popup .path-connector {
+                flex: 0 0 60px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
+                align-self: stretch;
+            }
+            .arena-timeline-popup .path-connector::before {
+                content: '';
+                position: absolute;
+                top: 0; bottom: 0; left: 50%;
+                transform: translateX(-50%);
+                width: 3px;
+                background-image: linear-gradient(to bottom, #ccc 50%, transparent 50%);
+                background-size: 1px 10px;
+            }
+            .arena-timeline-popup .arenas-container .arena-card:last-child .path-connector::before {
+                height: 40px; top: auto; bottom: 0;
+            }
+            .arena-timeline-popup .arenas-container .arena-card:first-child .path-connector::before {
+                height: calc(100% - 40px); top: 40px;
+            }
+            .arena-timeline-popup .trophy-marker {
+                display: flex; flex-direction: column; align-items: center;
+                background-color: var(--color-background);
+                padding: 5px 0; z-index: 1;
+            }
+            .arena-timeline-popup .trophy-marker .icon { font-size: 24px; color: #aaa; }
+            .arena-timeline-popup .trophy-marker .trophy-count { font-weight: bold; font-size: 14px; color: #777; }
+            .arena-timeline-popup .arena-content { flex: 1; }
+            .arena-timeline-popup .arena-image-wrapper { position: relative; margin-bottom: 10px; }
+            .arena-timeline-popup .arena-image { width: 100%; border-radius: 8px; display: block; }
+            .arena-timeline-popup .arena-info h2 { font-family: var(--font-title); font-size: 1.5em; margin-bottom: 8px; }
+            .arena-timeline-popup .unlocks-section h3 {
+                font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px;
+                color: #888; margin-bottom: 5px;
+            }
+            .arena-timeline-popup .schools-list { font-size: 0.9em; color: #555; }
+            
+            /* Estados */
+            .arena-timeline-popup .arena-card.locked { opacity: 0.7; }
+            .arena-timeline-popup .arena-card.locked .arena-image { filter: grayscale(100%) brightness(0.6); }
+            .arena-timeline-popup .arena-card.locked .arena-info h2 { color: #999; }
+            .arena-timeline-popup .lock-icon {
+                position: absolute; top: 50%; left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 48px; color: rgba(255, 255, 255, 0.8);
+            }
+            .arena-timeline-popup .arena-card.current {
+                border-color: var(--color-accent);
+                box-shadow: 0 0 15px rgba(212, 160, 23, 0.5);
+            }
+            .arena-timeline-popup .arena-card.current .trophy-marker .icon,
+            .arena-timeline-popup .arena-card.current .trophy-marker .trophy-count {
+                color: var(--color-accent); font-weight: bold;
+            }
+            .arena-timeline-popup .current-marker {
+                background-color: var(--color-accent); color: white; font-weight: bold;
+                padding: 4px 10px; border-radius: 20px; font-size: 0.8em;
+                margin-bottom: 10px; display: inline-block;
+            }
+            .arena-timeline-popup .arena-card.unlocked .trophy-marker .icon {
+                color: var(--color-primary);
+            }
+            </style>
+        `;
+        
+        return `${css}<div class="arena-timeline-popup"><div class="arenas-container">${arenasHTML}</div></div>`;
+    }
 
     _renderLevelXpPopup() {
         const winRate = gameState.totalDebates > 0 ? ((gameState.wins / gameState.totalDebates) * 100).toFixed(1) : 0;
