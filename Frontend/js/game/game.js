@@ -1,3 +1,8 @@
+// --- REFACTOR ---
+// Importa os novos bancos de dados do jogo
+import { PHILOSOPHERS_DATA } from './../data/philosophers.js';
+import { CONCEPTS_DATA } from './../data/concepts.js';
+
 // Verifica se o objeto principal do jogo já foi carregado (lógica de Single Page App).
 if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
     // 1. Re-busca todos os elementos da nova tela.
@@ -46,35 +51,16 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
     // =================================================================================
     // --- CONSTANTES E DADOS DO JOGO ---
     // =================================================================================
-    const PLAYER_COUNT = 4;
-    const ELIXIR_TICK_RATE = 280;
     const OPPONENT_PLAY_DELAY = 1500;
-    const MAX_ELIXIR = 10;
-    const ELIXIR_PER_TICK = 0.1;
-    const PLAYER_POWER_SLOTS = 4;
+    const PLAYER_CONCEPT_SLOTS = 4;
 
-    const CardColors = { RED: 'red', GREEN: 'green', BLUE: 'blue', YELLOW: 'yellow', WILD: 'wild' };
-
-    const CardIcons = {
-        SKIP: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`,
-        REVERSE: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`,
-        DRAW_TWO: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7M6 2h12v5H6z"></path><text x="12" y="17" font-size="8" text-anchor="middle" fill="currentColor">+2</text></svg>`,
-        WILD: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 00-10 10h20a10 10 0 00-10-10z" fill-opacity="0.2"></path></svg>`,
-        WILD_DRAW_FOUR: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><text x="12" y="17" font-size="8" text-anchor="middle" fill="currentColor">+4</text></svg>`
+    // Mapeamento de Eras para Cores Visuais
+    const ERA_COLOR_MAP = {
+        'Antiga': 'red',
+        'Medieval': 'blue',
+        'Moderna': 'yellow',
+        'Contemporânea': 'green'
     };
-    
-    const CARD_DECK_BASE = [
-        { value: 'Skip', color: CardColors.RED, cost: 5, icon: CardIcons.SKIP, description: 'O próximo jogador perde a vez.' },
-        { value: 'Reverse', color: CardColors.GREEN, cost: 5, icon: CardIcons.REVERSE, description: 'Inverte a direção do jogo.' },
-        { value: '+2', color: CardColors.BLUE, cost: 6, icon: CardIcons.DRAW_TWO, description: 'O próximo jogador compra 2 cartas.' },
-        { value: 'Wild', color: CardColors.WILD, cost: 8, icon: CardIcons.WILD, description: 'Muda a cor atual para a de sua escolha.' },
-        { value: 'Wild+4', color: CardColors.WILD, cost: 10, icon: CardIcons.WILD_DRAW_FOUR, description: 'Muda a cor e força o próximo a comprar 4 cartas.' }
-    ];
-    ['1','2','3','4','5','6','7','8','9'].forEach(num => {
-        [CardColors.RED, CardColors.GREEN, CardColors.BLUE, CardColors.YELLOW].forEach(color => {
-            CARD_DECK_BASE.push({ value: num, color: color, cost: parseInt(num), description: `Uma carta ${color} com valor ${num}.` });
-        });
-    });
 
     const MAIN_PLAYER_DATA = {
         id: 'player-main',
@@ -85,104 +71,9 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
     const OPPONENT_POOL = [
         { name: 'Nietzsche', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
         { name: 'Hipátia', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
-        { name: 'Confúcio', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
         { name: 'S. Beauvoir', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
         { name: 'Aristóteles', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
-        { name: 'Sun Tzu', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
-        { name: 'Sêneca', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
-        { name: 'Maquiavel', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' },
-        { name: 'Platão', avatarSVG: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' }
     ];
-
-    const POWERS_DATA = {
-        'clarividencia': {
-            id: 'clarividencia', name: 'Clarividência', description: 'Espia a carta de maior custo na mão de um oponente aleatório.', cost: 3,
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path></svg>`,
-            handler: function(gameUI) { gameUI.logEvent(`usou Clarividência!`, 'game-event', gameUI.state.playersData['player-main'].name); gameUI.triggerVFX(window.innerWidth / 2, window.innerHeight / 2, 'wild'); }
-        },
-        'barreira_filosofica': {
-            id: 'barreira_filosofica', name: 'Barreira Filosófica', description: 'Anula o efeito da próxima carta de +2 ou +4 jogada contra você.', cost: 5,
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
-            handler: function(gameUI) {
-                gameUI.state.game.players['player-main'].statusEffects.push({ id: 'shielded' });
-                gameUI.logEvent(`ergueu uma Barreira Filosófica!`, 'game-event', gameUI.state.playersData['player-main'].name);
-                gameUI.renderStatusEffects();
-                const playerEl = document.getElementById('player-main'); const rect = playerEl.getBoundingClientRect();
-                gameUI.triggerVFX(rect.left + rect.width / 2, rect.top + rect.height / 2, 'blue');
-            }
-        },
-        'troca_subita': {
-            id: 'troca_subita', name: 'Troca Súbita', description: 'Troque uma de suas cartas com uma carta aleatória de um oponente.', cost: 7,
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>`,
-            handler: function(gameUI) {
-                gameUI.logEvent(`ativou a Troca Súbita!`, 'game-event', gameUI.state.playersData['player-main'].name);
-                const playerEl = document.getElementById('player-main');
-                const opponentEl = document.querySelector('.player-area.opponent'); 
-                if (opponentEl) {
-                    gameUI.animateCardFly(playerEl, opponentEl, {color: 'red'}, false);
-                    gameUI.animateCardFly(opponentEl, playerEl, {color: 'blue'}, true);
-                }
-            }
-        },
-        'premonicao': { 
-            id: 'premonicao', name: 'Premonição', description: 'Olhe a carta do topo do baralho de compra.', cost: 2,
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`,
-            handler: function(gameUI) {
-                const topCard = gameUI.state.game.drawDeck[gameUI.state.game.drawDeck.length - 1];
-                gameUI.logEvent(`previu a próxima carta: um ${topCard.value} ${topCard.color}.`, 'game-event', gameUI.state.playersData['player-main'].name);
-                gameUI.elements.drawDeck.classList.add('pulse-elixir-gain');
-                setTimeout(() => gameUI.elements.drawDeck.classList.remove('pulse-elixir-gain'), 800);
-            }
-        },
-        'reflexao_socratica': {
-            id: 'reflexao_socratica', name: 'Reflexão Socrática', description: 'Pule sua vez para comprar duas cartas.', cost: 3,
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>`,
-            handler: async function(gameUI) {
-                gameUI.logEvent(`entrou em Reflexão Socrática...`, 'game-event', gameUI.state.playersData['player-main'].name);
-                await gameUI.playerDrawsCard(false); // Draw without advancing turn
-                await gameUI.playerDrawsCard(true); // Draw and advance turn
-            }
-        },
-        'dilema_de_seneca': {
-            id: 'dilema_de_seneca', name: 'Dilema de Sêneca', description: 'Escolha um oponente. Ele deverá jogar uma carta de valor 5 ou maior, ou comprará uma carta.', cost: 6,
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
-            handler: function(gameUI) {
-                const opponentId = gameUI.state.game.playerOrder.find(id => id !== 'player-main');
-                if (opponentId) {
-                    gameUI.logEvent(`impôs um dilema a ${gameUI.state.playersData[opponentId].name}.`, 'game-event', 'player-main');
-                    document.getElementById(opponentId).classList.add('pulse-elixir-gain');
-                    setTimeout(() => document.getElementById(opponentId).classList.remove('pulse-elixir-gain'), 800);
-                }
-            }
-        },
-        'furia_de_aquiles': {
-            id: 'furia_de_aquiles', name: 'Fúria de Aquiles', description: 'O próximo jogador compra uma carta imediatamente.', cost: 4,
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`,
-            handler: async function(gameUI) {
-                 const nextPlayerIndex = (gameUI.state.game.currentPlayerIndex + 1) % gameUI.state.game.playerOrder.length;
-                 const nextPlayerId = gameUI.state.game.playerOrder[nextPlayerIndex];
-                 const card = await gameUI.drawCardFromDeck();
-                 if(card){
-                    gameUI.state.game.players[nextPlayerId].hand.push(card);
-                    gameUI.logEvent(`forçou ${gameUI.state.playersData[nextPlayerId].name} a comprar uma carta!`, 'game-event', 'player-main');
-                    gameUI.render();
-                 }
-            }
-        },
-        'paradoxo_de_zenon': {
-            id: 'paradoxo_de_zenon', name: 'Paradoxo de Zenão', description: 'Embaralha a pilha de descarte de volta ao baralho de compra.', cost: 8,
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>`,
-            handler: async function(gameUI) {
-                 await gameUI.animateShuffle();
-                 const discard = gameUI.state.game.discardPile;
-                 const topCard = discard.pop();
-                 gameUI.state.game.drawDeck = gameUI.shuffleArray([...gameUI.state.game.drawDeck, ...discard]);
-                 gameUI.state.game.discardPile = [topCard];
-                 gameUI.logEvent(`invocou o Paradoxo de Zenão, reiniciando o baralho!`, 'game-event', 'player-main');
-                 gameUI.render();
-            }
-        }
-    };
     
     // =================================================================================
     // --- MÓDULO PRINCIPAL DO JOGO ---
@@ -190,7 +81,6 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
     const GameUI = {
         state: {},
         elements: {},
-        timers: null,
 
         // --- INICIALIZAÇÃO ---
         init() {
@@ -200,9 +90,7 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
         },
 
         initializeState() {
-            const opponentsToCreate = Math.max(1, Math.min(9, PLAYER_COUNT - 1));
-            const opponentData = this.shuffleArray([...OPPONENT_POOL]).slice(0, opponentsToCreate);
-
+            const opponentData = this.shuffleArray([...OPPONENT_POOL]).slice(0, 3);
             const playerIds = [MAIN_PLAYER_DATA.id];
             const playersData = { [MAIN_PLAYER_DATA.id]: { name: MAIN_PLAYER_DATA.name, avatarSVG: MAIN_PLAYER_DATA.avatarSVG } };
 
@@ -212,12 +100,15 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 playersData[opponentId] = { name: opponent.name, avatarSVG: opponent.avatarSVG };
             });
 
-            const gameDeck = this.shuffleArray([...CARD_DECK_BASE, ...CARD_DECK_BASE]);
+            const allPhilosopherIds = Object.keys(PHILOSOPHERS_DATA);
+            const philosopherDeck = this.shuffleArray(allPhilosopherIds);
             
-            let firstCardOnPile;
-            do { 
-                firstCardOnPile = gameDeck.pop();
-            } while (firstCardOnPile.color === CardColors.WILD);
+            const orderedPhilosophers = Object.keys(PHILOSOPHERS_DATA)
+                .map(id => ({ id, ...PHILOSOPHERS_DATA[id] }))
+                .sort((a, b) => a.date - b.date)
+                .map(p => p.id);
+
+            const firstCardOnPile = philosopherDeck.pop();
 
             this.state = {
                 isAnimating: false,
@@ -225,40 +116,34 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 isGameOver: false,
                 logMessages: [],
                 dragState: { isDragging: false },
-                roundSummary: {
-                    isActive: false,
-                    startPlayerId: null,
-                    powersUsed: []
-                },
+                roundSummary: { isActive: false, startPlayerId: null, powersUsed: [] },
                 playersData: playersData,
                 game: {
+                    orderedPhilosophers: orderedPhilosophers,
                     lastPlayedCard: firstCardOnPile,
-                    drawDeck: gameDeck,
+                    drawDeck: philosopherDeck,
                     discardPile: [firstCardOnPile],
                     playerOrder: playerIds,
                     currentPlayerIndex: 0,
-                    isAwaitingColorChoice: false,
                     get currentPlayerId() { return this.playerOrder[this.currentPlayerIndex]; },
                     players: {}
-                },
-                bottomHud: { elixir: 0, lastWholeElixir: 0, handCards: [] }
+                }
             };
 
             playerIds.forEach(id => {
                 this.state.game.players[id] = {
-                    hand: this.state.game.drawDeck.splice(0, 7),
+                    score: 0,
+                    hand: this.state.game.drawDeck.splice(0, 5),
                     statusEffects: [],
-                    powers: [],
-                    powerDeck: []
+                    concepts: [],
+                    conceptDeck: []
                 };
             });
             
             const mainPlayer = this.state.game.players['player-main'];
-            const allPowerIds = this.shuffleArray(Object.keys(POWERS_DATA));
-            mainPlayer.powers = allPowerIds.splice(0, PLAYER_POWER_SLOTS).map(id => POWERS_DATA[id]);
-            mainPlayer.powerDeck = allPowerIds.map(id => POWERS_DATA[id]);
-            
-            this.state.bottomHud.handCards = this.state.game.players['player-main'].hand;
+            const allConceptIds = this.shuffleArray(Object.keys(CONCEPTS_DATA));
+            mainPlayer.concepts = allConceptIds.splice(0, PLAYER_CONCEPT_SLOTS).map(id => CONCEPTS_DATA[id]);
+            mainPlayer.conceptDeck = allConceptIds.map(id => CONCEPTS_DATA[id]);
         },
 
         cacheDOMElements() {
@@ -267,9 +152,6 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 crHandContainer: document.getElementById('cr-hand'),
                 drawDeck: document.getElementById('draw-deck'),
                 discardPile: document.getElementById('discard-pile'),
-                elixirBarContainer: document.getElementById('elixir-bar-container'),
-                elixirBarFill: document.getElementById('elixir-bar-fill'),
-                elixirText: document.getElementById('elixir-text'),
                 drawDeckCounter: document.getElementById('draw-deck-counter'),
                 discardPileCounter: document.getElementById('discard-pile-counter'),
                 tooltip: document.getElementById('card-tooltip'),
@@ -281,14 +163,12 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 resumeButton: document.getElementById('resume-button'),
                 restartButton: document.getElementById('restart-button'),
                 soundToggle: document.getElementById('sound-toggle'),
-                quitButton: document.getElementById('quit-button'), // Botão de sair adicionado
+                quitButton: document.getElementById('quit-button'),
                 gameOverOverlay: document.getElementById('game-over-overlay'),
                 gameOverTitle: document.getElementById('game-over-title'),
                 gameOverMessage: document.getElementById('game-over-message'),
                 gameOverWinnerAvatar: document.getElementById('game-over-winner-avatar'),
                 playAgainButton: document.getElementById('play-again-button'),
-                colorPickerOverlay: document.getElementById('color-picker-overlay'),
-                colorOptions: document.querySelector('.color-options'),
                 powersContainer: document.getElementById('powers-container'),
                 hudToggle: document.getElementById('hud-toggle'),
                 gameLog: document.getElementById('game-log'),
@@ -299,65 +179,45 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
         },
 
         bindEventListeners() {
-            // ADIÇÃO: Eventos de toque para suporte mobile
             this.elements.crHandContainer.addEventListener('mousedown', e => this.onDragStart(e));
             this.elements.crHandContainer.addEventListener('touchstart', e => this.onDragStart(e), { passive: false });
-
             window.addEventListener('mousemove', e => this.onDragMove(e));
             window.addEventListener('touchmove', e => this.onDragMove(e), { passive: false });
-
             window.addEventListener('mouseup', e => this.onDragEnd(e));
             window.addEventListener('touchend', e => this.onDragEnd(e));
             
             this.elements.drawDeck.addEventListener('click', () => {
-                SoundManager.play('button_click');
                 if (this.state.game.currentPlayerId === 'player-main' && !this.state.isAnimating) {
+                    SoundManager.play('button_click');
                     this.playerDrawsCard(true);
                 }
             });
+
             this.elements.pauseButton.addEventListener('click', () => { SoundManager.play('button_click'); this.togglePause(true); });
             this.elements.resumeButton.addEventListener('click', () => { SoundManager.play('button_click'); this.togglePause(false); });
             this.elements.restartButton.addEventListener('click', () => { SoundManager.play('button_click'); this.restartGame(); });
             this.elements.playAgainButton.addEventListener('click', () => { SoundManager.play('button_click'); this.restartGame(); });
             this.elements.soundToggle.addEventListener('change', e => SoundManager.toggleMute(!e.target.checked));
-            
-            // Funcionalidade do botão de sair
-            this.elements.quitButton.addEventListener('click', () => {
-                window.location.href = './../index.html';
-            });
-
-            this.elements.colorOptions.addEventListener('click', e => {
-                const colorOption = e.target.closest('.color-option');
-                if (colorOption) {
-                    SoundManager.play('button_click');
-                    this.onColorPicked(colorOption.dataset.color);
-                }
-            });
+            this.elements.quitButton.addEventListener('click', () => { window.location.href = './../index.html'; });
             window.addEventListener('keydown', e => { if (e.key === 'Escape') this.togglePause(!this.state.isPaused); });
-            const bottomHud = document.getElementById('bottom-hud');
-            this.elements.hudToggle.addEventListener('click', () => { bottomHud.classList.toggle('collapsed'); });
-            this.elements.logToggle.addEventListener('click', () => {
-                this.elements.gameLog.classList.toggle('collapsed');
-            });
+            
+            this.elements.hudToggle.addEventListener('click', () => document.getElementById('bottom-hud').classList.toggle('collapsed'));
+            this.elements.logToggle.addEventListener('click', () => this.elements.gameLog.classList.toggle('collapsed'));
         },
         
         // --- UTILITÁRIOS E LÓGICA DE JOGO ---
         shuffleArray: (arr) => arr.sort(() => Math.random() - 0.5),
         
-        isCardPlayable(card) {
-            const lastPlayed = this.state.game.lastPlayedCard;
-            if (!lastPlayed) return true;
-            if (card.color === CardColors.WILD) return true;
-            const activeColor = lastPlayed.chosenColor || lastPlayed.color;
-            return card.color === activeColor || card.value === lastPlayed.value;
-        },
-        
         async drawCardFromDeck() {
             if (this.state.game.drawDeck.length === 0) {
+                if (this.state.game.discardPile.length <= 1) {
+                    this.logEvent("O baralho de compra acabou!", 'game-event');
+                    return null;
+                }
                 await this.animateShuffle();
-                const discard = this.state.game.discardPile;
-                const topCard = discard.pop();
-                this.state.game.drawDeck = this.shuffleArray(discard);
+                const pile = this.state.game.discardPile;
+                const topCard = pile.pop();
+                this.state.game.drawDeck = this.shuffleArray(pile);
                 this.state.game.discardPile = [topCard];
                 this.render();
             }
@@ -365,34 +225,35 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             return this.state.game.drawDeck.pop();
         },
 
-        async playCard(cardIndex, isOpponent = false, opponentId = '') {
+        async playCard(cardIndex) {
             if (this.state.isAnimating || this.state.isGameOver) return;
 
-            const playerId = isOpponent ? opponentId : 'player-main';
+            const playerId = 'player-main';
             const player = this.state.game.players[playerId];
-            const cardToPlay = player.hand[cardIndex];
-
-            if (!this.isCardPlayable(cardToPlay) && !isOpponent) {
-                this.elements.crHandContainer.children[cardIndex].classList.add('invalid-shake');
-                setTimeout(() => this.elements.crHandContainer.children[cardIndex].classList.remove('invalid-shake'), 500);
-                SoundManager.play('error');
-                return;
-            }
+            const cardToPlayId = player.hand[cardIndex];
+            
+            const points = this.calculateChronologicalScore(cardToPlayId);
+            player.score += points;
 
             this.state.isAnimating = true;
             this.hideTooltip();
             SoundManager.play('play_card');
 
-            let startElement = isOpponent ? document.getElementById(opponentId) : this.elements.crHandContainer.children[cardIndex];
-            await this.animateCardFly(startElement, this.elements.discardPile, cardToPlay, isOpponent);
+            let startElement = this.elements.crHandContainer.children[cardIndex];
+            await this.animateCardFly(startElement, this.elements.discardPile, PHILOSOPHERS_DATA[cardToPlayId]);
 
-            const playedCard = player.hand.splice(cardIndex, 1)[0];
-            this.state.game.discardPile.push(playedCard);
-            this.state.game.lastPlayedCard = playedCard;
-            this.logEvent(`jogou um ${playedCard.value} ${playedCard.color}.`, 'play-card', playerId);
+            const playedCardId = player.hand.splice(cardIndex, 1)[0];
+            this.state.game.discardPile.push(playedCardId);
+            this.state.game.lastPlayedCard = playedCardId;
+            this.logEvent(`jogou ${PHILOSOPHERS_DATA[playedCardId].name} e ganhou ${points} Pontos de Sabedoria!`, 'play-card', playerId);
 
+            const cardData = PHILOSOPHERS_DATA[playedCardId];
+            const color = ERA_COLOR_MAP[cardData.era] || 'wild';
             const discardRect = this.elements.discardPile.getBoundingClientRect();
-            this.triggerVFX(discardRect.left + discardRect.width / 2, discardRect.top + discardRect.height / 2, playedCard.color === CardColors.WILD ? 'wild' : playedCard.color);
+            this.triggerVFX(discardRect.left + discardRect.width / 2, discardRect.top + discardRect.height / 2, color);
+            
+            const newCard = await this.drawCardFromDeck();
+            if (newCard) player.hand.push(newCard);
 
             this.render();
             
@@ -402,25 +263,28 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 return;
             }
             
-            this.applyCardEffect(playedCard);
+            this.applyCardEffect(cardData); 
 
-            if (playedCard.color === CardColors.WILD) {
-                this.state.game.isAwaitingColorChoice = true;
-                this.elements.colorPickerOverlay.classList.remove('hidden');
-            } else {
-                this.advanceTurn();
-            }
+            this.advanceTurn();
             this.state.isAnimating = false;
         },
 
-        onColorPicked(color) {
-            if (!this.state.game.isAwaitingColorChoice) return;
-            this.state.game.lastPlayedCard.chosenColor = color;
-            this.logEvent(`escolheu a cor ${color}.`, 'game-event', this.state.game.currentPlayerId);
-            this.state.game.isAwaitingColorChoice = false;
-            this.elements.colorPickerOverlay.classList.add('hidden');
-            this.render();
-            this.advanceTurn();
+        calculateChronologicalScore(playedPhilosopherId) {
+            const topOfPileId = this.state.game.lastPlayedCard;
+            const orderedList = this.state.game.orderedPhilosophers;
+
+            const playedIndex = orderedList.indexOf(playedPhilosopherId);
+            const topOfPileIndex = orderedList.indexOf(topOfPileId);
+
+            if (playedIndex === -1 || topOfPileIndex === -1) return 0;
+
+            const indexDiff = Math.abs(playedIndex - topOfPileIndex);
+
+            if (indexDiff === 0) return 0;
+            if (indexDiff === 1) return 10;
+
+            const points = 10 - 2 * (indexDiff - 1);
+            return Math.max(0, points);
         },
 
         async playerDrawsCard(shouldAdvanceTurn) {
@@ -428,19 +292,21 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             const newCard = await this.drawCardFromDeck();
             if (newCard) {
                 SoundManager.play('draw_card');
-                await this.animateCardFly(this.elements.drawDeck, this.elements.crHandContainer, newCard);
+                await this.animateCardFly(this.elements.drawDeck, this.elements.crHandContainer, PHILOSOPHERS_DATA[newCard]);
                 this.state.game.players['player-main'].hand.push(newCard);
                 this.logEvent(`comprou uma carta.`, 'draw-card', 'player-main');
                 this.render();
-                if (shouldAdvanceTurn) {
-                    this.advanceTurn();
-                }
+                if (shouldAdvanceTurn) this.advanceTurn();
+            } else if (shouldAdvanceTurn) {
+                this.logEvent(`não pôde comprar, o baralho está vazio.`, 'draw-card', 'player-main');
+                this.advanceTurn();
             }
         },
 
         advanceTurn() {
             const game = this.state.game;
             let currentId = game.currentPlayerId;
+            
             game.players[currentId].statusEffects = [];
 
             if (this.state.roundSummary.isActive && game.currentPlayerId === this.state.roundSummary.startPlayerId) {
@@ -471,76 +337,111 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
 
             const opponentId = this.state.game.currentPlayerId;
             const opponent = this.state.game.players[opponentId];
-            const playableCardIndex = opponent.hand.findIndex(card => this.isCardPlayable(card));
 
-            if (playableCardIndex !== -1) {
-                this.playCard(playableCardIndex, true, opponentId);
-            } else {
+            let bestCardIndex = -1;
+            let maxScore = -1;
+
+            if (opponent.hand.length > 0) {
+                opponent.hand.forEach((cardId, index) => {
+                    const score = this.calculateChronologicalScore(cardId);
+                    if (score > maxScore) {
+                        maxScore = score;
+                        bestCardIndex = index;
+                    }
+                });
+            }
+
+            if (bestCardIndex === -1 || (maxScore <= 2 && Math.random() < 0.5)) {
                 const newCard = await this.drawCardFromDeck();
                 if (newCard) {
                     opponent.hand.push(newCard);
                     this.logEvent(`comprou uma carta.`, 'draw-card', opponentId);
                     this.render();
+                } else {
+                    this.logEvent(`tentou comprar mas o baralho está vazio.`, 'draw-card', opponentId);
                 }
                 this.advanceTurn();
+                return;
             }
+
+            const cardToPlayId = opponent.hand[bestCardIndex];
+            opponent.score += maxScore;
+
+            this.state.isAnimating = true;
+            SoundManager.play('play_card');
+            await this.animateCardFly(document.getElementById(opponentId), this.elements.discardPile, PHILOSOPHERS_DATA[cardToPlayId], true);
+
+            const playedCardId = opponent.hand.splice(bestCardIndex, 1)[0];
+            this.state.game.discardPile.push(playedCardId);
+            this.state.game.lastPlayedCard = playedCardId;
+            this.logEvent(`jogou ${PHILOSOPHERS_DATA[playedCardId].name} e ganhou ${maxScore} pts!`, 'play-card', opponentId);
+
+            const newCard = await this.drawCardFromDeck();
+            if (newCard) opponent.hand.push(newCard);
+            
+            this.render();
+            this.checkForWinner();
+            if(this.state.isGameOver) { this.state.isAnimating = false; return; }
+
+            this.advanceTurn();
+            this.state.isAnimating = false;
         },
         
         applyCardEffect(card) {
-            const nextPlayerIndex = (this.state.game.currentPlayerIndex + 1) % this.state.game.playerOrder.length;
-            const nextPlayerId = this.state.game.playerOrder[nextPlayerIndex];
-            if (card.value === 'Skip') {
-                this.state.game.players[nextPlayerId].statusEffects.push({ id: 'skipped' });
-            }
+            // Função placeholder para futuras expansões
         },
         
         checkForWinner() {
-            const winnerId = this.state.game.playerOrder.find(id => this.state.game.players[id].hand.length === 0);
-            if (winnerId) {
+            if (this.state.game.drawDeck.length === 0 && this.state.game.playerOrder.every(id => this.state.game.players[id].hand.length === 0)) {
+                let winnerId = this.state.game.playerOrder[0];
+                let highScore = -1;
+                this.state.game.playerOrder.forEach(id => {
+                    const playerScore = this.state.game.players[id].score;
+                    if (playerScore > highScore) {
+                        highScore = playerScore;
+                        winnerId = id;
+                    }
+                });
                 this.endGame(winnerId);
             }
         },
 
         endGame(winnerId) {
             this.state.isGameOver = true;
-            this.stopDynamicUpdates();
             const winnerData = this.state.playersData[winnerId];
             const isPlayerWinner = winnerId === 'player-main';
             SoundManager.play(isPlayerWinner ? 'win' : 'lose');
             
             this.elements.gameOverTitle.textContent = isPlayerWinner ? "Vitória!" : "Derrota!";
-            this.elements.gameOverMessage.textContent = `${winnerData.name} venceu a partida!`;
+            this.elements.gameOverMessage.textContent = `${winnerData.name} venceu a partida com ${this.state.game.players[winnerId].score} pontos!`;
             this.elements.gameOverWinnerAvatar.innerHTML = winnerData.avatarSVG;
             this.elements.gameOverOverlay.classList.remove('hidden');
             this.logEvent(`${winnerData.name} venceu a partida!`, 'game-event');
         },
 
         restartGame() {
-            this.stopDynamicUpdates();
             this.initializeState();
             this.renderPlayerAreas();
             this.render();
             document.getElementById('pause-menu-overlay').classList.add('hidden');
             document.getElementById('game-over-overlay').classList.add('hidden');
             this.logEvent('Partida iniciada. Boa sorte!', 'game-event');
-            this.startDynamicUpdates();
             this.animatePlayerEntry();
         },
 
         togglePause(pauseState) {
             this.state.isPaused = pauseState;
             this.elements.pauseMenuOverlay.classList.toggle('hidden', !this.state.isPaused);
-            if (this.state.isPaused) this.stopDynamicUpdates();
-            else this.startDynamicUpdates();
         },
         
-        onActivatePower(power, powerEl) {
+        onActivateConcept(concept, conceptEl) {
             if (this.state.isAnimating || this.state.isPaused) return;
-            const elixir = this.state.bottomHud.elixir;
-            if (elixir < power.cost) {
+            const player = this.state.game.players['player-main'];
+            
+            if (player.score < concept.cost) {
                 SoundManager.play('error');
-                powerEl.classList.add('invalid-shake');
-                setTimeout(() => powerEl.classList.remove('invalid-shake'), 500);
+                conceptEl.classList.add('invalid-shake');
+                setTimeout(() => conceptEl.classList.remove('invalid-shake'), 500);
                 return;
             }
 
@@ -548,52 +449,39 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 this.state.roundSummary.isActive = true;
                 this.state.roundSummary.startPlayerId = this.state.game.currentPlayerId;
             }
-            this.state.roundSummary.powersUsed.push({
-                playerId: 'player-main',
-                powerId: power.id
-            });
+            this.state.roundSummary.powersUsed.push({ playerId: 'player-main', powerId: concept.id });
 
-            this.state.bottomHud.elixir -= power.cost;
+            player.score -= concept.cost;
             SoundManager.play('power_activate');
             
-            powerEl.classList.add('vanishing');
-            if(power.handler) { power.handler(this); }
+            conceptEl.classList.add('vanishing');
+            if(concept.handler) { concept.handler(this); }
             
             setTimeout(() => {
-                const player = this.state.game.players['player-main'];
-                const powerIndex = player.powers.findIndex(p => p.id === power.id);
+                const conceptIndex = player.concepts.findIndex(c => c.id === concept.id);
+                if (player.conceptDeck.length === 0) this.replenishConceptDeck();
 
-                if (player.powerDeck.length === 0) {
-                    this.replenishPowerDeck();
-                }
-
-                const newPower = player.powerDeck.shift();
-                if (powerIndex !== -1 && newPower) {
-                    player.powers[powerIndex] = newPower;
-                }
+                const newConcept = player.conceptDeck.shift();
+                if (conceptIndex !== -1 && newConcept) player.concepts[conceptIndex] = newConcept;
                 
                 this.render();
             }, 500);
         },
         
-        replenishPowerDeck() {
+        replenishConceptDeck() {
             const player = this.state.game.players['player-main'];
-            this.logEvent('Seu deck de poderes foi reembaralhado!', 'game-event');
-            const currentPowerIds = new Set(player.powers.map(p => p.id));
-            const allPowerIds = Object.keys(POWERS_DATA);
-            const availablePowers = allPowerIds.filter(id => !currentPowerIds.has(id));
-            
-            player.powerDeck = this.shuffleArray(availablePowers).map(id => POWERS_DATA[id]);
+            this.logEvent('Seu deck de conceitos foi reembaralhado!', 'game-event');
+            const currentConceptIds = new Set(player.concepts.map(p => p.id));
+            const allConceptIds = Object.keys(CONCEPTS_DATA);
+            const availableConcepts = allConceptIds.filter(id => !currentConceptIds.has(id));
+            player.conceptDeck = this.shuffleArray(availableConcepts).map(id => CONCEPTS_DATA[id]);
         },
 
-        // MODIFICAÇÃO: Unificar lógica de toque e mouse
+        // --- Drag and Drop ---
         onDragStart(e) {
             if (this.state.isAnimating || this.state.game.currentPlayerId !== 'player-main' || this.state.isPaused) return;
-
-            // Unifica o evento para mouse e toque
             const touch = e.touches ? e.touches[0] : e;
             const cardEl = touch.target.closest('.cr-card');
-
             if (!cardEl || !this.elements.crHandContainer.contains(cardEl)) return;
 
             SoundManager.play('button_click');
@@ -606,55 +494,29 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 isDragging: true, draggedCardIndex: cardIndex, draggedElement: cardEl, cloneElement: clone,
                 offset: { x: touch.clientX - cardEl.getBoundingClientRect().left, y: touch.clientY - cardEl.getBoundingClientRect().top }
             };
-            
             cardEl.classList.add('dragging');
-            this.onDragMove(e); // Passa o evento original para a primeira chamada de move
+            this.onDragMove(e);
         },
-        // MODIFICAÇÃO: Unificar lógica de toque e mouse
         onDragMove(e) {
             if (!this.state.dragState.isDragging) return;
-            
-            // Previne o scroll da página em dispositivos de toque
             if (e.cancelable) e.preventDefault();
-
-            // Unifica o evento para mouse e toque
             const touch = e.touches ? e.touches[0] : e;
             const { cloneElement, offset } = this.state.dragState;
-
             cloneElement.style.left = `${touch.clientX - offset.x}px`;
             cloneElement.style.top = `${touch.clientY - offset.y}px`;
 
             const discardRect = this.elements.discardPile.getBoundingClientRect();
             const isOverDiscard = touch.clientX > discardRect.left && touch.clientX < discardRect.right && touch.clientY > discardRect.top && touch.clientY < discardRect.bottom;
-
-            if (isOverDiscard) {
-                const cardData = this.state.bottomHud.handCards[this.state.dragState.draggedCardIndex];
-                if (this.isCardPlayable(cardData)) {
-                    this.elements.discardPile.classList.add('droppable');
-                    this.elements.discardPile.classList.remove('invalid-drop');
-                } else {
-                    this.elements.discardPile.classList.add('invalid-drop');
-                    this.elements.discardPile.classList.remove('droppable');
-                }
-            } else {
-                this.elements.discardPile.classList.remove('droppable', 'invalid-drop');
-            }
+            this.elements.discardPile.classList.toggle('droppable', isOverDiscard);
         },
-        // MODIFICAÇÃO: Unificar lógica de toque e mouse
         onDragEnd(e) {
             if (!this.state.dragState.isDragging) return;
-
-            // Unifica o evento. Para 'touchend', usa 'changedTouches'
             const touch = e.changedTouches ? e.changedTouches[0] : e;
-
             const { cloneElement, draggedElement, draggedCardIndex } = this.state.dragState;
             const discardRect = this.elements.discardPile.getBoundingClientRect();
             const isOverDiscard = touch.clientX > discardRect.left && touch.clientX < discardRect.right && touch.clientY > discardRect.top && touch.clientY < discardRect.bottom;
-            const cardData = this.state.bottomHud.handCards[draggedCardIndex];
 
-            if (isOverDiscard && this.isCardPlayable(cardData)) {
-                this.playCard(draggedCardIndex);
-            }
+            if (isOverDiscard) this.playCard(draggedCardIndex);
 
             if (draggedElement) draggedElement.classList.remove('dragging');
             if (cloneElement) cloneElement.remove();
@@ -662,21 +524,19 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             this.state.dragState = { isDragging: false };
         },
         
+        // --- Animações e VFX ---
         async animateCardFly(startElement, endElement, cardData, isOpponent = false) {
             const startRect = startElement.getBoundingClientRect();
             const endRect = endElement.getBoundingClientRect();
             const cardEl = document.createElement('div');
             cardEl.className = 'cr-card animated-card-fly';
-            cardEl.dataset.color = cardData.color;
+            const color = ERA_COLOR_MAP[cardData.era] || 'wild';
+            cardEl.dataset.color = color;
             if (isOpponent) cardEl.classList.add('back');
             else cardEl.innerHTML = this.renderCardContent(cardData);
             document.body.appendChild(cardEl);
             
-            Object.assign(cardEl.style, {
-                width: `${startRect.width}px`, height: `${startRect.height}px`,
-                top: `${startRect.top}px`, left: `${startRect.left}px`
-            });
-
+            Object.assign(cardEl.style, { width: `${startRect.width}px`, height: `${startRect.height}px`, top: `${startRect.top}px`, left: `${startRect.left}px` });
             await new Promise(r => requestAnimationFrame(r));
             const targetLeft = endRect.left + (endRect.width / 2) - (startRect.width / 2);
             const targetTop = endRect.top + (endRect.height / 2) - (startRect.height / 2);
@@ -706,7 +566,15 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             this.logEvent("Embaralhando descarte...", 'game-event');
             const discardRect = this.elements.discardPile.getBoundingClientRect();
             const drawRect = this.elements.drawDeck.getBoundingClientRect();
-            const cards = this.state.game.discardPile.slice(0, -1).map(cardData => {
+            const cardsToShuffle = this.state.game.discardPile.slice(0, -1);
+
+            if (cardsToShuffle.length === 0) {
+                this.state.isAnimating = false;
+                return;
+            }
+
+            const cards = cardsToShuffle.map(cardId => {
+                const cardData = PHILOSOPHERS_DATA[cardId];
                 const card = document.createElement('div');
                 card.className = 'cr-card shuffling-card';
                 card.innerHTML = this.renderCardContent(cardData);
@@ -746,11 +614,11 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
 
             const summaryHtml = `
                 <div id="round-summary-card">
-                    <h3>Poderes da Rodada</h3>
+                    <h3>Conceitos da Rodada</h3>
                     <ul>
                         ${summary.powersUsed.map(usage => {
                             const playerData = this.state.playersData[usage.playerId];
-                            const powerData = POWERS_DATA[usage.powerId];
+                            const powerData = CONCEPTS_DATA[usage.powerId];
                             return `
                                 <li>
                                     <div class="power-icon">${powerData.icon}</div>
@@ -780,13 +648,14 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             }, 3000);
         },
 
+        // --- Funções de Renderização ---
         render() {
             this.renderOpponentHands();
             this.renderTurnIndicator();
             this.renderDiscardPile();
             this.renderBottomHud();
             this.renderDeckCounters();
-            this.renderElixir();
+            this.renderScores();
             this.renderStatusEffects();
             this.renderLog();
             this.renderUsedPowerIndicators();
@@ -811,9 +680,10 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 el.innerHTML = `
                     <div class="status-effects-container"></div>
                     <div class="used-power-indicator"></div> 
+                    <div class="player-score">0</div>
                     <div class="avatar">${playerData.avatarSVG}</div>
                     <div class="player-name">${playerData.name}</div>
-                    <div class="opponent-hand">7</div>`;
+                    <div class="opponent-hand">5</div>`;
                 
                 let currentAngle = startAngle + (i * angleStep);
                 if (numOpponents === 1) currentAngle = -90;
@@ -840,42 +710,40 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             }
         },
         renderDiscardPile() {
-            const cardData = this.state.game.lastPlayedCard;
+            const cardId = this.state.game.lastPlayedCard;
             const discardPileEl = this.elements.discardPile;
-            if (cardData) {
-                discardPileEl.innerHTML = `<div class="cr-card" data-color="${cardData.color}" style="width:100%; height:100%;">${this.renderCardContent(cardData)}</div>`;
-                if (cardData.chosenColor) {
-                    const indicator = document.createElement('div');
-                    indicator.className = 'chosen-color-indicator';
-                    indicator.style.backgroundColor = `var(--card-${cardData.chosenColor})`;
-                    discardPileEl.querySelector('.cr-card').appendChild(indicator);
-                }
+            if (cardId) {
+                const cardData = PHILOSOPHERS_DATA[cardId];
+                const color = ERA_COLOR_MAP[cardData.era] || 'wild';
+                discardPileEl.innerHTML = `<div class="cr-card" data-color="${color}" style="width:100%; height:100%;">${this.renderCardContent(cardData)}</div>`;
             } else {
                 discardPileEl.innerHTML = '';
             }
         },
         renderBottomHud() {
             this.renderPlayerHandArc();
-            this.renderPowers();
-            this.renderNextPowerPreview();
+            this.renderConcepts();
+            this.renderNextConceptPreview();
         },
         renderPlayerHandArc() {
             const handContainer = this.elements.crHandContainer;
             handContainer.innerHTML = '';
-            const cards = this.state.bottomHud.handCards;
+            const cards = this.state.game.players['player-main'].hand;
             const numCards = cards.length;
             const maxAngle = Math.min(numCards * 10, 80);
             const anglePerCard = numCards > 1 ? maxAngle / (numCards - 1) : 0;
             const startAngle = -maxAngle / 2;
             const liftDistance = 120;
             
-            cards.forEach((cardData, index) => {
+            cards.forEach((cardId, index) => {
+                const cardData = PHILOSOPHERS_DATA[cardId];
                 const cardEl = document.createElement('div');
                 cardEl.className = 'cr-card';
                 cardEl.dataset.index = index;
-                cardEl.dataset.color = cardData.color;
+                const color = ERA_COLOR_MAP[cardData.era] || 'wild';
+                cardEl.dataset.color = color;
                 cardEl.innerHTML = this.renderCardContent(cardData);
-                if (this.state.game.currentPlayerId === 'player-main' && this.isCardPlayable(cardData)) {
+                if (this.state.game.currentPlayerId === 'player-main') {
                     cardEl.classList.add('playable');
                 }
                 const angle = startAngle + (index * anglePerCard);
@@ -887,34 +755,34 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 handContainer.appendChild(cardEl);
             });
         },
-        renderPowers() {
+        renderConcepts() {
             const powersContainer = this.elements.powersContainer;
             powersContainer.innerHTML = '';
-            const playerPowers = this.state.game.players['player-main'].powers;
-            playerPowers.forEach(power => {
-                const powerEl = document.createElement('div');
-                powerEl.className = 'cr-card power-card';
-                powerEl.dataset.powerId = power.id;
-                const elixir = this.state.bottomHud.elixir;
-                if(elixir < power.cost) {
-                    powerEl.classList.add('unaffordable');
+            const playerConcepts = this.state.game.players['player-main'].concepts;
+            const playerScore = this.state.game.players['player-main'].score;
+            playerConcepts.forEach(concept => {
+                const conceptEl = document.createElement('div');
+                conceptEl.className = 'cr-card power-card';
+                conceptEl.dataset.powerId = concept.id;
+                if (playerScore < concept.cost) {
+                    conceptEl.classList.add('unaffordable');
                 }
-                powerEl.innerHTML = `<div class="card-icon">${power.icon}</div><div class="card-cost">${power.cost}</div>`;
+                conceptEl.innerHTML = `<div class="card-icon">${concept.icon}</div><div class="card-cost">${concept.cost}</div>`;
                 const transformValue = 'none';
-                powerEl.style.transform = transformValue;
-                powerEl.style.setProperty('--original-transform', transformValue);
-                powerEl.addEventListener('dblclick', () => this.onActivatePower(power, powerEl));
-                powerEl.addEventListener('mouseenter', () => this.showTooltip({ value: power.name, color: `Poder (Custo: ${power.cost})`, description: power.description }, powerEl));
-                powerEl.addEventListener('mouseleave', () => this.hideTooltip());
-                powersContainer.appendChild(powerEl);
+                conceptEl.style.transform = transformValue;
+                conceptEl.style.setProperty('--original-transform', transformValue);
+                conceptEl.addEventListener('dblclick', () => this.onActivateConcept(concept, conceptEl));
+                conceptEl.addEventListener('mouseenter', () => this.showTooltip({ name: concept.name, date: `Custo: ${concept.cost}`, description: concept.description }, conceptEl));
+                conceptEl.addEventListener('mouseleave', () => this.hideTooltip());
+                powersContainer.appendChild(conceptEl);
             });
         },
-        renderNextPowerPreview() {
+        renderNextConceptPreview() {
             const nextPowerCardEl = this.elements.nextPowerCard;
-            const nextPower = this.state.game.players['player-main'].powerDeck[0];
-            if(nextPower) {
-                nextPowerCardEl.innerHTML = `<div class="card-icon">${nextPower.icon}</div><div class="card-cost">${nextPower.cost}</div>`;
-                 nextPowerCardEl.addEventListener('mouseenter', () => this.showTooltip({ value: nextPower.name, color: `Poder (Custo: ${nextPower.cost})`, description: nextPower.description }, nextPowerCardEl));
+            const nextConcept = this.state.game.players['player-main'].conceptDeck[0];
+            if(nextConcept) {
+                nextPowerCardEl.innerHTML = `<div class="card-icon">${nextConcept.icon}</div><div class="card-cost">${nextConcept.cost}</div>`;
+                 nextPowerCardEl.addEventListener('mouseenter', () => this.showTooltip({ name: nextConcept.name, date: `Custo: ${nextConcept.cost}`, description: nextConcept.description }, nextPowerCardEl));
                  nextPowerCardEl.addEventListener('mouseleave', () => this.hideTooltip());
             } else {
                 nextPowerCardEl.innerHTML = '';
@@ -930,7 +798,7 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 const playerEl = document.getElementById(usage.playerId);
                 if (playerEl) {
                     const indicatorEl = playerEl.querySelector('.used-power-indicator');
-                    const powerData = POWERS_DATA[usage.powerId];
+                    const powerData = CONCEPTS_DATA[usage.powerId];
                     if (indicatorEl && powerData) {
                         indicatorEl.innerHTML = powerData.icon;
                         indicatorEl.classList.add('visible');
@@ -939,18 +807,20 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             });
         },
         renderCardContent(cardData) {
-            const content = cardData.icon ? `<div class="card-icon">${cardData.icon}</div>` : `<span class="card-value">${cardData.value}</span>`;
-            return `${content}<div class="card-cost">${cardData.cost}</div>`;
+            return `<span class="card-value">${cardData.name}</span><div class="card-cost">${cardData.date}</div>`;
         },
         renderDeckCounters() {
             this.elements.drawDeckCounter.textContent = this.state.game.drawDeck.length;
             this.elements.discardPileCounter.textContent = this.state.game.discardPile.length;
         },
-        renderElixir() {
-            const currentElixir = this.state.bottomHud.elixir;
-            const elixirPercentage = (currentElixir / MAX_ELIXIR) * 100;
-            this.elements.elixirBarFill.style.width = `${elixirPercentage}%`;
-            this.elements.elixirText.textContent = `${Math.floor(currentElixir)} / ${MAX_ELIXIR}`;
+        renderScores() {
+            this.state.game.playerOrder.forEach(id => {
+                const playerEl = document.getElementById(id);
+                const scoreEl = playerEl ? playerEl.querySelector('.player-score') : null;
+                if (scoreEl) {
+                    scoreEl.textContent = this.state.game.players[id].score;
+                }
+            });
         },
         renderStatusEffects() {
             this.state.game.playerOrder.forEach(id => {
@@ -970,17 +840,25 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 const playerNameHtml = entry.playerName ? `<span class="player-name">${entry.playerName}</span>` : '';
                 return `<li data-event-type="${entry.type}">${playerNameHtml} ${entry.message}</li>`;
             }).join('');
+            this.elements.logList.scrollTop = 0; // Auto-scroll to top
         },
         showTooltip(cardData, targetElement) {
             if (!cardData.description) return;
             const rect = targetElement.getBoundingClientRect();
-            this.elements.tooltipTitle.textContent = `${cardData.value} (${cardData.color})`;
+            this.elements.tooltipTitle.textContent = `${cardData.name} (${cardData.era || cardData.date})`;
             this.elements.tooltipDescription.textContent = cardData.description;
             const tooltipEl = this.elements.tooltip;
             tooltipEl.classList.add('visible');
             const tooltipRect = tooltipEl.getBoundingClientRect();
+
+            let top = rect.top - tooltipRect.height - 10;
+            // Adjust if tooltip goes off-screen
+            if (top < 10) {
+                top = rect.bottom + 10;
+            }
+
             tooltipEl.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
-            tooltipEl.style.top = `${rect.top - tooltipRect.height - 10}px`;
+            tooltipEl.style.top = `${top}px`;
         },
         hideTooltip() {
             this.elements.tooltip.classList.remove('visible');
@@ -988,33 +866,9 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
         logEvent(message, type = 'generic', playerId = '') {
             const playerName = playerId && this.state.playersData[playerId] ? this.state.playersData[playerId].name : '';
             this.state.logMessages.unshift({ message, type, playerName });
-            if (this.state.logMessages.length > 20) this.state.logMessages.pop();
+            if (this.state.logMessages.length > 30) this.state.logMessages.pop();
             this.renderLog();
         },
-        startDynamicUpdates() {
-            this.stopDynamicUpdates();
-            this.timers = {};
-            this.timers.elixir = setInterval(() => {
-                if (this.state.isPaused) return;
-                const hudState = this.state.bottomHud;
-                if (hudState.elixir < MAX_ELIXIR) {
-                    hudState.elixir = Math.min(MAX_ELIXIR, hudState.elixir + ELIXIR_PER_TICK);
-                    const currentWholeElixir = Math.floor(hudState.elixir);
-                    if (currentWholeElixir > hudState.lastWholeElixir) {
-                        hudState.lastWholeElixir = currentWholeElixir;
-                        this.elements.elixirBarContainer.classList.add('pulse-elixir-gain');
-                        setTimeout(() => this.elements.elixirBarContainer.classList.remove('pulse-elixir-gain'), 400);
-                    }
-                    this.renderElixir();
-                }
-            }, ELIXIR_TICK_RATE);
-        },
-        stopDynamicUpdates() {
-            if (this.timers) {
-                Object.values(this.timers).forEach(timerId => clearInterval(timerId));
-            }
-            this.timers = null;
-        }
     };
 
     window.GameUI = GameUI;
