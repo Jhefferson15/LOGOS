@@ -42,7 +42,7 @@ body {
     overflow: hidden;
     height: 100vh;
     width: 100vw;
-    background-image: url('/Frontend/assets/game/images/background/atenas.png');
+    background-image: url('./../../assets/game/images/background/atenas.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

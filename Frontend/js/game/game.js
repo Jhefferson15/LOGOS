@@ -17,14 +17,14 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
         isMuted: false,
         sounds: {},
         soundFiles: {
-            play_card: '/Frontend/assets/game/audio/flipcard.mp3',
-            draw_card: '/Frontend/assets/game/audio/flipcard.mp3',
-            button_click: '/Frontend/assets/game/audio/flipcard.mp3',
-            shuffle: '/Frontend/assets/game/audio/flipcard.mp3',
-            win: '/Frontend/assets/game/audio/game_start.mp3',
-            lose: '/Frontend/assets/game/audio/flipcard.mp3',
-            error: '/Frontend/assets/game/audio/flipcard.mp3',
-            power_activate: '/Frontend/assets/game/audio/flipcard.mp3'
+            play_card: './../assets/game/audio/flipcard.mp3',
+            draw_card: './../assets/game/audio/flipcard.mp3',
+            button_click: './../assets/game/audio/flipcard.mp3',
+            shuffle: './../assets/game/audio/flipcard.mp3',
+            win: './../assets/game/audio/game_start.mp3',
+            lose: './../assets/game/audio/flipcard.mp3',
+            error: './../assets/game/audio/flipcard.mp3',
+            power_activate: './../assets/game/audio/flipcard.mp3'
         },
         init() {
             for (const key in this.soundFiles) {
@@ -317,7 +317,7 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             
             // Funcionalidade do botão de sair
             this.elements.quitButton.addEventListener('click', () => {
-                window.location.href = '/Frontend/index.html';
+                window.location.href = './../index.html';
             });
 
             this.elements.colorOptions.addEventListener('click', e => {

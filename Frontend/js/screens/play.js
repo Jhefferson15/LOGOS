@@ -34,7 +34,7 @@ export function handlePlayScreenClick(e, gameState, updateDynamicUI, toast) {
         t.textContent = 'Carregando Batalha...';
         
         // Redireciona diretamente para a página do jogo para um carregamento limpo
-        window.location.href = '/Frontend/views/game.html';
+        window.location.href = './views/game.html';
         return; // Encerra a função aqui
     }
 
