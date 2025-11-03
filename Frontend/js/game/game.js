@@ -299,9 +299,15 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
         },
 
         bindEventListeners() {
+            // ADIÇÃO: Eventos de toque para suporte mobile
             this.elements.crHandContainer.addEventListener('mousedown', e => this.onDragStart(e));
+            this.elements.crHandContainer.addEventListener('touchstart', e => this.onDragStart(e), { passive: false });
+
             window.addEventListener('mousemove', e => this.onDragMove(e));
+            window.addEventListener('touchmove', e => this.onDragMove(e), { passive: false });
+
             window.addEventListener('mouseup', e => this.onDragEnd(e));
+            window.addEventListener('touchend', e => this.onDragEnd(e));
             
             this.elements.drawDeck.addEventListener('click', () => {
                 SoundManager.play('button_click');
@@ -580,9 +586,14 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             player.powerDeck = this.shuffleArray(availablePowers).map(id => POWERS_DATA[id]);
         },
 
+        // MODIFICAÇÃO: Unificar lógica de toque e mouse
         onDragStart(e) {
             if (this.state.isAnimating || this.state.game.currentPlayerId !== 'player-main' || this.state.isPaused) return;
-            const cardEl = e.target.closest('.cr-card');
+
+            // Unifica o evento para mouse e toque
+            const touch = e.touches ? e.touches[0] : e;
+            const cardEl = touch.target.closest('.cr-card');
+
             if (!cardEl || !this.elements.crHandContainer.contains(cardEl)) return;
 
             SoundManager.play('button_click');
@@ -593,21 +604,28 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             
             this.state.dragState = {
                 isDragging: true, draggedCardIndex: cardIndex, draggedElement: cardEl, cloneElement: clone,
-                offset: { x: e.clientX - cardEl.getBoundingClientRect().left, y: e.clientY - cardEl.getBoundingClientRect().top }
+                offset: { x: touch.clientX - cardEl.getBoundingClientRect().left, y: touch.clientY - cardEl.getBoundingClientRect().top }
             };
             
             cardEl.classList.add('dragging');
-            this.onDragMove(e);
+            this.onDragMove(e); // Passa o evento original para a primeira chamada de move
         },
+        // MODIFICAÇÃO: Unificar lógica de toque e mouse
         onDragMove(e) {
             if (!this.state.dragState.isDragging) return;
-            e.preventDefault();
+            
+            // Previne o scroll da página em dispositivos de toque
+            if (e.cancelable) e.preventDefault();
+
+            // Unifica o evento para mouse e toque
+            const touch = e.touches ? e.touches[0] : e;
             const { cloneElement, offset } = this.state.dragState;
-            cloneElement.style.left = `${e.clientX - offset.x}px`;
-            cloneElement.style.top = `${e.clientY - offset.y}px`;
+
+            cloneElement.style.left = `${touch.clientX - offset.x}px`;
+            cloneElement.style.top = `${touch.clientY - offset.y}px`;
 
             const discardRect = this.elements.discardPile.getBoundingClientRect();
-            const isOverDiscard = e.clientX > discardRect.left && e.clientX < discardRect.right && e.clientY > discardRect.top && e.clientY < discardRect.bottom;
+            const isOverDiscard = touch.clientX > discardRect.left && touch.clientX < discardRect.right && touch.clientY > discardRect.top && touch.clientY < discardRect.bottom;
 
             if (isOverDiscard) {
                 const cardData = this.state.bottomHud.handCards[this.state.dragState.draggedCardIndex];
@@ -622,11 +640,16 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 this.elements.discardPile.classList.remove('droppable', 'invalid-drop');
             }
         },
+        // MODIFICAÇÃO: Unificar lógica de toque e mouse
         onDragEnd(e) {
             if (!this.state.dragState.isDragging) return;
+
+            // Unifica o evento. Para 'touchend', usa 'changedTouches'
+            const touch = e.changedTouches ? e.changedTouches[0] : e;
+
             const { cloneElement, draggedElement, draggedCardIndex } = this.state.dragState;
             const discardRect = this.elements.discardPile.getBoundingClientRect();
-            const isOverDiscard = e.clientX > discardRect.left && e.clientX < discardRect.right && e.clientY > discardRect.top && e.clientY < discardRect.bottom;
+            const isOverDiscard = touch.clientX > discardRect.left && touch.clientX < discardRect.right && touch.clientY > discardRect.top && touch.clientY < discardRect.bottom;
             const cardData = this.state.bottomHud.handCards[draggedCardIndex];
 
             if (isOverDiscard && this.isCardPlayable(cardData)) {
