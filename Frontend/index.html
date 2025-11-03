@@ -6,11 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="./">
     <title>Logos - O Jogo da Filosofia</title>
+    <link rel="icon" href="assets/LOGOS.ico" type="image/x-icon">
+    <meta property="og:title" content="Logos - O Jogo da Filosofia">
+    <meta property="og:description" content="Explore o mundo da filosofia, debata ideias e aprenda com os grandes pensadores da história.">
+    <meta property="og:image" content="assets/LOGOS.ico">
+    <meta property="og:url" content="https://jhefferson15.github.io/LOGOS/Frontend/index.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Logos - O Jogo da Filosofia">
+    <meta name="twitter:description" content="Explore o mundo da filosofia, debata ideias e aprenda com os grandes pensadores da história.">
+    <meta name="twitter:image" content="assets/LOGOS.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
 
@@ -79,5 +89,16 @@
 
     <!-- Scripts -->
     <script type="module" src="js/main.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>
 </body>
 </html>
