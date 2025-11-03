@@ -1,7 +1,6 @@
 import { arenas } from '../../js/data/arenas.js';
 import { popupManager } from '../../js/ui/PopupManager.js';
 
-
 export function initPlayScreen(gameState, updateDynamicUI, toast) {
     // Código de inicialização da tela, permanece o mesmo.
     const arena = arenas[1];
@@ -67,7 +66,7 @@ export function handlePlayScreenClick(e, gameState, updateDynamicUI, toast) {
         const c = gameState.chestSlots[i];
         if (!c) return;
 
-        if (t.classList.contains('open-btn')) {
+        if (c.status === 'ready') {
             const chest = gameState.chestSlots[i];
             const rewards = { scrolls: 50, books: 1 };
             gameState.scrolls += rewards.scrolls;

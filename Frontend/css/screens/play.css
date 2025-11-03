@@ -1,5 +1,11 @@
 html, body {
-    overflow: hidden; 
+    height: 100%;
+}
+
+.play-screen-active {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 .player-info-container, .timed-chests {
     display: flex;
@@ -65,29 +71,49 @@ html, body {
 /* --- ESTILOS ATUALIZADOS --- */
 
 .arena-section {
+
     display: flex;
+
     /* Alinha o texto no topo e no centro */
+
     justify-content: center;
+
     align-items: flex-start;
+
     text-align: center;
+
     
+
     position: relative;
+
     border-radius: 0.6rem;
+
     overflow: hidden;
+
     cursor: pointer;
+
     
+
     /* Altura e margem para espaçamento */
-    min-height: 200px; /* Damos uma altura mínima para a imagem aparecer bem */
-    height: 45vh; /* 45% da altura da tela */
+
+    flex: 1; /* This is the important part */
 
     margin-top: 1rem;
+
     padding-top: 1.5rem; /* Empurra o texto um pouco para baixo do topo */
 
+
+
     /* Estilos do background */
+
     background-size: contain;
+
     background-position: center; /* Você pode usar 'top center' se preferir focar no topo da imagem */
+
     background-repeat: no-repeat;
+
     color: white;
+
 }
 
 .arena-section h2 {
@@ -132,7 +158,7 @@ html, body {
     border-radius: 0.6rem;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     text-align: center;
     padding: 0.3rem;

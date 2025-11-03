@@ -58,10 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const s = document.createElement('div');
                 s.className = 'chest-slot';
                 s.dataset.index = i;
+
                 if (c) {
                     s.innerHTML = `<i class="${getChestIcon(c.type)} fa-2x"></i><span>${c.type}</span><span>${c.arena}</span><strong>${formatTime(c.remainingTime)}</strong>`;
                     s.classList.add(c.status);
-                    if (c.status === 'ready') s.innerHTML += `<button class="open-btn">Abrir</button>`;
                 } else {
                     s.innerHTML = `<span>Vazio</span>`;
                 }
@@ -79,6 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const content = await response.text();
             screenContent.innerHTML = content;
             currentScreenName = screenName; // Set the current screen name
+
+            // Add/remove class for play screen
+            if (screenName === 'play') {
+                screenContent.classList.add('play-screen-active');
+            } else {
+                screenContent.classList.remove('play-screen-active');
+            }
 
             // Initialize screen-specific JavaScript (for initial setup, not event listeners)
             switch (screenName) {
@@ -153,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     const gameHeader = document.querySelector('.game-header'); // Certifique-se que o seletor está correto
-
 
     // Adicione este listener para o header
     gameHeader.addEventListener('click', (e) => {
