@@ -3,7 +3,7 @@ import { gameState } from '../data/gameState.js';
 import { arenas } from '../data/arenas.js';
 import { toast } from './Toast.js'; // Importar o toast para usar nos placeholders
 import { PHILOSOPHERS_DATA } from '../data/philosophers.js';
-import { CONCEPTS_DATA } from '../data/concepts.js';
+import { CONCEPTS_DATA, CONCEPTS_DATA_1 } from '../data/concepts.js';
 
 class PopupManager {
     constructor() {
@@ -88,7 +88,11 @@ class PopupManager {
      _renderPhilosopherCardPopup(philosopher, state) {
         // Gera o HTML para os conceitos-chave
         const keyConceptsHTML = philosopher.keyConcepts.map(conceptId => {
-            const concept = CONCEPTS_DATA[conceptId];
+            const concept = CONCEPTS_DATA_1[conceptId]; // Use o objeto de dados correto
+            if (!concept) {
+                console.warn(`Conceito com ID ${conceptId} não encontrado para o filósofo ${philosopher.name}.`);
+                return ''; // Retorna uma string vazia se o conceito não for encontrado
+            }
             return `
                 <div class="concept-chip">
                     <strong>${concept.name}</strong> (${concept.points} pts)
@@ -98,12 +102,17 @@ class PopupManager {
         }).join('');
 
         // Gera o HTML para os predecessores (links para outros filósofos)
-        const predecessorsHTML = philosopher.predecessors.length > 0
-            ? philosopher.predecessors.map(id => {
-                const pred = PHILOSOPHERS_DATA[id];
-                // Adicionamos um data-id para poder, no futuro, clicar e abrir o popup deles
-                return `<span class="philosopher-link" data-philosopher-id="${id}">${pred.name}</span>`;
-              }).join(', ')
+        const predecessorsLinks = philosopher.predecessors.map(id => {
+            const pred = PHILOSOPHERS_DATA[id];
+            if (!pred) {
+                console.warn(`Predecessor com ID ${id} não encontrado para o filósofo ${philosopher.name}.`);
+                return null;
+            }
+            return `<span class="philosopher-link" data-philosopher-id="${id}">${pred.name}</span>`;
+        }).filter(Boolean); // Remove quaisquer links nulos
+
+        const predecessorsHTML = predecessorsLinks.length > 0
+            ? predecessorsLinks.join(', ')
             : '<span>Nenhum direto (pensador original)</span>';
 
         const nextLevelPergaminhos = state.level * 10; // Exemplo de cálculo

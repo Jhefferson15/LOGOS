@@ -1,8 +1,10 @@
-import { initPlayScreen, handlePlayScreenClick } from './screens/play.js';                                                                                                                 
-import { initLibraryScreen, handleLibraryScreenClick } from './screens/library.js';                                                                                                        
-import { initPhilosophersScreen, handlePhilosophersScreenClick } from './screens/philosophers.js';                                                                                                
-import { initSchoolsScreen, handleSchoolsScreenClick } from './screens/schools.js';                                                                                                        
+import { initPlayScreen, handlePlayScreenClick } from './screens/play.js';
+import { initLibraryScreen, handleLibraryScreenClick } from './screens/library.js';
+import { initPhilosophersScreen, handlePhilosophersScreenClick } from './screens/philosophers.js';
+import { initSchoolsScreen, handleSchoolsScreenClick } from './screens/schools.js';
 import { initSymposiumScreen, handleSymposiumScreenClick } from './screens/symposium.js'; 
+import { initSchoolMembersScreen, handleSchoolMembersScreenClick } from './screens/school_members.js'; 
+import { initReelsScreen, handleReelsScreenClick } from './screens/reels.js'; // Import reels screen
 import { toast } from './ui/Toast.js';
 import { gameState } from './data/gameState.js';
 import { popupManager } from './ui/PopupManager.js';
@@ -70,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const loadScreen = async (screenName) => {
+    const loadScreen = async (screenName, params = null) => {
         try {
             const response = await fetch(`views/${screenName}.html`);
             if (!response.ok) {
@@ -87,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 screenContent.classList.remove('play-screen-active');
             }
 
-            // Initialize screen-specific JavaScript (for initial setup, not event listeners)
+            // Initialize screen-specific JavaScript
             switch (screenName) {
                 case 'play':
                     initPlayScreen(gameState, updateDynamicUI, toast);
@@ -103,6 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     break;
                 case 'symposium':
                     initSymposiumScreen(gameState, updateDynamicUI, toast);
+                    break;
+                case 'school_members':
+                    initSchoolMembersScreen(params, gameState);
+                    break;
+                case 'reels': // Novo caso
+                    initReelsScreen(gameState);
                     break;
                 default:
                     console.warn(`No specific init function for screen: ${screenName}`);
@@ -136,6 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        let navigationAction = null;
+
         // Delegate clicks to the appropriate screen handler
         switch (currentScreenName) {
             case 'play':
@@ -145,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 handleLibraryScreenClick(e, gameState, updateDynamicUI, toast);
                 break;
             case 'schools':
-                handleSchoolsScreenClick(e, gameState, updateDynamicUI, toast);
+                navigationAction = handleSchoolsScreenClick(e, gameState, updateDynamicUI, toast);
                 break;
             case 'symposium':
                 handleSymposiumScreenClick(e, gameState, updateDynamicUI, toast);
@@ -153,10 +163,19 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'philosophers':
                 handlePhilosophersScreenClick(e, gameState, updateDynamicUI, toast);
                 break;
-            // Philosophers screen has no click handler yet
-            default:
-                // console.log(`Click on ${currentScreenName} screen:`, e.target);
+            case 'school_members':
+                handleSchoolMembersScreenClick(e, gameState, toast);
                 break;
+            case 'reels': // Novo caso
+                handleReelsScreenClick(e, gameState, toast);
+                break;
+            default:
+                break;
+        }
+
+        // If the handler returned a navigation action, execute it
+        if (navigationAction && navigationAction.action === 'navigate') {
+            loadScreen(navigationAction.screen, navigationAction.params);
         }
     });
     const gameHeader = document.querySelector('.game-header'); // Certifique-se que o seletor está correto

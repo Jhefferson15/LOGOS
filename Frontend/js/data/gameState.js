@@ -44,5 +44,10 @@ export let gameState = {
         { type: 'Papiro', arena: 1, status: 'locked', totalTime: 10800, remainingTime: 10 },
     ],
     isUnlocking: true,
-    discoveredPhilosophers: [2, 3]
+    discoveredPhilosophers: [2, 3],
+
+    // --- Ações do Usuário ---
+    userActions: {
+        likedPosts: [1, 3] // IDs dos posts que o usuário curtiu
+    }
 };

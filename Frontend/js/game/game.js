@@ -85,7 +85,6 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
         // --- INICIALIZAÇÃO ---
         init() {
             this.cacheDOMElements();
-            this.bindEventListeners();
             this.restartGame(); 
         },
 
@@ -116,6 +115,7 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 isGameOver: false,
                 logMessages: [],
                 dragState: { isDragging: false },
+                selectedCardIndex: null, // -1 represents no card selected
                 roundSummary: { isActive: false, startPlayerId: null, powersUsed: [] },
                 playersData: playersData,
                 game: {
@@ -174,7 +174,8 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 gameLog: document.getElementById('game-log'),
                 logToggle: document.getElementById('log-toggle'),
                 nextPowerPreview: document.getElementById('next-power-preview'),
-                nextPowerCard: document.getElementById('next-power-card')
+                nextPowerCard: document.getElementById('next-power-card'),
+                selectedCardSlot: document.getElementById('selected-card-slot') // Add this line
             };
         },
 
@@ -228,8 +229,7 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
         async playCard(cardIndex) {
             if (this.state.isAnimating || this.state.isGameOver) return;
 
-            const playerId = 'player-main';
-            const player = this.state.game.players[playerId];
+            const player = this.state.game.players['player-main'];
             const cardToPlayId = player.hand[cardIndex];
             
             const points = this.calculateChronologicalScore(cardToPlayId);
@@ -239,13 +239,19 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             this.hideTooltip();
             SoundManager.play('play_card');
 
-            let startElement = this.elements.crHandContainer.children[cardIndex];
+            let startElement;
+            if (this.state.selectedCardIndex !== null && this.state.selectedCardIndex === cardIndex) {
+                startElement = this.elements.selectedCardSlot.firstChild;
+            } else {
+                startElement = Array.from(this.elements.crHandContainer.children).find(el => parseInt(el.dataset.index) === cardIndex);
+            }
+
             await this.animateCardFly(startElement, this.elements.discardPile, PHILOSOPHERS_DATA[cardToPlayId]);
 
             const playedCardId = player.hand.splice(cardIndex, 1)[0];
             this.state.game.discardPile.push(playedCardId);
             this.state.game.lastPlayedCard = playedCardId;
-            this.logEvent(`jogou ${PHILOSOPHERS_DATA[playedCardId].name} e ganhou ${points} Pontos de Sabedoria!`, 'play-card', playerId);
+            this.logEvent(`jogou ${PHILOSOPHERS_DATA[playedCardId].name} e ganhou ${points} Pontos de Sabedoria!`, 'play-card', 'player-main');
 
             const cardData = PHILOSOPHERS_DATA[playedCardId];
             const color = ERA_COLOR_MAP[cardData.era] || 'wild';
@@ -255,6 +261,7 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             const newCard = await this.drawCardFromDeck();
             if (newCard) player.hand.push(newCard);
 
+            this.state.selectedCardIndex = null; // Deselect card after playing
             this.render();
             
             this.checkForWinner();
@@ -482,23 +489,38 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             if (this.state.isAnimating || this.state.game.currentPlayerId !== 'player-main' || this.state.isPaused) return;
             const touch = e.touches ? e.touches[0] : e;
             const cardEl = touch.target.closest('.cr-card');
-            if (!cardEl || !this.elements.crHandContainer.contains(cardEl)) return;
 
-            SoundManager.play('button_click');
-            const cardIndex = parseInt(cardEl.dataset.index);
-            const clone = cardEl.cloneNode(true);
-            clone.classList.add('drag-clone');
-            document.body.appendChild(clone);
-            
-            this.state.dragState = {
-                isDragging: true, draggedCardIndex: cardIndex, draggedElement: cardEl, cloneElement: clone,
-                offset: { x: touch.clientX - cardEl.getBoundingClientRect().left, y: touch.clientY - cardEl.getBoundingClientRect().top }
-            };
-            cardEl.classList.add('dragging');
-            this.onDragMove(e);
+            if (!cardEl) return;
+
+            if (this.elements.crHandContainer.contains(cardEl)) {
+                const cardIndex = parseInt(cardEl.dataset.index);
+                
+                if (this.state.selectedCardIndex === cardIndex) {
+                    this.state.selectedCardIndex = null;
+                } else {
+                    this.state.selectedCardIndex = cardIndex;
+                }
+                this.render();
+
+                // Inicia o drag
+                SoundManager.play('button_click');
+                const clone = cardEl.cloneNode(true);
+                clone.classList.add('drag-clone');
+                document.body.appendChild(clone);
+                
+                this.state.dragState = {
+                    isDragging: true, draggedCardIndex: cardIndex, draggedElement: cardEl, cloneElement: clone,
+                    offset: { x: touch.clientX - cardEl.getBoundingClientRect().left, y: touch.clientY - cardEl.getBoundingClientRect().top }
+                };
+                cardEl.classList.add('dragging');
+                this.onDragMove(e);
+            } else if (this.elements.selectedCardSlot.contains(cardEl)) {
+                this.state.selectedCardIndex = null;
+                this.render();
+            }
         },
         onDragMove(e) {
-            if (!this.state.dragState.isDragging) return;
+            if (!this.state.dragState || !this.state.dragState.isDragging) return;
             if (e.cancelable) e.preventDefault();
             const touch = e.touches ? e.touches[0] : e;
             const { cloneElement, offset } = this.state.dragState;
@@ -523,6 +545,8 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
             this.elements.discardPile.classList.remove('droppable', 'invalid-drop');
             this.state.dragState = { isDragging: false };
         },
+
+
         
         // --- Animações e VFX ---
         async animateCardFly(startElement, endElement, cardData, isOpponent = false) {
@@ -727,15 +751,31 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
         },
         renderPlayerHandArc() {
             const handContainer = this.elements.crHandContainer;
+            const selectedCardSlot = this.elements.selectedCardSlot;
             handContainer.innerHTML = '';
+            selectedCardSlot.innerHTML = '';
+
             const cards = this.state.game.players['player-main'].hand;
-            const numCards = cards.length;
+            const numCards = cards.length - (this.state.selectedCardIndex !== null ? 1 : 0);
             const maxAngle = Math.min(numCards * 10, 80);
             const anglePerCard = numCards > 1 ? maxAngle / (numCards - 1) : 0;
             const startAngle = -maxAngle / 2;
             const liftDistance = 120;
             
+            let handCardIndex = 0;
             cards.forEach((cardId, index) => {
+                if (index === this.state.selectedCardIndex) {
+                    // Render the selected card in its slot
+                    const cardData = PHILOSOPHERS_DATA[cardId];
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'cr-card';
+                    const color = ERA_COLOR_MAP[cardData.era] || 'wild';
+                    cardEl.dataset.color = color;
+                    cardEl.innerHTML = this.renderCardContent(cardData);
+                    selectedCardSlot.appendChild(cardEl);
+                    return; // Skip rendering in hand
+                }
+
                 const cardData = PHILOSOPHERS_DATA[cardId];
                 const cardEl = document.createElement('div');
                 cardEl.className = 'cr-card';
@@ -746,13 +786,14 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
                 if (this.state.game.currentPlayerId === 'player-main') {
                     cardEl.classList.add('playable');
                 }
-                const angle = startAngle + (index * anglePerCard);
+                const angle = startAngle + (handCardIndex * anglePerCard);
                 const transformValue = `rotate(${angle}deg) translateY(-${liftDistance}px)`;
                 cardEl.style.transform = transformValue;
                 cardEl.style.setProperty('--original-transform', transformValue);
                 cardEl.addEventListener('mouseenter', () => this.showTooltip(cardData, cardEl));
                 cardEl.addEventListener('mouseleave', () => this.hideTooltip());
                 handContainer.appendChild(cardEl);
+                handCardIndex++;
             });
         },
         renderConcepts() {
@@ -875,8 +916,9 @@ if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
 
     // Garante que o init seja chamado apenas uma vez.
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => GameUI.init());
+        document.addEventListener('DOMContentLoaded', () => { GameUI.init(); GameUI.bindEventListeners(); });
     } else {
         GameUI.init();
+        GameUI.bindEventListeners();
     }
 }

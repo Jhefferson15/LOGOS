@@ -1,0 +1,45 @@
+<div class="screen" id="school-members-screen">
+    <!-- Cabeçalho da Tela -->
+    <header class="screen-header">
+        <div class="header-content">
+            <a href="#schools" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                <span>Voltar</span>
+            </a>
+            <h1 id="school-members-title" class="screen-title">Escola</h1>
+        </div>
+    </header>
+
+    <!-- Abas de Navegação -->
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="members-content">
+                <i class="fas fa-users"></i>
+                <span>Membros</span>
+            </button>
+            <button class="tab-btn" data-tab="posts-content">
+                <i class="fas fa-film"></i>
+                <span>Postagens</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="screen-content">
+        <!-- Aba de Membros -->
+        <div class="tab-content active" id="members-content">
+            <div class="card-grid-container">
+                <div class="card-grid" id="school-members-grid">
+                    <!-- Cards dos membros serão inseridos dinamicamente aqui -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Aba de Postagens (Reels) -->
+        <div class="tab-content" id="posts-content">
+            <div class="reels-container" id="school-posts-reels-container">
+                <!-- Postagens em formato de reels serão inseridas aqui -->
+            </div>
+        </div>
+    </main>
+</div>

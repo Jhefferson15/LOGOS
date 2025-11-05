@@ -479,6 +479,27 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 /* --- 9. NOVOS ESTILOS - LOG COLAPSÁVEL E RESUMO INTEGRADO --- */
 
+#selected-card-slot {
+    position: absolute;
+    bottom: 190%; /* Ajuste conforme necessário */
+    left: 60%;
+    transform: translateX(-50%);
+    width: 100px; /* Largura do card + padding */
+    height: 145px; /* Altura do card + padding */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1006; /* Acima da mão, abaixo do drag */
+}
+
+#selected-card-slot .cr-card {
+    position: static; /* Remove o posicionamento absoluto da mão */
+    transform: none !important; /* Remove a rotação e translação */
+    pointer-events: all;
+    cursor: pointer;
+}
+
+
 /* LOG COLAPSÁVEL */
 #game-log {
     transition: height 0.4s ease-in-out;
