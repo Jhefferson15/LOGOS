@@ -1,5 +1,6 @@
-const CACHE_NAME = 'logos-cache-v1';
+const CACHE_NAME = 'logos-cache-v2';
 const urlsToCache = [
+  './', // Cache the root URL
   './index.html',
   './manifest.json',
   './views/game.html',
@@ -59,19 +60,46 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        // Use { cache: 'reload' } to bypass the HTTP cache for the request.
+        const promises = urlsToCache.map(url => {
+            return fetch(url, { cache: 'reload' }).then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+                }
+                return cache.put(url, response);
+            });
+        });
+        return Promise.all(promises);
       })
   );
 });
 
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      })
+self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
+});
+
+self.addEventListener('fetch', event => {
+    // More robust fetch strategy: Network falling back to cache
+    event.respondWith(
+        fetch(event.request).catch(() => {
+            return caches.match(event.request).then(response => {
+                if (response) {
+                    return response;
+                }
+                // Optional: return a fallback page if nothing is found
+            });
+        })
+    );
 });
