@@ -34,60 +34,47 @@ class PopupManager {
         let title = '';
         let contentHTML = '';
 
-        switch (popupId) {
-            // --- NOVO POPUP DE ESTUDO ---
-            case 'philosopher-study-module':
-                const philosopherStudy = PHILOSOPHERS_DATA[data.philosopherId];
-                if (!philosopherStudy || !STUDY_CONTENT_DATA[data.philosopherId]) {
-                    console.error(`Dados de estudo para o filósofo com ID ${data.philosopherId} não encontrados.`);
-                    toast.show('Material de estudo indisponível para este filósofo.', 'error');
-                    return;
-                }
-                title = `Estudando: ${philosopherStudy.name}`;
-                contentHTML = this._renderPhilosopherStudyModulePopup(data.philosopherId);
-                break;
-
-            // --- POPUPS EXISTENTES ---
-            case 'philosopher-details':
-                const philosopher = PHILOSOPHERS_DATA[data.philosopherId];
-                if (!philosopher) {
-                    console.error(`Filósofo com ID ${data.philosopherId} não encontrado.`);
-                    return;
-                }
-                title = philosopher.name;
-                contentHTML = this._renderPhilosopherCardPopup(philosopher, data.philosopherState);
-                break;
-            case 'full-profile':
-                title = 'Perfil do Filósofo';
-                contentHTML = this._renderFullProfilePopup();
-                break;
-            case 'settings':
-                title = 'Configurações';
-                contentHTML = this._renderSettingsPopup();
-                break;
-            case 'chest-rewards':
-                title = `Recompensas da Obra "${data.chestType}"`;
-                contentHTML = this._renderChestRewardsPopup(data.rewards);
-                break;
-            case 'arena-timeline':
-                title = 'Jornada Filosófica';
-                contentHTML = this._renderArenaTimelinePopup();
-                break;
-            case 'level-xp':
-                title = `Nível ${gameState.level} - Progresso`;
-                contentHTML = this._renderLevelXpPopup();
-                break;
-            case 'chest-info':
-                title = `Obra: ${data.chest.type}`;
-                contentHTML = this._renderChestInfoPopup(data.chest);
-                break;
-            case 'timed-chest-info':
-                title = data.type === 'free' ? 'Conceito Grátis' : 'Coroa da Sabedoria';
-                contentHTML = this._renderTimedChestInfoPopup(data.type);
-                break;
-            default:
-                console.error(`Popup com ID "${popupId}" não encontrado.`);
+        if (popupId === 'philosopher-study-module') {
+            const philosopherStudy = PHILOSOPHERS_DATA[data.philosopherId];
+            if (!philosopherStudy || !STUDY_CONTENT_DATA[data.philosopherId]) {
+                console.error(`Dados de estudo para o filósofo com ID ${data.philosopherId} não encontrados.`);
+                toast.show('Material de estudo indisponível para este filósofo.', 'error');
                 return;
+            }
+            title = `Estudando: ${philosopherStudy.name}`;
+            contentHTML = this._renderPhilosopherStudyModulePopup(data.philosopherId);
+        } else if (popupId === 'philosopher-details') {
+            const philosopher = PHILOSOPHERS_DATA[data.philosopherId];
+            if (!philosopher) {
+                console.error(`Filósofo com ID ${data.philosopherId} não encontrado.`);
+                return;
+            }
+            title = philosopher.name;
+            contentHTML = this._renderPhilosopherCardPopup(philosopher, data.philosopherState);
+        } else if (popupId === 'full-profile') {
+            title = 'Perfil do Filósofo';
+            contentHTML = this._renderFullProfilePopup();
+        } else if (popupId === 'settings') {
+            title = 'Configurações';
+            contentHTML = this._renderSettingsPopup();
+        } else if (popupId === 'chest-rewards') {
+            title = `Recompensas da Obra "${data.chestType}"`;
+            contentHTML = this._renderChestRewardsPopup(data.rewards);
+        } else if (popupId === 'arena-timeline') {
+            title = 'Jornada Filosófica';
+            contentHTML = this._renderArenaTimelinePopup();
+        } else if (popupId === 'level-xp') {
+            title = `Nível ${gameState.level} - Progresso`;
+            contentHTML = this._renderLevelXpPopup();
+        } else if (popupId === 'chest-info') {
+            title = `Obra: ${data.chest.type}`;
+            contentHTML = this._renderChestInfoPopup(data.chest);
+        } else if (popupId === 'timed-chest-info') {
+            title = data.type === 'free' ? 'Conceito Grátis' : 'Coroa da Sabedoria';
+            contentHTML = this._renderTimedChestInfoPopup(data.type);
+        } else {
+            console.error(`Popup com ID "${popupId}" não encontrado.`);
+            return;
         }
 
         this.titleElement.innerText = title;
