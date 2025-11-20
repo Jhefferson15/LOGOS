@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>ui/PopupManager.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Card.html">Card</a><ul class='methods'><li data-type='method'><a href="Card.html#.create">create</a></li><li data-type='method'><a href="Card.html#.createConcept">createConcept</a></li></ul></li><li><a href="Modal.html">Modal</a><ul class='methods'><li data-type='method'><a href="Modal.html#hide">hide</a></li><li data-type='method'><a href="Modal.html#setContent">setContent</a></li><li data-type='method'><a href="Modal.html#show">show</a></li></ul></li><li><a href="Player.html">Player</a><ul class='methods'><li data-type='method'><a href="Player.html#.create">create</a></li></ul></li><li><a href="PopupManager.html">PopupManager</a><ul class='methods'><li data-type='method'><a href="PopupManager.html#close">close</a></li><li data-type='method'><a href="PopupManager.html#open">open</a></li></ul></li><li><a href="Toast.html">Toast</a><ul class='methods'><li data-type='method'><a href="Toast.html#show">show</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-GameConstants.html">GameConstants</a></li><li><a href="module-LoginScreen.html">LoginScreen</a></li><li><a href="module-Main.html">Main</a></li></ul><h3>Namespaces</h3><ul><li><a href="GameState.html">GameState</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CONCEPTS_DATA">CONCEPTS_DATA</a></li><li><a href="global.html#CONCEPTS_DATA_1">CONCEPTS_DATA_1</a></li><li><a href="global.html#PHILOSOPHERS_DATA">PHILOSOPHERS_DATA</a></li><li><a href="global.html#POSTS_DATA">POSTS_DATA</a></li><li><a href="global.html#SCHOOLS">SCHOOLS</a></li><li><a href="global.html#STUDY_CONTENT_DATA">STUDY_CONTENT_DATA</a></li><li><a href="global.html#arenas">arenas</a></li><li><a href="global.html#handleLibraryScreenClick">handleLibraryScreenClick</a></li><li><a href="global.html#handlePhilosophersScreenClick">handlePhilosophersScreenClick</a></li><li><a href="global.html#handlePlayScreenClick">handlePlayScreenClick</a></li><li><a href="global.html#handleReelsScreenClick">handleReelsScreenClick</a></li><li><a href="global.html#handleSchoolMembersScreenClick">handleSchoolMembersScreenClick</a></li><li><a href="global.html#handleSchoolsScreenClick">handleSchoolsScreenClick</a></li><li><a href="global.html#handleSymposiumScreenClick">handleSymposiumScreenClick</a></li><li><a href="global.html#initLibraryScreen">initLibraryScreen</a></li><li><a href="global.html#initPhilosophersScreen">initPhilosophersScreen</a></li><li><a href="global.html#initPlayScreen">initPlayScreen</a></li><li><a href="global.html#initReelsScreen">initReelsScreen</a></li><li><a href="global.html#initSchoolMembersScreen">initSchoolMembersScreen</a></li><li><a href="global.html#initSchoolsScreen">initSchoolsScreen</a></li><li><a href="global.html#initSymposiumScreen">initSymposiumScreen</a></li><li><a href="global.html#preloadAdjacentImages">preloadAdjacentImages</a></li><li><a href="global.html#renderMembers">renderMembers</a></li><li><a href="global.html#renderPosts">renderPosts</a></li><li><a href="global.html#renderReels">renderReels</a></li><li><a href="global.html#setupImageObserver">setupImageObserver</a></li><li><a href="global.html#setupReelsObserver">setupReelsObserver</a></li><li><a href="global.html#showLikeAnimation">showLikeAnimation</a></li><li><a href="global.html#toggleLike">toggleLike</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">ui/PopupManager.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { gameState } from '../data/gameState.js';
+import { arenas } from '../data/arenas.js';
+import { toast } from './Toast.js';
+import { PHILOSOPHERS_DATA } from '../data/philosophers.js';
+import { CONCEPTS_DATA, CONCEPTS_DATA_1 } from '../data/concepts.js';
+
+// --- IMPORTANTE ---
+// Presume-se a existência de um novo arquivo de dados para o conteúdo de estudo aprofundado.
+// Crie este arquivo em: /data/study_content.js
+import { STUDY_CONTENT_DATA } from '../data/study_content.js';
+
+
+/**
+ * Manages the display and interaction of modal popups in the application.
+ * Handles opening, closing, and rendering specific popup content.
+ */
+class PopupManager {
+    constructor() {
+        this.container = document.getElementById('modal-container');
+        this.titleElement = document.getElementById('modal-title');
+        this.bodyElement = document.getElementById('modal-body');
+        this.closeBtn = document.getElementById('modal-close-btn');
+
+        this.closeBtn.addEventListener('click', () => this.close());
+        this.container.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-container')) {
+                this.close();
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' &amp;&amp; this.container.classList.contains('active')) {
+                this.close();
+            }
+        });
+    }
+
+    /**
+     * Opens a specific popup with provided data.
+     * @param {string} popupId - The unique identifier for the popup type (e.g., 'philosopher-details').
+     * @param {Object} [data={}] - Data required to render the popup content.
+     */
+    open(popupId, data = {}) {
+        let title = '';
+        let contentHTML = '';
+
+        if (popupId === 'philosopher-study-module') {
+            const philosopherStudy = PHILOSOPHERS_DATA[data.philosopherId];
+            if (!philosopherStudy || !STUDY_CONTENT_DATA[data.philosopherId]) {
+                console.error(`Dados de estudo para o filósofo com ID ${data.philosopherId} não encontrados.`);
+                toast.show('Material de estudo indisponível para este filósofo.', 'error');
+                return;
+            }
+            title = `Estudando: ${philosopherStudy.name}`;
+            contentHTML = this._renderPhilosopherStudyModulePopup(data.philosopherId);
+        } else if (popupId === 'philosopher-details') {
+            const philosopher = PHILOSOPHERS_DATA[data.philosopherId];
+            if (!philosopher) {
+                console.error(`Filósofo com ID ${data.philosopherId} não encontrado.`);
+                return;
+            }
+            title = philosopher.name;
+            contentHTML = this._renderPhilosopherCardPopup(philosopher, data.philosopherState);
+        } else if (popupId === 'full-profile') {
+            title = 'Perfil do Filósofo';
+            contentHTML = this._renderFullProfilePopup();
+        } else if (popupId === 'settings') {
+            title = 'Configurações';
+            contentHTML = this._renderSettingsPopup();
+        } else if (popupId === 'chest-rewards') {
+            title = `Recompensas da Obra "${data.chestType}"`;
+            contentHTML = this._renderChestRewardsPopup(data.rewards);
+        } else if (popupId === 'arena-timeline') {
+            title = 'Jornada Filosófica';
+            contentHTML = this._renderArenaTimelinePopup();
+        } else if (popupId === 'level-xp') {
+            title = `Nível ${gameState.level} - Progresso`;
+            contentHTML = this._renderLevelXpPopup();
+        } else if (popupId === 'chest-info') {
+            title = `Obra: ${data.chest.type}`;
+            contentHTML = this._renderChestInfoPopup(data.chest);
+        } else if (popupId === 'timed-chest-info') {
+            title = data.type === 'free' ? 'Conceito Grátis' : 'Coroa da Sabedoria';
+            contentHTML = this._renderTimedChestInfoPopup(data.type);
+        } else {
+            console.error(`Popup com ID "${popupId}" não encontrado.`);
+            return;
+        }
+
+        this.titleElement.innerText = title;
+        this.bodyElement.innerHTML = contentHTML;
+        this.container.classList.add('active');
+        this._addInternalListeners(popupId, data);
+
+        if (popupId === 'arena-timeline') {
+            setTimeout(() => { this.bodyElement.scrollTop = this.bodyElement.scrollHeight; }, 100);
+        }
+    }
+
+    /**
+     * Closes the currently active popup.
+     */
+    close() {
+        this.container.classList.remove('active');
+        setTimeout(() => { this.bodyElement.innerHTML = ''; }, 300);
+    }
+
+    // --- MÉTODO DE RENDERIZAÇÃO DO NOVO MÓDULO DE ESTUDO ---
+
+    /**
+     * Renders the HTML content for the Philosopher Study Module.
+     * @private
+     * @param {string|number} philosopherId - The ID of the philosopher to study.
+     * @returns {string} The HTML string for the study module.
+     */
+    _renderPhilosopherStudyModulePopup(philosopherId) {
+        const studyData = STUDY_CONTENT_DATA[philosopherId];
+        const philosopher = PHILOSOPHERS_DATA[philosopherId];
+
+        // Inicializa o progresso no gameState se não existir (robusto)
+        if (!gameState.studyProgress) gameState.studyProgress = {};
+        if (!gameState.studyProgress[philosopherId]) {
+            gameState.studyProgress[philosopherId] = { pagesViewed: new Set() };
+        }
+
+        const progress = gameState.studyProgress[philosopherId];
+        const percentage = Math.floor((progress.pagesViewed.size / studyData.totalPages) * 100);
+        const css = `
+            &lt;style>
+            .study-module { display: flex; flex-direction: column; height: 100%; }
+            .study-header { display: flex; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+            .study-header img { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 3px solid var(--bg-darker); }
+            .study-header .header-info { flex: 1; }
+            .study-progress-bar { background: var(--bg-dark); border-radius: 5px; height: 10px; margin-top: 5px; overflow: hidden; }
+            .study-progress-bar div { background: var(--accent-yellow); height: 100%; transition: width 0.5s ease; }
+            .study-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-top: 1rem; }
+            .study-tabs .tab-btn { background: none; border: none; padding: 0.8rem 1rem; cursor: pointer; border-bottom: 3px solid transparent; }
+            .study-tabs .tab-btn.active { border-bottom-color: var(--accent-yellow); font-weight: bold; }
+            .study-content-area { flex: 1; padding: 1rem 0; overflow-y: auto; font-family: 'Times New Roman', serif; line-height: 1.6; }
+            .study-content-area h1, .study-content-area h2 { font-family: var(--font-title); }
+            .study-content-area .comic-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+            .study-content-area .comic-grid img { width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+            .study-content-area .quiz-question { background: var(--bg-light); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+            .study-content-area .toc-list { list-style: none; padding: 0; }
+            .study-content-area .toc-list li { padding: 0.5rem; border-bottom: 1px dashed var(--border-color); cursor: pointer; }
+            .study-content-area .toc-list li:hover { background: var(--bg-darker-alpha); }
+            .study-navigation { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid var(--border-color); }
+            .study-navigation button { background: var(--bg-darker); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
+            .study-navigation button:disabled { opacity: 0.5; cursor: not-allowed; }
+            &lt;/style>
+        `;
+        return `
+            ${css}
+            &lt;div class="study-module" data-id="${philosopherId}" data-current-page="1" data-total-pages="${studyData.totalPages}">
+                &lt;div class="study-header">
+                    &lt;img src="${studyData.realImage}" alt="Retrato de ${philosopher.name}">
+                    &lt;div class="header-info">
+                        &lt;h2>${philosopher.name}&lt;/h2>
+                        &lt;span>Progresso de Maestria: &lt;span id="study-progress-text">${percentage}&lt;/span>%&lt;/span>
+                        &lt;div class="study-progress-bar">&lt;div id="study-progress-fill" style="width:${percentage}%">&lt;/div>&lt;/div>
+                    &lt;/div>
+                &lt;/div>
+
+                &lt;div class="study-tabs">
+                    &lt;button class="tab-btn active" data-tab="theory">Teoria&lt;/button>
+                    &lt;button class="tab-btn" data-tab="quiz">Quiz&lt;/button>
+                    &lt;button class="tab-btn" data-tab="comic">HQ&lt;/button>
+                &lt;/div>
+
+                &lt;div id="study-content-area" class="study-content-area">
+                    &lt;!-- Conteúdo dinâmico será injetado aqui -->
+                &lt;/div>
+
+                &lt;div id="study-navigation" class="study-navigation">
+                    &lt;button id="study-prev-btn">&lt;i class="fas fa-arrow-left">&lt;/i> Anterior&lt;/button>
+                    &lt;button id="study-toc-btn">&lt;i class="fas fa-list-ul">&lt;/i> Sumário&lt;/button>
+                    &lt;span id="study-page-counter">Página 1 de ${studyData.totalPages}&lt;/span>
+                    &lt;button id="study-next-btn">Próxima &lt;i class="fas fa-arrow-right">&lt;/i>&lt;/button>
+                &lt;/div>
+            &lt;/div>
+        `;
+    }
+
+
+    // --- MÉTODOS DE RENDERIZAÇÃO ANTIGOS (SEM ALTERAÇÃO) ---
+
+    _renderPhilosopherCardPopup(philosopher, state) {
+        const keyConceptsHTML = philosopher.keyConcepts.map(conceptId => {
+            const concept = CONCEPTS_DATA_1[conceptId];
+            if (!concept) return '';
+            return `&lt;div class="concept-chip">&lt;strong>${concept.name}&lt;/strong> (${concept.points} pts)&lt;p>${concept.description}&lt;/p>&lt;/div>`;
+        }).join('');
+        const predecessorsLinks = philosopher.predecessors.map(id => {
+            const pred = PHILOSOPHERS_DATA[id];
+            return pred ? `&lt;span class="philosopher-link" data-philosopher-id="${id}">${pred.name}&lt;/span>` : null;
+        }).filter(Boolean);
+        const predecessorsHTML = predecessorsLinks.length > 0 ? predecessorsLinks.join(', ') : '&lt;span>Nenhum direto (pensador original)&lt;/span>';
+        const nextLevelPergaminhos = state.level * 10;
+        return `
+            &lt;div class="philosopher-popup">
+                &lt;div class="popup-header">&lt;img src="${philosopher.image}" alt="${philosopher.name}" class="philosopher-image-large">&lt;div class="header-info">&lt;span class="philosopher-era">${philosopher.era}&lt;/span>&lt;h2 class="philosopher-school">${philosopher.school}&lt;/h2>&lt;p class="philosopher-description">${philosopher.description}&lt;/p>&lt;/div>&lt;/div>
+                &lt;div class="popup-stats">&lt;div class="stat-item">&lt;span>Nível&lt;/span>&lt;strong>${state.level}&lt;/strong>&lt;/div>&lt;div class="stat-item">&lt;span>Poder de Argumento&lt;/span>&lt;strong>${state.level * 15}&lt;/strong>&lt;/div>&lt;div class="stat-item">&lt;span>Custo de Aprimoramento&lt;/span>&lt;strong>&lt;i class="fas fa-coins">&lt;/i> ${state.level * 100}&lt;/strong>&lt;/div>&lt;/div>
+                &lt;div class="popup-upgrade-section">&lt;div class="upgrade-bar">&lt;div class="upgrade-fill" style="width: ${(state.count / nextLevelPergaminhos) * 100}%">&lt;/div>&lt;span class="upgrade-text">${state.count} / ${nextLevelPergaminhos} Pergaminhos&lt;/span>&lt;/div>&lt;button class="action-button ${state.count >= nextLevelPergaminhos ? '' : 'disabled'}" id="upgrade-philosopher-btn">Aprimorar&lt;/button>&lt;/div>
+                &lt;div class="popup-section">&lt;h3>Conceitos-Chave&lt;/h3>&lt;div class="concepts-container">${keyConceptsHTML}&lt;/div>&lt;/div>
+                &lt;div class="popup-section">&lt;h3>Influenciado Por&lt;/h3>&lt;p class="predecessors-list">${predecessorsHTML}&lt;/p>&lt;/div>
+            &lt;/div>`;
+    }
+
+    _renderArenaTimelinePopup() {
+        // ... (código original sem alterações)
+        const playerTrophies = gameState.trophies;
+        let currentArena = arenas.slice().reverse().find(arena => playerTrophies >= arena.trophyReq) || arenas[0];
+        const arenasHTML = arenas.map(arena => {
+            let stateClass = playerTrophies >= arena.trophyReq ? (arena.id === currentArena.id ? 'current' : 'unlocked') : 'locked';
+            const schoolsText = arena.schools.join(', ').replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+            return `&lt;div class="arena-card ${stateClass}" data-trophies="${arena.trophyReq}">&lt;div class="path-connector">&lt;div class="trophy-marker">&lt;i class="fa-solid fa-trophy icon">&lt;/i>&lt;span class="trophy-count">${arena.trophyReq}&lt;/span>&lt;/div>&lt;/div>&lt;div class="arena-content">&lt;div class="arena-image-wrapper">&lt;img src="${arena.image}" alt="${arena.name}" class="arena-image"> ${stateClass === 'locked' ? '&lt;i class="fa-solid fa-lock lock-icon">&lt;/i>' : ''}&lt;/div>&lt;div class="arena-info"> ${stateClass === 'current' ? '&lt;span class="current-marker">SUA ARENA&lt;/span>' : ''}&lt;h2>${arena.id}: ${arena.name}&lt;/h2>&lt;div class="unlocks-section">&lt;h3>Escolas de Pensamento&lt;/h3>&lt;p class="schools-list">${schoolsText}&lt;/p>&lt;/div>&lt;/div>&lt;/div>&lt;/div>`;
+        }).join('');
+        const css = `&lt;style>.arena-timeline-popup .arenas-container { display: flex; flex-direction: column-reverse; gap: 20px; padding: 10px; } .arena-timeline-popup .arena-card { display: flex; align-items: flex-start; gap: 15px; padding: 15px; background-color: #fff; border: 1px solid var(--color-border); border-radius: 12px; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.05); } .arena-timeline-popup .path-connector { flex: 0 0 60px; display: flex; flex-direction: column; align-items: center; position: relative; align-self: stretch; } .arena-timeline-popup .path-connector::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 3px; background-image: linear-gradient(to bottom, #ccc 50%, transparent 50%); background-size: 1px 10px; } .arena-timeline-popup .arenas-container .arena-card:last-child .path-connector::before { height: 40px; top: auto; bottom: 0; } .arena-timeline-popup .arenas-container .arena-card:first-child .path-connector::before { height: calc(100% - 40px); top: 40px; } .arena-timeline-popup .trophy-marker { display: flex; flex-direction: column; align-items: center; background-color: var(--color-background); padding: 5px 0; z-index: 1; } .arena-timeline-popup .trophy-marker .icon { font-size: 24px; color: #aaa; } .arena-timeline-popup .trophy-marker .trophy-count { font-weight: bold; font-size: 14px; color: #777; } .arena-timeline-popup .arena-content { flex: 1; } .arena-timeline-popup .arena-image-wrapper { position: relative; margin-bottom: 10px; } .arena-timeline-popup .arena-image { width: 100%; border-radius: 8px; display: block; } .arena-timeline-popup .arena-info h2 { font-family: var(--font-title); font-size: 1.5em; margin-bottom: 8px; } .arena-timeline-popup .unlocks-section h3 { font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 5px; } .arena-timeline-popup .schools-list { font-size: 0.9em; color: #555; } .arena-timeline-popup .arena-card.locked { opacity: 0.7; } .arena-timeline-popup .arena-card.locked .arena-image { filter: grayscale(100%) brightness(0.6); } .arena-timeline-popup .arena-card.locked .arena-info h2 { color: #999; } .arena-timeline-popup .lock-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; color: rgba(255, 255, 255, 0.8); } .arena-timeline-popup .arena-card.current { border-color: var(--color-accent); box-shadow: 0 0 15px rgba(212, 160, 23, 0.5); } .arena-timeline-popup .arena-card.current .trophy-marker .icon, .arena-timeline-popup .arena-card.current .trophy-marker .trophy-count { color: var(--color-accent); font-weight: bold; } .arena-timeline-popup .current-marker { background-color: var(--color-accent); color: white; font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 0.8em; margin-bottom: 10px; display: inline-block; } .arena-timeline-popup .arena-card.unlocked .trophy-marker .icon { color: var(--color-primary); } &lt;/style>`;
+        return `${css}&lt;div class="arena-timeline-popup">&lt;div class="arenas-container">${arenasHTML}&lt;/div>&lt;/div>`;
+    }
+
+    _renderLevelXpPopup() {
+        // ... (código original sem alterações)
+        const winRate = gameState.totalDebates > 0 ? ((gameState.wins / gameState.totalDebates) * 100).toFixed(1) : 0;
+        return `&lt;div class="level-xp-popup">&lt;div class="popup-card">&lt;h4>Progresso Atual&lt;/h4>&lt;div class="xp-bar-popup">&lt;div class="xp-fill-popup" style="width: ${(gameState.xp / gameState.xpMax) * 100}%">&lt;/div>&lt;span class="xp-text">${gameState.xp} / ${gameState.xpMax} XP&lt;/span>&lt;/div>&lt;p class="xp-remaining">Faltam ${gameState.xpMax - gameState.xp} XP para o próximo nível.&lt;/p>&lt;/div>&lt;div class="popup-card">&lt;h4>Recompensas do Nível ${gameState.level + 1}&lt;/h4>&lt;ul class="rewards-list">&lt;li>&lt;i class="fas fa-coins">&lt;/i> +500 Ouro&lt;/li>&lt;li>&lt;i class="fas fa-scroll">&lt;/i> +100 Pergaminhos&lt;/li>&lt;li>&lt;i class="fas fa-unlock-alt">&lt;/i> Nova Arena Desbloqueada&lt;/li>&lt;/ul>&lt;/div>&lt;div class="popup-card">&lt;h4>Estatísticas de Batalha&lt;/h4>&lt;div class="stats-grid">&lt;div class="stat-item">&lt;span>Vitórias&lt;/span>&lt;strong>${gameState.wins}&lt;/strong>&lt;/div>&lt;div class="stat-item">&lt;span>Derrotas&lt;/span>&lt;strong>${gameState.totalDebates - gameState.wins}&lt;/strong>&lt;/div>&lt;div class="stat-item">&lt;span>Coroas&lt;/span>&lt;strong>${gameState.crowns}&lt;/strong>&lt;/div>&lt;div class="stat-item">&lt;span>Taxa de Vit.&lt;/span>&lt;strong>${winRate}%&lt;/strong>&lt;/div>&lt;div class="stat-item">&lt;span>Filósofo Fav.&lt;/span>&lt;strong>Platão&lt;/strong>&lt;/div>&lt;div class="stat-item">&lt;span>Escola Fav.&lt;/span>&lt;strong>Grega&lt;/strong>&lt;/div>&lt;/div>&lt;/div>&lt;/div>`;
+    }
+
+    _renderFullProfilePopup() {
+        // ... (código original sem alterações)
+        const winRate = gameState.totalDebates > 0 ? ((gameState.wins / gameState.totalDebates) * 100).toFixed(1) : 0;
+        return `&lt;div class="profile-popup">&lt;div class="profile-main-info">&lt;div class="profile-avatar-container">&lt;img src="assets/avatars/socrates.png" alt="Avatar" class="profile-avatar">&lt;button class="avatar-change-btn">&lt;i class="fas fa-pencil-alt">&lt;/i>&lt;/button>&lt;/div>&lt;div class="profile-details">&lt;h3>${gameState.playerName}&lt;/h3>&lt;div class="profile-sub-details">&lt;span>&lt;i class="fas fa-shield-alt">&lt;/i> ${gameState.clanName}&lt;/span>&lt;span>&lt;i class="fas fa-trophy">&lt;/i> ${gameState.trophies} Troféus&lt;/span>&lt;/div>&lt;/div>&lt;/div>&lt;div class="profile-tabs">&lt;button class="tab-btn active" data-tab="stats">Perfil&lt;/button>&lt;button class="tab-btn" data-tab="battles">Debates&lt;/button>&lt;button class="tab-btn" data-tab="friends">Amigos&lt;/button>&lt;/div>&lt;div class="tab-content-container">&lt;div class="tab-content active" id="stats-content">&lt;div class="stats-grid">&lt;div class="stat-item">&lt;span>Vitórias&lt;/span>&lt;strong>${gameState.wins}&lt;/strong>&lt;/div>&lt;div class="stat-item">&lt;span>Vitórias 3 Coroas&lt;/span>&lt;strong>${gameState.threeCrownWins || 0}&lt;/strong>&lt;/div>&lt;div class="stat-item">&lt;span>Total Debates&lt;/span>&lt;strong>${gameState.totalDebates}&lt;/strong>&lt;/div>&lt;div class="stat-item">&lt;span>Taxa de Vit.&lt;/span>&lt;strong>${winRate}%&lt;/strong>&lt;/div>&lt;div class="stat-item">&lt;span>Filósofo Favorito&lt;/span>&lt;strong>Platão&lt;/strong>&lt;/div>&lt;div class="stat-item">&lt;span>Doações de Cartas&lt;/span>&lt;strong>${gameState.donations || 0}&lt;/strong>&lt;/div>&lt;/div>&lt;/div>&lt;div class="tab-content" id="battles-content">&lt;p>Histórico de debates aparecerá aqui.&lt;/p>&lt;/div>&lt;div class="tab-content" id="friends-content">&lt;p>Lista de amigos e convites.&lt;/p>&lt;/div>&lt;/div>&lt;/div>`;
+    }
+
+    _renderSettingsPopup() {
+        // ... (código original sem alterações)
+        return `&lt;div class="settings-popup">&lt;div class="settings-section">&lt;h4>&lt;i class="fas fa-volume-up">&lt;/i> Áudio&lt;/h4>&lt;div class="setting-item">&lt;span>Música&lt;/span>&lt;div class="range-slider">&lt;input type="range" min="0" max="100" value="80">&lt;/div>&lt;/div>&lt;div class="setting-item">&lt;span>Efeitos Sonoros&lt;/span>&lt;div class="range-slider">&lt;input type="range" min="0" max="100" value="100">&lt;/div>&lt;/div>&lt;/div>&lt;div class="settings-section">&lt;h4>&lt;i class="fas fa-user-circle">&lt;/i> Conta&lt;/h4>&lt;button class="action-button-secondary">&lt;i class="fab fa-google">&lt;/i> Vincular ao Google&lt;/button>&lt;button class="action-button-secondary">&lt;i class="fab fa-facebook">&lt;/i> Vincular ao Facebook&lt;/button>&lt;/div>&lt;div class="settings-section">&lt;h4>&lt;i class="fas fa-info-circle">&lt;/i> Outros&lt;/h4>&lt;button id="fullscreen-btn" class="action-button-secondary">&lt;i class="fas fa-expand">&lt;/i> &lt;span>Tela Cheia&lt;/span>&lt;/button>&lt;button class="action-button-secondary">Termos de Serviço&lt;/button>&lt;button class="action-button-secondary">Política de Privacidade&lt;/button>&lt;button id="logout-btn" class="action-button red">Sair da Conta&lt;/button>&lt;/div>&lt;/div>`;
+    }
+
+    _renderChestInfoPopup(chest) {
+        // ... (código original sem alterações)
+        const formatTime = (s) => { const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60); return `${h}h ${m}m`; };
+        return `&lt;div class="chest-info-popup">&lt;img src="assets/chests/${chest.type.toLowerCase().replace(' ', '-')}.png" alt="${chest.type}" class="chest-info-image">&lt;p class="chest-arena-text">Obtido na Arena ${chest.arena}&lt;/p>&lt;div class="chest-unlock-info">&lt;i class="fas fa-clock">&lt;/i>&lt;span>Tempo para estudar: &lt;strong>${formatTime(chest.totalTime)}&lt;/strong>&lt;/span>&lt;/div>&lt;h4>Recompensas Possíveis&lt;/h4>&lt;div class="possible-rewards">&lt;span>&lt;i class="fas fa-scroll">&lt;/i> Pergaminhos&lt;/span>&lt;span>&lt;i class="fas fa-book">&lt;/i> Livros&lt;/span>&lt;span>&lt;i class="fas fa-users">&lt;/i> Novos Filósofos&lt;/span>&lt;/div>&lt;/div>`;
+    }
+
+    _renderTimedChestInfoPopup(type) {
+        // ... (código original sem alterações)
+        const chest = type === 'free' ? gameState.timers.freeChest : gameState.timers.crownChest;
+        const isReady = chest &lt;= 0;
+        const formatTime = (s) => { const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60; return h > 0 ? `${h}:${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}` : `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`; };
+        const info = { free: { icon: 'fa-box-open', desc: 'Um baú com conceitos e recursos básicos, disponível a cada 4 horas.' }, crown: { icon: 'fa-crown', desc: 'Vença debates e colete 10 coroas para abrir este baú com recompensas superiores!' } };
+        return `&lt;div class="timed-chest-popup">&lt;i class="fas ${info[type].icon} chest-icon">&lt;/i>&lt;p>${info[type].desc}&lt;/p>${isReady ? `&lt;button class="action-button">Coletar Agora!&lt;/button>` : `&lt;div class="timed-chest-timer">Próximo em: &lt;strong>${formatTime(chest)}&lt;/strong>&lt;/div>`}&lt;/div>`;
+    }
+
+    // --- LISTENERS INTERNOS: ADIÇÃO DA LÓGICA DO MÓDULO DE ESTUDO ---
+
+    _addInternalListeners(popupId, data) {
+
+        if (popupId === 'philosopher-study-module') {
+            this._setupStudyModuleListeners(data.philosopherId);
+        }
+
+        if (popupId === 'full-profile') {
+            const tabs = this.bodyElement.querySelectorAll('.tab-btn');
+            const contents = this.bodyElement.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    this.bodyElement.querySelector(`#${tab.dataset.tab}-content`).classList.add('active');
+                    if (tab.dataset.tab !== 'stats') {
+                        toast.show('Funcionalidade em desenvolvimento!', 'info');
+                    }
+                });
+            });
+            this.bodyElement.querySelector('.avatar-change-btn').addEventListener('click', () => {
+                toast.show('Customização de avatar em breve!', 'info');
+            });
+        }
+        if (popupId === 'philosopher-details') {
+            const upgradeBtn = this.bodyElement.querySelector('#upgrade-philosopher-btn');
+            if (upgradeBtn &amp;&amp; !upgradeBtn.classList.contains('disabled')) {
+                upgradeBtn.addEventListener('click', () => {
+                    toast.show(`Aprimorando ${PHILOSOPHERS_DATA[data.philosopherId].name}...`, 'success');
+                    this.close();
+                });
+            }
+        }
+        if (popupId === 'settings') {
+            this._setupFullscreenButton();
+            const logoutBtn = this.bodyElement.querySelector('#logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    localStorage.removeItem('isLoggedIn');
+                    window.location.href = 'login.html';
+                });
+            }
+        }
+    }
+
+    // --- LÓGICA DE INTERAÇÃO DO MÓDULO DE ESTUDO ---
+
+    _setupStudyModuleListeners(philosopherId) {
+        const module = this.bodyElement.querySelector('.study-module');
+        const contentArea = this.bodyElement.querySelector('#study-content-area');
+        const navigation = this.bodyElement.querySelector('#study-navigation');
+        const tabs = this.bodyElement.querySelectorAll('.study-tabs .tab-btn');
+
+        const updatePage = (pageNumber) => {
+            const studyData = STUDY_CONTENT_DATA[philosopherId];
+            const totalPages = studyData.totalPages;
+
+            // Valida a página
+            let newPage = Math.max(1, Math.min(pageNumber, totalPages));
+            module.dataset.currentPage = newPage;
+
+            // Renderiza conteúdo
+            contentArea.innerHTML = studyData.pages[newPage] || `&lt;p>Conteúdo para esta página ainda não foi escrito.&lt;/p>`;
+
+            // Salva progresso
+            gameState.studyProgress[philosopherId].pagesViewed.add(newPage);
+
+            // Atualiza UI
+            const progress = gameState.studyProgress[philosopherId];
+            const percentage = Math.floor((progress.pagesViewed.size / totalPages) * 100);
+            this.bodyElement.querySelector('#study-progress-text').textContent = percentage;
+            this.bodyElement.querySelector('#study-progress-fill').style.width = `${percentage}%`;
+            this.bodyElement.querySelector('#study-page-counter').textContent = `Página ${newPage} de ${totalPages}`;
+
+            // Atualiza botões
+            this.bodyElement.querySelector('#study-prev-btn').disabled = (newPage === 1);
+            this.bodyElement.querySelector('#study-next-btn').disabled = (newPage === totalPages);
+        };
+
+        const showTableOfContents = () => {
+            const studyData = STUDY_CONTENT_DATA[philosopherId];
+            const tocHTML = Object.entries(studyData.tableOfContents).map(([page, title]) =>
+                `&lt;li data-page="${page}">&lt;strong>Pág. ${page}:&lt;/strong> ${title}&lt;/li>`
+            ).join('');
+            contentArea.innerHTML = `&lt;ul class="toc-list">${tocHTML}&lt;/ul>`;
+
+            contentArea.querySelectorAll('.toc-list li').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const page = parseInt(e.currentTarget.dataset.page);
+                    // Retorna para a aba de teoria e pula para a página
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.bodyElement.querySelector('.tab-btn[data-tab="theory"]').classList.add('active');
+                    navigation.style.display = 'flex';
+                    updatePage(page);
+                });
+            });
+        };
+
+        // Listeners dos botões de navegação
+        navigation.querySelector('#study-prev-btn').addEventListener('click', () => {
+            let currentPage = parseInt(module.dataset.currentPage);
+            updatePage(currentPage - 1);
+        });
+
+        navigation.querySelector('#study-next-btn').addEventListener('click', () => {
+            let currentPage = parseInt(module.dataset.currentPage);
+            updatePage(currentPage + 1);
+        });
+
+        navigation.querySelector('#study-toc-btn').addEventListener('click', showTableOfContents);
+
+        // Listeners das abas
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const tabType = tab.dataset.tab;
+                navigation.style.display = (tabType === 'theory') ? 'flex' : 'none';
+
+                if (tabType === 'theory') {
+                    updatePage(parseInt(module.dataset.currentPage));
+                } else if (tabType === 'quiz') {
+                    contentArea.innerHTML = `&lt;div class="quiz-question">O sistema de Quiz está em desenvolvimento!&lt;/div>`;
+                } else if (tabType === 'comic') {
+                    const comicPanels = STUDY_CONTENT_DATA[philosopherId].comic.map(panelUrl => `&lt;img src="${panelUrl}" alt="Painel da HQ">`).join('');
+                    contentArea.innerHTML = `&lt;div class="comic-grid">${comicPanels}&lt;/div>`;
+                }
+            });
+        });
+
+        // Carrega a primeira página ao abrir
+        updatePage(1);
+    }
+
+    _setupFullscreenButton() {
+        const fullscreenButton = document.getElementById('fullscreen-btn');
+        if (!fullscreenButton) return;
+        const buttonIcon = fullscreenButton.querySelector('i');
+        const buttonText = fullscreenButton.querySelector('span');
+        function updateButtonUI() {
+            if (document.fullscreenElement) {
+                buttonIcon.classList.remove('fa-expand'); buttonIcon.classList.add('fa-compress');
+                buttonText.textContent = 'Sair da Tela Cheia';
+            } else {
+                buttonIcon.classList.remove('fa-compress'); buttonIcon.classList.add('fa-expand');
+                buttonText.textContent = 'Tela Cheia';
+            }
+        }
+        fullscreenButton.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.error(`Erro: ${err.message}`));
+            } else {
+                document.exitFullscreen();
+            }
+        });
+        document.addEventListener('fullscreenchange', updateButtonUI);
+        updateButtonUI();
+    }
+}
+
+export const popupManager = new PopupManager();</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Tue Nov 18 2025 21:20:50 GMT-0300 (Horário Padrão de Brasília) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

@@ -13,6 +13,12 @@
  * Constante para manter a consistência dos nomes das escolas.
  * Funciona como as "cores" ou "facções" do jogo.
  */
+/**
+ * Enum for Philosophical Schools.
+ * Acts as the "factions" or "types" for the philosophers.
+ * @readonly
+ * @enum {string}
+ */
 export const SCHOOLS = {
     // Antigas
     GREGA: 'Grega Clássica',
@@ -25,7 +31,7 @@ export const SCHOOLS = {
     EPICURISMO: 'Epicurismo',
     CINISMO: 'Cinismo',
     NEOPLATONISMO: 'Neoplatonismo',
-    CETISCISMO: 'Ceticismo', 
+    CETISCISMO: 'Ceticismo',
     // Medievais
     ESCOLASTICA: 'Escolástica',
     // Modernas
@@ -46,6 +52,21 @@ export const SCHOOLS = {
  * PHILOSOPHERS_DATA
  * Banco de dados principal das cartas de filósofos.
  */
+/**
+ * Main database of Philosopher cards.
+ * Indexed by unique ID.
+ * @type {Object.<number, {
+ *   date: number,
+ *   name: string,
+ *   school: string,
+ *   era: string,
+ *   predecessors: number[],
+ *   keyConcepts: number[],
+ *   description: string,
+ *   image: string,
+ *   pos: {x: string, y: string}
+ * }>}
+ */
 export const PHILOSOPHERS_DATA = {
     // --- ANTIGUIDADE ---
     // Pré-Socráticos
@@ -64,7 +85,7 @@ export const PHILOSOPHERS_DATA = {
     30: { date: -490, name: 'Protágoras', school: SCHOOLS.SOFISMO, era: 'Antiga', predecessors: [], keyConcepts: [121], description: '"O homem é a medida de todas as coisas".', image: 'assets/game/images/philosophers/protagoras.png', pos: { x: '20%', y: '50%' } },
     37: { date: -485, name: 'Górgias', school: SCHOOLS.SOFISMO, era: 'Antiga', predecessors: [26], keyConcepts: [127], description: 'Mestre da retórica e do ceticismo.', image: 'assets/game/images/philosophers/gorgias.png', pos: { x: '50%', y: '50%' } },
     38: { date: -450, name: 'Trasímaco', school: SCHOOLS.SOFISMO, era: 'Antiga', predecessors: [30, 37], keyConcepts: [128], description: 'Defendia que a justiça é "o interesse do mais forte".', image: 'assets/game/images/philosophers/trasimaco.png', pos: { x: '80%', y: '50%' } },
-    
+
     // Período Clássico e Helenístico
     1: { date: -470, name: 'Sócrates', school: SCHOOLS.GREGA, era: 'Antiga', predecessors: [30], keyConcepts: [101, 102], description: 'O mestre do questionamento. "Só sei que nada sei".', image: 'assets/game/images/philosophers/socrates.png', pos: { x: '15%', y: '50%' } },
     2: { date: -427, name: 'Platão', school: SCHOOLS.GREGA, era: 'Antiga', predecessors: [1, 24, 26], keyConcepts: [103, 104], description: 'Discípulo de Sócrates, idealizou um mundo de formas perfeitas.', image: 'assets/game/images/philosophers/platao.png', pos: { x: '50%', y: '50%' } },

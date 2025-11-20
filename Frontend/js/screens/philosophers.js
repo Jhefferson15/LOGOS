@@ -2,6 +2,13 @@ import { PHILOSOPHERS_DATA } from '../data/philosophers.js';
 import { CONCEPTS_DATA } from '../data/concepts.js';
 import { popupManager } from '../ui/PopupManager.js';
 
+/**
+ * Initializes the Philosophers Collection Screen.
+ * Renders the grid of collected and undiscovered philosopher cards.
+ * @param {object} gameState - The global game state.
+ * @param {function} updateDynamicUI - Function to refresh the UI.
+ * @param {object} toast - Toast notification utility.
+ */
 export function initPhilosophersScreen(gameState, updateDynamicUI, toast) {
     const cardGrid = document.querySelector('.card-grid');
     if (!cardGrid) return;
@@ -13,8 +20,8 @@ export function initPhilosophersScreen(gameState, updateDynamicUI, toast) {
         .sort((a, b) => a.name.localeCompare(b.name));
 
     sortedPhilosophers.forEach(philosopher => {
-        const isDiscovered = gameState.discoveredPhilosophers.includes(philosopher.id);
-        const philosopherState = gameState.collection.philosophers[philosopher.id] || { level: 0, count: 0 };
+        const philosopherState = gameState.collection.philosophers[philosopher.id];
+        const isDiscovered = !!philosopherState;
 
         const cardElement = document.createElement('div');
         cardElement.className = `card-item ${isDiscovered ? 'unlocked' : 'locked'}`;
@@ -33,27 +40,35 @@ export function initPhilosophersScreen(gameState, updateDynamicUI, toast) {
                 <span class="card-level">Não Descoberto</span>
             `;
         }
-        
+
         cardGrid.appendChild(cardElement);
     });
 
     updateDynamicUI();
 }
 
+/**
+ * Handles click events on the Philosophers Screen.
+ * Opens detailed views for discovered philosophers.
+ * @param {Event} e - The click event object.
+ * @param {object} gameState - The global game state.
+ * @param {function} updateDynamicUI - Function to refresh the UI.
+ * @param {object} toast - Toast notification utility.
+ */
 export function handlePhilosophersScreenClick(e, gameState, updateDynamicUI, toast) {
     const cardItem = e.target.closest('.card-item');
-    
+
     if (cardItem && cardItem.dataset.philosopherId) {
         const philosopherId = cardItem.dataset.philosopherId;
-        const isDiscovered = gameState.discoveredPhilosophers.includes(parseInt(philosopherId));
+        const philosopherState = gameState.collection.philosophers[philosopherId];
+        const isDiscovered = !!philosopherState;
 
         if (!isDiscovered) {
             toast.show('Este filósofo ainda não foi descoberto!', 'info');
             return;
         }
 
-        const philosopherState = gameState.collection.philosophers[philosopherId] || { level: 0, count: 0 };
-        popupManager.open('philosopher-details', { 
+        popupManager.open('philosopher-details', {
             philosopherId: philosopherId,
             philosopherState: philosopherState
         });

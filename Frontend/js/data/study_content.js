@@ -1,4 +1,16 @@
 // data/study_content.js
+/**
+ * Database of Study Content.
+ * Contains detailed articles, quizzes, and comics for each philosopher.
+ * @type {Object.<string, {
+ *   realImage: string,
+ *   totalPages: number,
+ *   tableOfContents: Object.<number, string>,
+ *   pages: Object.<string, string>,
+ *   quiz: Array<{question: string, options: string[], answer: string}>,
+ *   comic: string[]
+ * }>}
+ */
 export const STUDY_CONTENT_DATA = {
     '21': { // ID de Tales de Mileto
         realImage: 'assets/game/images/philosophers/real/tales.jpg',
@@ -169,7 +181,7 @@ export const STUDY_CONTENT_DATA = {
             { question: "O fato de Anaximandro e Anaxímenes terem proposto teorias diferentes das de Tales para a Arché demonstra o estabelecimento de uma:", options: ["Rivalidade política que destruiu Mileto.", "Tradição de crítica e debate racional, fundamental para a ciência.", "Decadência do pensamento, já que se afastaram da verdade da água.", "Seita secreta onde as doutrinas não podiam ser alteradas."], answer: "Tradição de crítica e debate racional, fundamental para a ciência." },
             { question: "A teoria de que a Terra é esférica, embora controversa, pode ser atribuída a Tales com base em qual evidência observacional?", options: ["A forma como os terremotos ocorrem.", "A sombra sempre circular que a Terra projeta na Lua durante um eclipse lunar.", "A análise da composição das rochas.", "A observação de que o Sol parece um disco plano."], answer: "A sombra sempre circular que a Terra projeta na Lua durante um eclipse lunar." }
         ],
-        comic: [ 
+        comic: [
             'assets/comics/tales/panel_1.png',
             'assets/comics/tales/panel_2.png',
             'assets/comics/tales/panel_3.png',

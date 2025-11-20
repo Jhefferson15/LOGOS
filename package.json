@@ -1,0 +1,14 @@
+{
+  "name": "logos-documentation",
+  "version": "1.0.0",
+  "description": "Documentation generation for LOGOS project",
+  "scripts": {
+    "docs:build": "jsdoc -c jsdoc.json",
+    "docs:watch": "onchange \"Frontend/js/**/*.js\" -- npm run docs:build"
+  },
+  "devDependencies": {
+    "docdash": "^2.0.2",
+    "jsdoc": "^4.0.2",
+    "onchange": "^7.1.0"
+  }
+}

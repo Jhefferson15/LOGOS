@@ -1,7 +1,7 @@
 import { gameState } from '../data/gameState.js';
 import { PHILOSOPHERS_DATA } from '../data/philosophers.js';
 // Importe o seu arquivo de conteúdo de estudo. Crie este arquivo se ele não existir.
-import { STUDY_CONTENT_DATA } from '../data/study_content.js'; 
+import { STUDY_CONTENT_DATA } from '../data/study_content.js';
 import { popupManager } from '../ui/PopupManager.js';
 
 // Variáveis globais do módulo
@@ -10,27 +10,42 @@ let tooltip;
 let container;
 
 // Função principal que inicializa a tela da biblioteca
+/**
+ * Initializes the Library Screen (Knowledge Tree).
+ * Structures philosopher data by school and renders the interactive tree.
+ * @param {object} globalGameState - The global game state.
+ * @param {function} updateDynamicUI - Function to refresh the UI.
+ * @param {object} toast - Toast notification utility.
+ */
 export function initLibraryScreen(globalGameState, updateDynamicUI, toast) {
     container = document.getElementById('knowledge-tree-container');
     tooltip = document.getElementById('tooltip');
-    
+
     // 1. Estrutura os dados dos filósofos por escola
     structurePhilosopherData();
-    
+
     // 2. Cria os elementos visuais na DOM
     createKnowledgeTreeDOM();
-    
+
     // 3. Atualiza a UI com base no progresso do jogador
     updateTreeUI();
 }
 
 // Lida com cliques na tela da biblioteca
+/**
+ * Handles click events on the Library Screen.
+ * Manages interactions with philosopher nodes to open study modules.
+ * @param {Event} e - The click event object.
+ * @param {object} gameState - The global game state.
+ * @param {function} updateDynamicUI - Function to refresh the UI.
+ * @param {object} toast - Toast notification utility.
+ */
 export function handleLibraryScreenClick(e, gameState, updateDynamicUI, toast) {
     const nodeElement = e.target.closest('.philosopher-node');
     if (nodeElement) {
         const philosopherId = nodeElement.dataset.id;
         const nodeData = findNodeGlobally(philosopherId);
-        
+
         // Verifica se o estudo está disponível (pré-requisitos cumpridos)
         if (checkPrerequisites(nodeData)) {
             // Abre o popup de estudo detalhado
@@ -42,13 +57,18 @@ export function handleLibraryScreenClick(e, gameState, updateDynamicUI, toast) {
 }
 
 // 1. Organiza os dados de PHILOSOPHERS_DATA em um formato agrupado por escola
+/**
+ * Structures the flat PHILOSOPHERS_DATA into a hierarchical format grouped by school.
+ * Sorts philosophers chronologically within the structure.
+ * @private
+ */
 function structurePhilosopherData() {
     structuredData = {};
     const philosopherIds = Object.keys(PHILOSOPHERS_DATA);
-    
+
     // Ordena os filósofos por data para garantir a ordem correta das eras
     philosopherIds.sort((a, b) => PHILOSOPHERS_DATA[a].date - PHILOSOPHERS_DATA[b].date);
-    
+
     for (const id of philosopherIds) {
         const philosopher = PHILOSOPHERS_DATA[id];
         const schoolKey = philosopher.school.toLowerCase().replace(/ /g, '_').replace(/-/g, '_');
@@ -73,13 +93,18 @@ function structurePhilosopherData() {
 }
 
 // 2. Cria os elementos da árvore do conhecimento na página
+/**
+ * Creates the DOM elements for the Knowledge Tree.
+ * Renders era dividers, school timelines, and philosopher nodes with SVG connections.
+ * @private
+ */
 function createKnowledgeTreeDOM() {
     container.innerHTML = ''; // Limpa o contêiner
     let currentEra = '';
 
     for (const schoolKey in structuredData) {
         const schoolData = structuredData[schoolKey];
-        
+
         // Adiciona o divisor de era
         if (schoolData.era !== currentEra) {
             currentEra = schoolData.era;
@@ -88,7 +113,7 @@ function createKnowledgeTreeDOM() {
             eraDivider.innerHTML = `<h2>Filosofia ${currentEra}</h2>`;
             container.appendChild(eraDivider);
         }
-        
+
         // Cria o card da escola
         const schoolElement = document.createElement('div');
         schoolElement.className = `school-timeline era-${schoolData.era.toLowerCase()}`;
@@ -97,7 +122,7 @@ function createKnowledgeTreeDOM() {
 
         const content = document.createElement('div');
         content.className = 'timeline-content';
-        
+
         const svgLines = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
         schoolData.nodes.forEach(node => {
@@ -107,14 +132,14 @@ function createKnowledgeTreeDOM() {
             nodeElement.dataset.id = node.id;
             nodeElement.style.left = node.pos.x;
             nodeElement.style.top = node.pos.y;
-            
+
             nodeElement.innerHTML = `<img src="${node.image}" alt="${node.name}"><span class="progress-label">0%</span>`;
-            
+
             // Adiciona listeners para o tooltip
             nodeElement.addEventListener('mouseover', (e) => showTooltip(e, node));
             nodeElement.addEventListener('mousemove', moveTooltip);
             nodeElement.addEventListener('mouseout', hideTooltip);
-            
+
             content.appendChild(nodeElement);
 
             // Desenha as linhas de conexão
@@ -131,7 +156,7 @@ function createKnowledgeTreeDOM() {
                 }
             });
         });
-        
+
         content.appendChild(svgLines);
         schoolElement.appendChild(content);
         container.appendChild(schoolElement);
@@ -139,6 +164,11 @@ function createKnowledgeTreeDOM() {
 }
 
 // 3. Atualiza a aparência dos nós e linhas com base no progresso do jogador
+/**
+ * Updates the visual state of the Knowledge Tree based on player progress.
+ * Handles unlocking, completion status, and connection line activation.
+ * @private
+ */
 function updateTreeUI() {
     if (!gameState.studyProgress) gameState.studyProgress = {};
 
@@ -159,7 +189,7 @@ function updateTreeUI() {
 
             nodeElement.querySelector('.progress-label').textContent = `${percentage}%`;
             nodeElement.classList.remove('active', 'maxed', 'available', 'locked');
-            
+
             const isAvailable = checkPrerequisites(node);
 
             if (percentage > 0) {
@@ -171,7 +201,7 @@ function updateTreeUI() {
                 nodeElement.classList.add('locked');
             }
         });
-        
+
         // Atualiza as linhas de conexão
         const svgLines = document.querySelectorAll(`#${schoolKey} .timeline-content svg line`);
         svgLines.forEach(line => {

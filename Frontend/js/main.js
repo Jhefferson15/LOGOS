@@ -1,17 +1,23 @@
-// --- EXISTING IMPORTS FROM YOUR FILE ---
+/**
+ * Main application entry point.
+ * Orchestrates screen loading, navigation, and global event handling.
+ * @module Main
+ */
 import { initPlayScreen, handlePlayScreenClick } from './screens/play.js';
 import { initLibraryScreen, handleLibraryScreenClick } from './screens/library.js';
 import { initPhilosophersScreen, handlePhilosophersScreenClick } from './screens/philosophers.js';
 import { initSchoolsScreen, handleSchoolsScreenClick } from './screens/schools.js';
-import { initSymposiumScreen, handleSymposiumScreenClick } from './screens/symposium.js'; 
-import { initSchoolMembersScreen, handleSchoolMembersScreenClick } from './screens/school_members.js'; 
+import { initSymposiumScreen, handleSymposiumScreenClick } from './screens/symposium.js';
+import { initSchoolMembersScreen, handleSchoolMembersScreenClick } from './screens/school_members.js';
 import { initReelsScreen, handleReelsScreenClick } from './screens/reels.js';
 import { toast } from './ui/Toast.js';
 import { gameState } from './data/gameState.js';
 import { popupManager } from './ui/PopupManager.js';
+import { logout, subscribeToAuthChanges } from './services/auth-service.js';
+import { saveUserProfile, saveGameProgress, loadGameProgress } from './services/db-service.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- LOGIN CHECK (from your file) ---
+    // --- LOGIN CHECK (Legacy/Fast check) ---
     if (!localStorage.getItem('isLoggedIn')) {
         window.location.href = 'login.html';
         return;
@@ -24,19 +30,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainNav = document.querySelector('.main-nav');
     const sidebarToggleButton = document.getElementById('sidebar-toggle-btn');
     const gameHeader = document.querySelector('.game-header');
+    const logoutBtn = document.getElementById('logout-btn');
 
     // --- NEW: STATE TRACKING FOR PANELS ---
+    /**
+     * Tracks the name of the screen currently displayed in the context panel (desktop only).
+     * @type {string}
+     */
     let currentContextScreenName = ''; // Tracks what's in the context panel
     const DESKTOP_BREAKPOINT = 768;
+    let currentUser = null; // Track current user for saving
 
     // --- HELPER FUNCTIONS (from your file, unchanged) ---
     const formatTime = (s) => { if (s <= 0) return "Pronto!"; const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60; return h > 0 ? `${h}H ${m}MIN` : m > 0 ? `${m}MIN ${sec}SEG` : `${sec}SEG`; };
-    const getChestIcon = (t) => `fas ${{Papiro: 'fa-scroll', Tomo: 'fa-book', 'Obra Rara': 'fa-gem'}[t] || 'fa-box'}`;
-    
+    const getChestIcon = (t) => `fas ${{ Papiro: 'fa-scroll', Tomo: 'fa-book', 'Obra Rara': 'fa-gem' }[t] || 'fa-box'}`;
+
     // --- NEW: HELPER TO CHECK VIEWPORT ---
+    /**
+     * Checks if the current viewport width corresponds to a desktop view.
+     * @returns {boolean} True if viewport width >= DESKTOP_BREAKPOINT.
+     */
     const isDesktopView = () => window.innerWidth >= DESKTOP_BREAKPOINT;
 
     // --- UI UPDATE FUNCTION (from your file, unchanged) ---
+    /**
+     * Updates the dynamic UI elements based on the current game state.
+     * Updates resources (scrolls, books), stats (trophies, xp), and timers.
+     */
     const updateDynamicUI = () => {
         const scrollAmount = document.getElementById('scroll-amount');
         if (scrollAmount) scrollAmount.innerText = gameState.scrolls;
@@ -52,17 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const xpText = document.getElementById('xp-text');
         if (xpText) xpText.innerText = `${gameState.xp}/${gameState.xpMax}`;
-        
+
         // This function will find these elements regardless of which panel they are in
         const freeChestTimer = document.getElementById('free-chest-timer');
-        if(freeChestTimer) freeChestTimer.innerText = gameState.timers.freeChest > 0 ? `Em: ${formatTime(gameState.timers.freeChest)}` : 'COLETAR!';
+        if (freeChestTimer) freeChestTimer.innerText = gameState.timers.freeChest > 0 ? `Em: ${formatTime(gameState.timers.freeChest)}` : 'COLETAR!';
         const freeChest = document.getElementById('free-chest');
-        if(freeChest) freeChest.classList.toggle('ready', gameState.timers.freeChest <= 0);
+        if (freeChest) freeChest.classList.toggle('ready', gameState.timers.freeChest <= 0);
 
         const crownChestTimer = document.getElementById('crown-chest-timer');
-        if(crownChestTimer) crownChestTimer.innerText = gameState.timers.crownChest > 0 ? `Em: ${formatTime(gameState.timers.crownChest)}` : 'COLETAR!';
+        if (crownChestTimer) crownChestTimer.innerText = gameState.timers.crownChest > 0 ? `Em: ${formatTime(gameState.timers.crownChest)}` : 'COLETAR!';
         const crownChest = document.getElementById('crown-chest');
-        if(crownChest) crownChest.classList.toggle('ready', gameState.timers.crownChest <= 0);
+        if (crownChest) crownChest.classList.toggle('ready', gameState.timers.crownChest <= 0);
 
         const chestSlotsContainer = document.getElementById('chest-slots-container');
         if (chestSlotsContainer) {
@@ -83,17 +103,24 @@ document.addEventListener('DOMContentLoaded', () => {
      * This function now only loads content into a specific panel and runs initializers.
      * It's called by the main `loadScreen` function.
      */
+    /**
+     * Loads screen content into a specific DOM element and initializes it.
+     * @async
+     * @param {string} screenName - The name of the screen to load (e.g., 'play', 'library').
+     * @param {HTMLElement} targetPanel - The DOM element where content should be injected.
+     * @param {Object} [params=null] - Optional parameters to pass to the screen initializer.
+     */
     const loadContentIntoPanel = async (screenName, targetPanel, params = null) => {
         try {
             // NOTE: Using your path '/views/'
             const response = await fetch(`views/${screenName}.html`);
             if (!response.ok) throw new Error(`Could not load screen: ${screenName}`);
-            
+
             const content = await response.text();
             targetPanel.innerHTML = content;
-            
+
             // On desktop, track the context screen name
-            if(targetPanel === contextPanel) {
+            if (targetPanel === contextPanel) {
                 currentContextScreenName = screenName;
             }
 
@@ -120,10 +147,19 @@ document.addEventListener('DOMContentLoaded', () => {
      * --- NEW: MAIN SCREEN ORCHESTRATOR ---
      * This function decides WHERE to load content based on viewport size.
      */
+    /**
+     * Orchestrates screen loading based on the device type (mobile vs desktop).
+     * On desktop, manages the split view (main debate panel vs context panel).
+     * On mobile, loads content into the single main view.
+     * @param {string} screenName - The name of the screen to navigate to.
+     * @param {Object} [params=null] - Optional navigation parameters.
+     */
     const loadScreen = (screenName, params = null) => {
         // Update active state on navigation
         const navItems = mainNav.querySelectorAll('.nav-item');
         navItems.forEach(item => {
+            // Ignore logout button for active state
+            if (item.id === 'logout-btn') return;
             item.classList.toggle('active', item.dataset.target === screenName);
         });
 
@@ -153,6 +189,10 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * --- INITIALIZATION FUNCTION ---
      */
+    /**
+     * Initializes the application.
+     * Sets up sidebar state, loads initial screens, and attaches global event listeners.
+     */
     const initialize = () => {
         // Setup sidebar state from localStorage
         if (isDesktopView() && localStorage.getItem('sidebarState') !== 'expanded') {
@@ -169,14 +209,62 @@ document.addEventListener('DOMContentLoaded', () => {
             loadScreen('play');
         }
 
+        // --- AUTH LISTENER ---
+        subscribeToAuthChanges(async (user) => {
+            if (!user) {
+                // Check for Demo Mode
+                if (localStorage.getItem('isDemoMode')) {
+                    console.log("Running in Demo Mode");
+                    // Create a mock user for demo purposes
+                    user = {
+                        uid: 'demo-user-123',
+                        displayName: 'Demo User',
+                        email: 'demo@demo.com',
+                        isAnonymous: true
+                    };
+                } else {
+                    // User signed out or session expired
+                    window.location.href = 'login.html';
+                    return;
+                }
+            }
+
+            if (user) {
+                console.log("Authenticated as:", user.displayName || user.email);
+                currentUser = user;
+
+                // Save user profile
+                await saveUserProfile(user);
+
+                // Load game progress
+                const savedProgress = await loadGameProgress(user.uid);
+                if (savedProgress) {
+                    // Update local gameState with saved data
+                    Object.assign(gameState, savedProgress);
+                    updateDynamicUI();
+                    toast.show("Progresso carregado da nuvem!", "success");
+                }
+            }
+        });
+
         // --- EVENT LISTENERS ---
 
         // Navigation click handler
         mainNav.addEventListener('click', (e) => {
             const navItem = e.target.closest('.nav-item');
-            if (navItem && navItem.dataset.target) {
-                e.preventDefault();
-                loadScreen(navItem.dataset.target);
+            if (navItem) {
+                if (navItem.id === 'logout-btn') {
+                    // Handle Logout
+                    logout().then(() => {
+                        window.location.href = 'login.html';
+                    }).catch(err => console.error("Logout failed", err));
+                    return;
+                }
+
+                if (navItem.dataset.target) {
+                    e.preventDefault();
+                    loadScreen(navItem.dataset.target);
+                }
             }
         });
 
@@ -231,8 +319,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- GAME TIMER (from your file, unchanged) ---
+        // --- GAME TIMER & AUTO-SAVE ---
+        let saveCounter = 0;
         setInterval(() => {
+            // Timer logic
             if (gameState.timers.freeChest > 0) gameState.timers.freeChest--;
             if (gameState.timers.crownChest > 0) gameState.timers.crownChest--;
             gameState.chestSlots.forEach(c => {
@@ -245,6 +335,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             updateDynamicUI();
+
+            // Auto-save every 30 seconds
+            saveCounter++;
+            if (saveCounter >= 30) {
+                if (currentUser) {
+                    saveGameProgress(currentUser.uid, gameState);
+                }
+                saveCounter = 0;
+            }
         }, 1000);
     };
 

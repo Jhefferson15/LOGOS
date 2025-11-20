@@ -21,6 +21,18 @@
 // Importa os dados dos filósofos se necessário para alguma lógica de conceito
 // import { PHILOSOPHERS_DATA } from './philosophers.js';
 
+/**
+ * Database of Active Concepts (Abilities).
+ * These are special powers players can use during the game.
+ * @type {Object.<string, {
+ *   id: string,
+ *   name: string,
+ *   description: string,
+ *   cost: number,
+ *   icon: string,
+ *   handler: function
+ * }>}
+ */
 export const CONCEPTS_DATA = {
     // --- Conceitos de Manipulação de Pontos ---
     'socialismo': {
@@ -29,11 +41,11 @@ export const CONCEPTS_DATA = {
         description: 'Divide a soma de todos os Pontos de Sabedoria igualmente entre todos os jogadores.',
         cost: 20, // Custo em Pontos de Sabedoria
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
-        handler: function(gameUI) {
+        handler: function (gameUI) {
             const allPlayerIds = gameUI.state.game.playerOrder;
             const totalScore = allPlayerIds.reduce((sum, id) => sum + gameUI.state.game.players[id].score, 0);
             const sharedScore = Math.floor(totalScore / allPlayerIds.length);
-            
+
             allPlayerIds.forEach(id => {
                 gameUI.state.game.players[id].score = sharedScore;
             });
@@ -47,7 +59,7 @@ export const CONCEPTS_DATA = {
         description: 'Roube 5 Pontos de Sabedoria do jogador com a maior pontuação.',
         cost: 12,
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 12H3v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6h-1.5M12 3v13.5M9 12l3 3 3-3"/></svg>`,
-        handler: function(gameUI) {
+        handler: function (gameUI) {
             const ownId = gameUI.state.game.currentPlayerId;
             let targetId = null;
             let maxScore = -1;
@@ -66,7 +78,7 @@ export const CONCEPTS_DATA = {
                 const targetName = gameUI.state.playersData[targetId].name;
                 gameUI.logEvent(`usou a Vontade de Poder para tomar ${stolenAmount} pontos de ${targetName}!`, 'game-event');
             } else {
-                 gameUI.logEvent(`tentou usar a Vontade de Poder, mas não havia alvos!`, 'game-event');
+                gameUI.logEvent(`tentou usar a Vontade de Poder, mas não havia alvos!`, 'game-event');
             }
         }
     },
@@ -78,7 +90,7 @@ export const CONCEPTS_DATA = {
         description: 'Pule sua vez para comprar duas cartas de Filósofo.',
         cost: 5,
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>`,
-        handler: async function(gameUI) {
+        handler: async function (gameUI) {
             gameUI.logEvent(`entrou em Reflexão Socrática...`, 'game-event');
             await gameUI.playerDrawsCard(false); // Compra a primeira sem avançar o turno
             await gameUI.playerDrawsCard(true); // Compra a segunda E avança o turno
@@ -90,14 +102,14 @@ export const CONCEPTS_DATA = {
         description: 'Embaralha a pilha de descarte de volta ao baralho de compra.',
         cost: 15,
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>`,
-        handler: async function(gameUI) {
-             await gameUI.animateShuffle();
-             const discard = gameUI.state.game.discardPile;
-             const topCard = discard.pop(); // Mantém a carta do topo
-             // Adiciona o resto do descarte ao baralho de compra e embaralha
-             gameUI.state.game.drawDeck = gameUI.shuffleArray([...gameUI.state.game.drawDeck, ...discard]);
-             gameUI.state.game.discardPile = [topCard]; // A pilha agora só tem a carta do topo
-             gameUI.logEvent(`invocou o Paradoxo de Zenão, reiniciando o baralho!`, 'game-event');
+        handler: async function (gameUI) {
+            await gameUI.animateShuffle();
+            const discard = gameUI.state.game.discardPile;
+            const topCard = discard.pop(); // Mantém a carta do topo
+            // Adiciona o resto do descarte ao baralho de compra e embaralha
+            gameUI.state.game.drawDeck = gameUI.shuffleArray([...gameUI.state.game.drawDeck, ...discard]);
+            gameUI.state.game.discardPile = [topCard]; // A pilha agora só tem a carta do topo
+            gameUI.logEvent(`invocou o Paradoxo de Zenão, reiniciando o baralho!`, 'game-event');
         }
     }
     // Adicione mais conceitos aqui...
@@ -108,6 +120,16 @@ export const CONCEPTS_DATA = {
 
 
 
+/**
+ * Database of Collectible Concepts.
+ * These are the concepts associated with specific philosophers for collection purposes.
+ * @type {Object.<number, {
+ *   name: string,
+ *   philosophers: number[],
+ *   points: number,
+ *   description: string
+ * }>}
+ */
 export const CONCEPTS_DATA_1 = {
     // --- Conceitos Antigos (IDs 1xx) ---
     101: { name: 'Maiêutica', philosophers: [1], points: 30, description: 'O método socrático de "dar à luz" às ideias por meio de um diálogo de perguntas e respostas, levando o interlocutor ao conhecimento.' },

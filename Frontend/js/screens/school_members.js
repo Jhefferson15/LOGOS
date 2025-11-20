@@ -42,7 +42,7 @@ function renderMembers(schoolName, gameState) {
                 <span class="card-level">Não Descoberto</span>
             `;
         }
-        
+
         gridElement.appendChild(cardElement);
     });
 }
@@ -107,7 +107,7 @@ function renderPosts(schoolName) {
  */
 function setupReelsObserver() {
     const reels = document.querySelectorAll('.reel-item');
-    
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             const video = entry.target.querySelector('video');
@@ -133,10 +133,16 @@ function setupReelsObserver() {
  * @param {object} params - Parâmetros da rota (ex: { school: 'Estoicismo' }).
  * @param {object} gameState - O estado atual do jogo.
  */
+/**
+ * Initializes the School Members Screen.
+ * Sets the title, renders members and posts, and sets up tab navigation.
+ * @param {object} params - Route parameters (e.g., { school: 'Stoicism' }).
+ * @param {object} gameState - The global game state.
+ */
 export function initSchoolMembersScreen(params, gameState) {
     const schoolName = params.school;
     const titleElement = document.getElementById('school-members-title');
-    
+
     if (!titleElement) {
         console.error("Elemento de título da tela de membros não encontrado.");
         return;
@@ -169,9 +175,9 @@ export function initSchoolMembersScreen(params, gameState) {
             } else {
                 // Toca o primeiro vídeo visível se a aba de postagens for ativada
                 const firstVisibleReel = document.querySelector('.reel-item');
-                if(firstVisibleReel) {
+                if (firstVisibleReel) {
                     const video = firstVisibleReel.querySelector('video');
-                    if(video) video.play().catch(e => console.error("Erro ao tocar o vídeo:", e));
+                    if (video) video.play().catch(e => console.error("Erro ao tocar o vídeo:", e));
                 }
             }
         });
@@ -186,6 +192,13 @@ export function initSchoolMembersScreen(params, gameState) {
  * @param {Event} event - O objeto do evento de clique.
  * @param {object} gameState - O estado atual do jogo.
  * @param {object} toast - A instância do Toast para notificações.
+ */
+/**
+ * Handles click events on the School Members Screen.
+ * Manages interactions with member cards and post profiles.
+ * @param {Event} event - The click event object.
+ * @param {object} gameState - The global game state.
+ * @param {object} toast - Toast notification utility.
  */
 export function handleSchoolMembersScreenClick(event, gameState, toast) {
     const target = event.target;
@@ -202,7 +215,7 @@ export function handleSchoolMembersScreenClick(event, gameState, toast) {
         }
 
         const philosopherState = gameState.collection.philosophers[philosopherId] || { level: 0, count: 0 };
-        popupManager.open('philosopher-details', { 
+        popupManager.open('philosopher-details', {
             philosopherId: philosopherId,
             philosopherState: philosopherState
         });
@@ -215,8 +228,8 @@ export function handleSchoolMembersScreenClick(event, gameState, toast) {
         event.preventDefault(); // Previne a navegação do link '#'
         const philosopherId = reelInfo.dataset.philosopherId;
         const philosopherState = gameState.collection.philosophers[philosopherId] || { level: 0, count: 0 };
-        
-        popupManager.open('philosopher-details', { 
+
+        popupManager.open('philosopher-details', {
             philosopherId: philosopherId,
             philosopherState: philosopherState
         });

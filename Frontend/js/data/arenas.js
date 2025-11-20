@@ -10,6 +10,18 @@
 
 import { SCHOOLS } from './philosophers.js'; // Importa as escolas para garantir consistência
 
+/**
+ * List of Game Arenas.
+ * Each arena corresponds to a philosophical era or movement.
+ * @type {Array<{
+ *   id: number,
+ *   name: string,
+ *   description: string,
+ *   trophyReq: number,
+ *   schools: string[],
+ *   image: string
+ * }>}
+ */
 export const arenas = [
     {
         id: 1,

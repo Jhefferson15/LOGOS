@@ -1,6 +1,13 @@
 import { arenas } from '../../js/data/arenas.js';
 import { popupManager } from '../../js/ui/PopupManager.js';
 
+/**
+ * Initializes the Play Screen (Main Debate Arena).
+ * Sets up the arena background and name based on the current level.
+ * @param {object} gameState - The global game state.
+ * @param {function} updateDynamicUI - Function to refresh the UI.
+ * @param {object} toast - Toast notification utility.
+ */
 export function initPlayScreen(gameState, updateDynamicUI, toast) {
     // Código de inicialização da tela, permanece o mesmo.
     const arena = arenas[1];
@@ -31,7 +38,7 @@ export function handlePlayScreenClick(e, gameState, updateDynamicUI, toast) {
         // Desabilita o botão para evitar cliques múltiplos
         t.disabled = true;
         t.textContent = 'Carregando Batalha...';
-        
+
         // Redireciona diretamente para a página do jogo para um carregamento limpo
         window.location.href = './views/game.html';
         return; // Encerra a função aqui
@@ -74,7 +81,7 @@ export function handlePlayScreenClick(e, gameState, updateDynamicUI, toast) {
             popupManager.open('chest-rewards', { chestType: chest.type, rewards: rewards });
             gameState.chestSlots[i] = null;
             // É importante chamar updateDynamicUI após modificar o estado
-            updateDynamicUI(); 
+            updateDynamicUI();
             return;
         }
         if (c.status === 'locked' || c.status === 'unlocking') {

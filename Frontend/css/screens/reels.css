@@ -1,39 +1,31 @@
+/* --- DEFINIÇÃO DE TEMA ("Philosophy Theme" baseado na sua imagem) --- */
+.philosophy-theme {
+    --reels-bg-color: #ffffff;
+    /* Fundo branco conforme pedido */
+    --reels-text-color: #3a3a3a;
+    --reels-accent-color: #6b6b6b;
+    --reels-button-bg: #9e8a70;
+    --reels-button-text: #fdfaf6;
+    --reels-overlay-gradient-top: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    --reels-overlay-text: #fff;
+    --reels-avatar-border: #fff;
+    --skeleton-bg: #e9e4dd;
+    --skeleton-shine: rgba(255, 255, 255, 0.5);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
 /* --- ESTRUTURA GERAL DA TELA --- */
 #reels-screen {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background-color: #000;
-    color: #fff;
-}
+    background-color: var(--reels-bg-color);
+    color: var(--reels-text-color);
+    position: relative;
+    overflow: hidden;
 
-/* --- CABEÇALHO DOS REELS --- */
-.screen-header-reels {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background-color: rgba(0, 0, 0, 0.3);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-}
-
-.reels-title {
-    font-family: var(--font-headings);
-    font-size: 1.5em;
-    margin: 0;
-    font-weight: 700;
-}
-
-.reels-actions button {
-    background: transparent;
-    border: none;
-    color: #fff;
-    font-size: 1.5em;
-    cursor: pointer;
+    /* AJUSTE IMPORTANTE: Adiciona espaço no topo para não sobrepor a barra de status do celular */
+    padding-top: env(safe-area-inset-top);
 }
 
 /* --- CONTÊINER DOS REELS --- */
@@ -44,6 +36,17 @@
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
+
+    /* ALTERAÇÃO 1: Esconde a barra de rolagem em todos os navegadores */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+/* ALTERAÇÃO 1 (continuação): Esconde a barra de rolagem para navegadores Webkit (Chrome, Safari) */
+.reels-container::-webkit-scrollbar {
+    display: none;
 }
 
 /* --- ITEM INDIVIDUAL DO REEL --- */
@@ -51,72 +54,125 @@
     width: 100%;
     height: 100%;
     position: relative;
-    scroll-snap-align: start;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
+    background-color: var(--reels-bg-color);
 }
 
-.reel-video {
+.reel-media-container {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    position: relative;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    /* Importante para o pinch-to-zoom funcionar sem scroll */
 }
 
-/* --- SOBREPOSIÇÃO DE INFORMAÇÕES --- */
-.reel-overlay {
+.reel-image {
+    width: 100%;
+    height: 100%;
+    /* ALTERAÇÃO 3: Garante que a imagem preencha o espaço sem cortar (contain) */
+    object-fit: contain;
+    transform-origin: center center;
+    /* Para o zoom */
+}
+
+/* Restante do CSS permanece igual... */
+
+/* Animação de coração no toque duplo */
+.like-heart-animation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 6rem;
+    color: var(--reels-overlay-text);
+    opacity: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
+}
+
+.like-heart-animation.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.9;
+}
+
+/* INFO NA PARTE INFERIOR */
+.reel-bottom-info {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     padding: 20px;
-    padding-bottom: 80px; /* Espaço para a barra de navegação */
-    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-}
-
-.reel-details {
+    padding-bottom: 80px;
+    /* Espaço para não sobrepor os botões de ação */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
     display: flex;
     flex-direction: column;
-    gap: 15px;
-}
-
-.reel-caption {
-    font-size: 1em;
-    line-height: 1.4;
+    color: var(--reels-overlay-text);
+    pointer-events: none;
+    /* Permite clicar na imagem/vídeo abaixo se necessário */
+    z-index: 5;
+    transition: opacity 0.3s ease;
 }
 
 .reel-info {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
-    cursor: pointer;
+    pointer-events: auto;
+    /* Reabilita cliques nos links */
     text-decoration: none;
-    color: white;
+    color: var(--reels-overlay-text);
 }
 
 .reel-avatar {
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    border: 2px solid #fff;
+    border: 2px solid var(--reels-avatar-border);
     object-fit: cover;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+}
+
+.reel-text-info {
+    display: flex;
+    flex-direction: column;
 }
 
 .reel-info strong {
     font-weight: 700;
     font-size: 1.1em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* --- AÇÕES LATERAIS (CURTIR, COMENTAR) --- */
+.reel-caption-text {
+    font-size: 0.95em;
+    line-height: 1.4;
+    margin-top: 4px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+
+/* AÇÕES LATERAIS */
 .reel-actions-sidebar {
+    position: absolute;
+    bottom: 40px;
+    right: 10px;
     display: flex;
     flex-direction: column;
     gap: 25px;
     align-items: center;
+    z-index: 5;
+    transition: opacity 0.3s ease;
 }
 
 .action-btn {
@@ -126,25 +182,142 @@
     gap: 8px;
     background: none;
     border: none;
-    color: #fff;
+    color: #333;
+    /* Cor escura para contrastar com fundo branco se imagem for pequena, ou sombra se for grande */
     cursor: pointer;
     font-size: 0.9em;
+    transition: transform 0.2s ease;
+}
+
+/* Adiciona sombra para garantir visibilidade sobre imagens */
+.action-btn i,
+.action-btn span {
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.action-btn:active {
+    transform: scale(0.9);
 }
 
 .action-btn i {
     font-size: 1.8em;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
 }
 
 .action-btn.liked i {
-    color: var(--accent-red);
+    color: var(--accent-red, #ff3b30);
+    text-shadow: none;
 }
 
-/* --- RESPONSIVIDADE --- */
+/* SKELETON LOADER */
+.reels-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 200;
+    background-color: var(--reels-bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reel-skeleton {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-box {
+    background-color: var(--skeleton-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton-box::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 150%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        left: 150%;
+    }
+}
+
+.skeleton-image {
+    width: 100%;
+    height: 100%;
+}
+
+.skeleton-details {
+    position: absolute;
+    top: 80px;
+    left: 20px;
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.skeleton-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.skeleton-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+
+.skeleton-text {
+    height: 1em;
+    border-radius: 4px;
+}
+
+.skeleton-actions {
+    position: absolute;
+    bottom: 80px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+    align-items: center;
+}
+
+.skeleton-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+/* MODO LIMPO (CLEAN VIEW) - Esconde info e ações */
+.reel-item.clean-view .reel-bottom-info,
+.reel-item.clean-view .reel-actions-sidebar {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* RESPONSIVIDADE */
 @media (min-width: 768px) {
-    .reels-container {
-        max-width: 480px;
+
+    /* ALTERAÇÃO 2: Remove a limitação de largura para que ocupe todo o espaço */
+    .reels-container,
+    .reels-loader {
+        /* max-width: 450px; foi removido */
         margin: 0 auto;
-        border-left: 1px solid #333;
-        border-right: 1px solid #333;
+        /* border-left e border-right foram removidos */
+        height: 100vh;
     }
 }

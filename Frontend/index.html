@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +8,14 @@
     <title>Logos - O Jogo da Filosofia</title>
     <link rel="icon" href="assets/LOGOS.ico" type="image/x-icon">
     <meta property="og:title" content="Logos - O Jogo da Filosofia">
-    <meta property="og:description" content="Explore o mundo da filosofia, debata ideias e aprenda com os grandes pensadores da história.">
+    <meta property="og:description"
+        content="Explore o mundo da filosofia, debata ideias e aprenda com os grandes pensadores da história.">
     <meta property="og:image" content="assets/LOGOS.ico">
     <meta property="og:url" content="https://jhefferson15.github.io/LOGOS/Frontend/index.html">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Logos - O Jogo da Filosofia">
-    <meta name="twitter:description" content="Explore o mundo da filosofia, debata ideias e aprenda com os grandes pensadores da história.">
+    <meta name="twitter:description"
+        content="Explore o mundo da filosofia, debata ideias e aprenda com os grandes pensadores da história.">
     <meta name="twitter:image" content="assets/LOGOS.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,6 +24,7 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
 
     <div class="game-container">
@@ -70,8 +74,8 @@
                 <a class="nav-item" data-target="schools"><i class="fas fa-landmark"></i><span>Escolas</span></a>
             </nav>
 
-             <!-- 5. BOTÃO DE COLAPSAR SIDEBAR (Apenas para Desktop) -->
-             <button id="sidebar-toggle-btn" class="sidebar-toggle-btn">
+            <!-- 5. BOTÃO DE COLAPSAR SIDEBAR (Apenas para Desktop) -->
+            <button id="sidebar-toggle-btn" class="sidebar-toggle-btn">
                 <i class="fas fa-chevron-left"></i>
             </button>
         </div>
@@ -95,17 +99,18 @@
 
     <!-- Scripts -->
     <!-- Substitua o script antigo pelo novo main.js -->
-    <script type="module" src="js/main.js"></script> 
+    <script type="module" src="js/main.js"></script>
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').then(registration => {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          }, err => {
-            console.log('ServiceWorker registration failed: ', err);
-          });
-        });
-      }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
     </script>
 </body>
+
 </html>

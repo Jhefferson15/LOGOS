@@ -1,3 +1,6 @@
+
+
+
 import { gameState } from '../data/gameState.js';
 import { arenas } from '../data/arenas.js';
 import { toast } from './Toast.js';
@@ -10,6 +13,10 @@ import { CONCEPTS_DATA, CONCEPTS_DATA_1 } from '../data/concepts.js';
 import { STUDY_CONTENT_DATA } from '../data/study_content.js';
 
 
+/**
+ * Manages the display and interaction of modal popups in the application.
+ * Handles opening, closing, and rendering specific popup content.
+ */
 class PopupManager {
     constructor() {
         this.container = document.getElementById('modal-container');
@@ -30,6 +37,11 @@ class PopupManager {
         });
     }
 
+    /**
+     * Opens a specific popup with provided data.
+     * @param {string} popupId - The unique identifier for the popup type (e.g., 'philosopher-details').
+     * @param {Object} [data={}] - Data required to render the popup content.
+     */
     open(popupId, data = {}) {
         let title = '';
         let contentHTML = '';
@@ -72,6 +84,9 @@ class PopupManager {
         } else if (popupId === 'timed-chest-info') {
             title = data.type === 'free' ? 'Conceito Grátis' : 'Coroa da Sabedoria';
             contentHTML = this._renderTimedChestInfoPopup(data.type);
+        } else if (popupId === 'reels-settings') {
+            title = 'Configurações do Reels';
+            contentHTML = this._renderReelsSettingsPopup();
         } else {
             console.error(`Popup com ID "${popupId}" não encontrado.`);
             return;
@@ -103,7 +118,7 @@ class PopupManager {
         if (!gameState.studyProgress[philosopherId]) {
             gameState.studyProgress[philosopherId] = { pagesViewed: new Set() };
         }
-        
+
         const progress = gameState.studyProgress[philosopherId];
         const percentage = Math.floor((progress.pagesViewed.size / studyData.totalPages) * 100);
         const css = `
@@ -164,6 +179,17 @@ class PopupManager {
 
 
     // --- MÉTODOS DE RENDERIZAÇÃO ANTIGOS (SEM ALTERAÇÃO) ---
+    _renderReelsSettingsPopup() {
+        return `
+            <div class="reels-settings-popup">
+                <div class="settings-section">
+                    <h4><i class="fas fa-history"></i> Histórico de Reels</h4>
+                    <p>Limpe seu histórico de reels para vê-los novamente.</p>
+                    <button id="clear-reels-history-btn" class="action-button red">Limpar Histórico</button>
+                </div>
+            </div>
+        `;
+    }
 
     _renderPhilosopherCardPopup(philosopher, state) {
         const keyConceptsHTML = philosopher.keyConcepts.map(conceptId => {
@@ -227,9 +253,9 @@ class PopupManager {
         // ... (código original sem alterações)
         const chest = type === 'free' ? gameState.timers.freeChest : gameState.timers.crownChest;
         const isReady = chest <= 0;
-        const formatTime = (s) => { const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60; return h > 0 ? `${h}:${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}` : `${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`; };
-        const info = { free: { icon: 'fa-box-open', desc: 'Um baú com conceitos e recursos básicos, disponível a cada 4 horas.'}, crown: { icon: 'fa-crown', desc: 'Vença debates e colete 10 coroas para abrir este baú com recompensas superiores!'} };
-        return `<div class="timed-chest-popup"><i class="fas ${info[type].icon} chest-icon"></i><p>${info[type].desc}</p>${isReady ? `<button class="action-button">Coletar Agora!</button>` : `<div class="timed-chest-timer">Próximo em: <strong>${formatTime(chest)}</strong></div>` }</div>`;
+        const formatTime = (s) => { const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60; return h > 0 ? `${h}:${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}` : `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`; };
+        const info = { free: { icon: 'fa-box-open', desc: 'Um baú com conceitos e recursos básicos, disponível a cada 4 horas.' }, crown: { icon: 'fa-crown', desc: 'Vença debates e colete 10 coroas para abrir este baú com recompensas superiores!' } };
+        return `<div class="timed-chest-popup"><i class="fas ${info[type].icon} chest-icon"></i><p>${info[type].desc}</p>${isReady ? `<button class="action-button">Coletar Agora!</button>` : `<div class="timed-chest-timer">Próximo em: <strong>${formatTime(chest)}</strong></div>`}</div>`;
     }
 
     // --- LISTENERS INTERNOS: ADIÇÃO DA LÓGICA DO MÓDULO DE ESTUDO ---
@@ -249,16 +275,16 @@ class PopupManager {
                     contents.forEach(c => c.classList.remove('active'));
                     tab.classList.add('active');
                     this.bodyElement.querySelector(`#${tab.dataset.tab}-content`).classList.add('active');
-                    if(tab.dataset.tab !== 'stats') {
-                       toast.show('Funcionalidade em desenvolvimento!', 'info');
+                    if (tab.dataset.tab !== 'stats') {
+                        toast.show('Funcionalidade em desenvolvimento!', 'info');
                     }
                 });
             });
             this.bodyElement.querySelector('.avatar-change-btn').addEventListener('click', () => {
-                 toast.show('Customização de avatar em breve!', 'info');
+                toast.show('Customização de avatar em breve!', 'info');
             });
         }
-         if (popupId === 'philosopher-details') {
+        if (popupId === 'philosopher-details') {
             const upgradeBtn = this.bodyElement.querySelector('#upgrade-philosopher-btn');
             if (upgradeBtn && !upgradeBtn.classList.contains('disabled')) {
                 upgradeBtn.addEventListener('click', () => {
@@ -266,11 +292,11 @@ class PopupManager {
                     this.close();
                 });
             }
-         }
+        }
         if (popupId === 'settings') {
             this._setupFullscreenButton();
             const logoutBtn = this.bodyElement.querySelector('#logout-btn');
-            if(logoutBtn) {
+            if (logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
                     localStorage.removeItem('isLoggedIn');
                     window.location.href = 'login.html';
@@ -278,9 +304,9 @@ class PopupManager {
             }
         }
     }
-    
+
     // --- LÓGICA DE INTERAÇÃO DO MÓDULO DE ESTUDO ---
-    
+
     _setupStudyModuleListeners(philosopherId) {
         const module = this.bodyElement.querySelector('.study-module');
         const contentArea = this.bodyElement.querySelector('#study-content-area');
@@ -290,36 +316,36 @@ class PopupManager {
         const updatePage = (pageNumber) => {
             const studyData = STUDY_CONTENT_DATA[philosopherId];
             const totalPages = studyData.totalPages;
-            
+
             // Valida a página
             let newPage = Math.max(1, Math.min(pageNumber, totalPages));
             module.dataset.currentPage = newPage;
-            
+
             // Renderiza conteúdo
             contentArea.innerHTML = studyData.pages[newPage] || `<p>Conteúdo para esta página ainda não foi escrito.</p>`;
-            
+
             // Salva progresso
             gameState.studyProgress[philosopherId].pagesViewed.add(newPage);
-            
+
             // Atualiza UI
             const progress = gameState.studyProgress[philosopherId];
             const percentage = Math.floor((progress.pagesViewed.size / totalPages) * 100);
             this.bodyElement.querySelector('#study-progress-text').textContent = percentage;
             this.bodyElement.querySelector('#study-progress-fill').style.width = `${percentage}%`;
             this.bodyElement.querySelector('#study-page-counter').textContent = `Página ${newPage} de ${totalPages}`;
-            
+
             // Atualiza botões
             this.bodyElement.querySelector('#study-prev-btn').disabled = (newPage === 1);
             this.bodyElement.querySelector('#study-next-btn').disabled = (newPage === totalPages);
         };
-        
+
         const showTableOfContents = () => {
             const studyData = STUDY_CONTENT_DATA[philosopherId];
-            const tocHTML = Object.entries(studyData.tableOfContents).map(([page, title]) => 
+            const tocHTML = Object.entries(studyData.tableOfContents).map(([page, title]) =>
                 `<li data-page="${page}"><strong>Pág. ${page}:</strong> ${title}</li>`
             ).join('');
             contentArea.innerHTML = `<ul class="toc-list">${tocHTML}</ul>`;
-            
+
             contentArea.querySelectorAll('.toc-list li').forEach(item => {
                 item.addEventListener('click', (e) => {
                     const page = parseInt(e.currentTarget.dataset.page);
@@ -331,13 +357,13 @@ class PopupManager {
                 });
             });
         };
-        
+
         // Listeners dos botões de navegação
         navigation.querySelector('#study-prev-btn').addEventListener('click', () => {
             let currentPage = parseInt(module.dataset.currentPage);
             updatePage(currentPage - 1);
         });
-        
+
         navigation.querySelector('#study-next-btn').addEventListener('click', () => {
             let currentPage = parseInt(module.dataset.currentPage);
             updatePage(currentPage + 1);
@@ -350,7 +376,7 @@ class PopupManager {
             tab.addEventListener('click', () => {
                 tabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                
+
                 const tabType = tab.dataset.tab;
                 navigation.style.display = (tabType === 'theory') ? 'flex' : 'none';
 
@@ -364,34 +390,34 @@ class PopupManager {
                 }
             });
         });
-        
+
         // Carrega a primeira página ao abrir
         updatePage(1);
     }
-    
-    _setupFullscreenButton() { 
-            const fullscreenButton = document.getElementById('fullscreen-btn');
-            if (!fullscreenButton) return;
-            const buttonIcon = fullscreenButton.querySelector('i');
-            const buttonText = fullscreenButton.querySelector('span');
-            function updateButtonUI() {
-                if (document.fullscreenElement) {
-                    buttonIcon.classList.remove('fa-expand'); buttonIcon.classList.add('fa-compress');
-                    buttonText.textContent = 'Sair da Tela Cheia';
-                } else {
-                    buttonIcon.classList.remove('fa-compress'); buttonIcon.classList.add('fa-expand');
-                    buttonText.textContent = 'Tela Cheia';
-                }
+
+    _setupFullscreenButton() {
+        const fullscreenButton = document.getElementById('fullscreen-btn');
+        if (!fullscreenButton) return;
+        const buttonIcon = fullscreenButton.querySelector('i');
+        const buttonText = fullscreenButton.querySelector('span');
+        function updateButtonUI() {
+            if (document.fullscreenElement) {
+                buttonIcon.classList.remove('fa-expand'); buttonIcon.classList.add('fa-compress');
+                buttonText.textContent = 'Sair da Tela Cheia';
+            } else {
+                buttonIcon.classList.remove('fa-compress'); buttonIcon.classList.add('fa-expand');
+                buttonText.textContent = 'Tela Cheia';
             }
-            fullscreenButton.addEventListener('click', () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(err => console.error(`Erro: ${err.message}`));
-                } else {
-                    document.exitFullscreen();
-                }
-            });
-            document.addEventListener('fullscreenchange', updateButtonUI);
-            updateButtonUI();
+        }
+        fullscreenButton.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.error(`Erro: ${err.message}`));
+            } else {
+                document.exitFullscreen();
+            }
+        });
+        document.addEventListener('fullscreenchange', updateButtonUI);
+        updateButtonUI();
     }
 }
 

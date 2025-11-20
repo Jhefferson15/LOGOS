@@ -1,3 +1,14 @@
+/**
+ * Database of Social Media Posts (Reels).
+ * @type {Array<{
+ *   id: number,
+ *   philosopherId: string,
+ *   mediaUrl: string,
+ *   caption: string,
+ *   likes: number,
+ *   comments: Array<{user: string, text: string}>
+ * }>}
+ */
 export const POSTS_DATA = [
     {
         id: 1,

@@ -1,4 +1,12 @@
+/**
+ * Component for updating Player UI.
+ */
 export class Player {
+    /**
+     * Updates the player info display.
+     * @param {object} player - The player data.
+     * @param {object} currentPlayer - The current active player.
+     */
     static create(player, currentPlayer) {
         const infoEl = document.getElementById(`player-info-${player.id}`);
         const avatarSeed = player.name === 'Você' ? 'Human' : player.name;

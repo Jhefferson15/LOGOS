@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>screens/reels.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Card.html">Card</a><ul class='methods'><li data-type='method'><a href="Card.html#.create">create</a></li><li data-type='method'><a href="Card.html#.createConcept">createConcept</a></li></ul></li><li><a href="Modal.html">Modal</a><ul class='methods'><li data-type='method'><a href="Modal.html#hide">hide</a></li><li data-type='method'><a href="Modal.html#setContent">setContent</a></li><li data-type='method'><a href="Modal.html#show">show</a></li></ul></li><li><a href="Player.html">Player</a><ul class='methods'><li data-type='method'><a href="Player.html#.create">create</a></li></ul></li><li><a href="PopupManager.html">PopupManager</a><ul class='methods'><li data-type='method'><a href="PopupManager.html#close">close</a></li><li data-type='method'><a href="PopupManager.html#open">open</a></li></ul></li><li><a href="Toast.html">Toast</a><ul class='methods'><li data-type='method'><a href="Toast.html#show">show</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-GameConstants.html">GameConstants</a></li><li><a href="module-LoginScreen.html">LoginScreen</a></li><li><a href="module-Main.html">Main</a></li></ul><h3>Namespaces</h3><ul><li><a href="GameState.html">GameState</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CONCEPTS_DATA">CONCEPTS_DATA</a></li><li><a href="global.html#CONCEPTS_DATA_1">CONCEPTS_DATA_1</a></li><li><a href="global.html#PHILOSOPHERS_DATA">PHILOSOPHERS_DATA</a></li><li><a href="global.html#POSTS_DATA">POSTS_DATA</a></li><li><a href="global.html#SCHOOLS">SCHOOLS</a></li><li><a href="global.html#STUDY_CONTENT_DATA">STUDY_CONTENT_DATA</a></li><li><a href="global.html#arenas">arenas</a></li><li><a href="global.html#handleLibraryScreenClick">handleLibraryScreenClick</a></li><li><a href="global.html#handlePhilosophersScreenClick">handlePhilosophersScreenClick</a></li><li><a href="global.html#handlePlayScreenClick">handlePlayScreenClick</a></li><li><a href="global.html#handleReelsScreenClick">handleReelsScreenClick</a></li><li><a href="global.html#handleSchoolMembersScreenClick">handleSchoolMembersScreenClick</a></li><li><a href="global.html#handleSchoolsScreenClick">handleSchoolsScreenClick</a></li><li><a href="global.html#handleSymposiumScreenClick">handleSymposiumScreenClick</a></li><li><a href="global.html#initLibraryScreen">initLibraryScreen</a></li><li><a href="global.html#initPhilosophersScreen">initPhilosophersScreen</a></li><li><a href="global.html#initPlayScreen">initPlayScreen</a></li><li><a href="global.html#initReelsScreen">initReelsScreen</a></li><li><a href="global.html#initSchoolMembersScreen">initSchoolMembersScreen</a></li><li><a href="global.html#initSchoolsScreen">initSchoolsScreen</a></li><li><a href="global.html#initSymposiumScreen">initSymposiumScreen</a></li><li><a href="global.html#preloadAdjacentImages">preloadAdjacentImages</a></li><li><a href="global.html#renderMembers">renderMembers</a></li><li><a href="global.html#renderPosts">renderPosts</a></li><li><a href="global.html#renderReels">renderReels</a></li><li><a href="global.html#setupImageObserver">setupImageObserver</a></li><li><a href="global.html#setupReelsObserver">setupReelsObserver</a></li><li><a href="global.html#showLikeAnimation">showLikeAnimation</a></li><li><a href="global.html#toggleLike">toggleLike</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">screens/reels.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+import { POSTS_DATA } from '../data/posts.js';
+import { PHILOSOPHERS_DATA } from '../data/philosophers.js';
+import { popupManager } from '../ui/PopupManager.js';
+
+let lastTap = 0; // Para detectar o toque duplo
+
+/**
+ * Renderiza todos os reels (imagens) na tela com Skeletons e Lazy Loading.
+ * @param {object} gameState - O estado atual do jogo para verificar interações.
+ */
+function renderReels(gameState) {
+    const reelsContainer = document.getElementById('reels-container');
+    const loader = document.getElementById('reels-loader');
+    if (!reelsContainer || !loader) return;
+
+    reelsContainer.innerHTML = '';
+    loader.style.display = 'flex'; // Mostra o skeleton
+
+    // Simula um carregamento de rede
+    setTimeout(() => {
+        POSTS_DATA.forEach(post => {
+            const philosopher = PHILOSOPHERS_DATA[post.philosopherId];
+            if (!philosopher) return;
+
+            const reelElement = document.createElement('div');
+            reelElement.className = 'reel-item';
+            reelElement.dataset.postId = post.id;
+
+            const isLiked = gameState.userActions.likedPosts.includes(post.id);
+
+            // Ponto 3: Acessibilidade (alt text e aria-labels)
+            const captionExcerpt = post.caption.substring(0, 50).replace(/"/g, "'") + '...';
+            const altText = `Reel por ${philosopher.name}: ${captionExcerpt}`;
+
+            reelElement.innerHTML = `
+                &lt;!-- Ponto 8: Contêiner para gesto de toque duplo -->
+                &lt;div class="reel-media-container">
+                    &lt;!-- Ponto 2: Lazy loading com data-src -->
+                    &lt;img class="reel-image" data-src="${post.mediaUrl}" alt="${altText}" />
+                    &lt;i class="fas fa-heart like-heart-animation">&lt;/i>
+                &lt;/div>
+                &lt;div class="reel-overlay">
+                    &lt;div class="reel-details">
+                        &lt;!-- Ponto 6: Link para perfil do filósofo -->
+                        &lt;div class="reel-info" data-philosopher-id="${post.philosopherId}">
+                            &lt;img src="${philosopher.image}" alt="${philosopher.name}" class="reel-avatar">
+                            &lt;strong>@${philosopher.name.toLowerCase().replace(/\s+/g, '_')}&lt;/strong>
+                        &lt;/div>
+                        &lt;div class="reel-caption">
+                            &lt;p>${post.caption}&lt;/p>
+                        &lt;/div>
+                    &lt;/div>
+                    &lt;div class="reel-actions-sidebar">
+                        &lt;button class="action-btn like-btn ${isLiked ? 'liked' : ''}" data-post-id="${post.id}" aria-label="Curtir post de ${philosopher.name}">
+                            &lt;i class="fas fa-heart">&lt;/i>
+                            &lt;span>${post.likes}&lt;/span>
+                        &lt;/button>
+                        &lt;!-- Ponto 5: Ação para comentários (abre popup) -->
+                        &lt;button class="action-btn comment-btn" data-post-id="${post.id}" aria-label="Ver comentários">
+                            &lt;i class="fas fa-comment-dots">&lt;/i>
+                            &lt;span>${post.comments.length}&lt;/span>
+                        &lt;/button>
+                        &lt;!-- Ponto 7: Botão de compartilhamento real -->
+                        &lt;button class="action-btn share-btn" data-post-id="${post.id}" aria-label="Compartilhar post">
+                            &lt;i class="fas fa-share-square">&lt;/i>
+                        &lt;/button>
+                    &lt;/div>
+                &lt;/div>`;
+
+            reelsContainer.appendChild(reelElement);
+        });
+
+        loader.style.display = 'none'; // Esconde o skeleton
+        setupImageObserver();
+    }, 1000); // Atraso de 1s para visualizar o loader
+}
+
+/**
+ * Configura Intersection Observer para lazy loading e preloading de imagens.
+ */
+function setupImageObserver() {
+    const reels = document.querySelectorAll('.reel-item');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const img = entry.target.querySelector('.reel-image');
+            if (!img) return;
+
+            if (entry.isIntersecting) {
+                // Ponto 2: Lazy Loading - Carrega a imagem visível
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                }
+
+                // Ponto 2: Preloading - Carrega a próxima e a anterior
+                preloadAdjacentImages(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    reels.forEach(reel => observer.observe(reel));
+}
+
+/**
+ * Pré-carrega as imagens do reel adjacente (próximo e anterior).
+ * @param {HTMLElement} currentReelElement O elemento do reel atual.
+ */
+function preloadAdjacentImages(currentReelElement) {
+    const nextReel = currentReelElement.nextElementSibling;
+    const prevReel = currentReelElement.previousElementSibling;
+
+    const preload = (element) => {
+        if (!element) return;
+        const imgToPreload = element.querySelector('.reel-image[data-src]');
+        if (imgToPreload) {
+            // Cria um objeto de imagem em memória para forçar o download e cache
+            const img = new Image();
+            img.src = imgToPreload.dataset.src;
+        }
+    };
+
+    preload(nextReel);
+    preload(prevReel);
+}
+
+/**
+ * Mostra a animação de coração no centro da imagem.
+ * @param {HTMLElement} mediaContainer O contêiner da mídia.
+ */
+function showLikeAnimation(mediaContainer) {
+    const heart = mediaContainer.querySelector('.like-heart-animation');
+    if (heart) {
+        heart.classList.add('show');
+        setTimeout(() => {
+            heart.classList.remove('show');
+        }, 800);
+    }
+}
+
+/**
+ * Lógica para curtir/descurtir um post.
+ * @param {number} postId ID do post.
+ * @param {object} gameState O estado do jogo.
+ */
+function toggleLike(postId, gameState) {
+    const post = POSTS_DATA.find(p => p.id === postId);
+    const likeBtn = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
+    if (!post || !likeBtn) return;
+
+    const likeCount = likeBtn.querySelector('span');
+    const isLiked = gameState.userActions.likedPosts.includes(postId);
+
+    if (isLiked) {
+        // Descurtir
+        gameState.userActions.likedPosts = gameState.userActions.likedPosts.filter(id => id !== postId);
+        post.likes--;
+        likeBtn.classList.remove('liked');
+    } else {
+        // Curtir
+        gameState.userActions.likedPosts.push(postId);
+        post.likes++;
+        likeBtn.classList.add('liked');
+        // Mostra animação apenas ao curtir
+        const mediaContainer = likeBtn.closest('.reel-item').querySelector('.reel-media-container');
+        showLikeAnimation(mediaContainer);
+    }
+    likeCount.textContent = post.likes;
+}
+
+
+/**
+ * Inicializa a tela de Reels.
+ * @param {object} gameState - O estado atual do jogo.
+ */
+/**
+ * Initializes the Reels Screen.
+ * Triggers the rendering of the reels feed.
+ * @param {object} gameState - The global game state.
+ */
+export function initReelsScreen(gameState) {
+    renderReels(gameState);
+}
+
+/**
+ * Manipulador de cliques e toques para a tela de Reels.
+ * @param {Event} event - O objeto do evento.
+ * @param {object} gameState - O estado atual do jogo.
+ * @param {object} toast - A instância do Toast para notificações.
+ */
+/**
+ * Handles click and tap events on the Reels Screen.
+ * Supports double-tap to like, and buttons for like, comment, and share.
+ * @param {Event} event - The event object.
+ * @param {object} gameState - The global game state.
+ * @param {object} toast - Toast notification utility.
+ */
+export function handleReelsScreenClick(event, gameState, toast) {
+    const target = event.target;
+
+    // Ponto 8: Gesto de toque duplo para curtir
+    const mediaContainer = target.closest('.reel-media-container');
+    if (mediaContainer) {
+        const currentTime = new Date().getTime();
+        const timeSinceLastTap = currentTime - lastTap;
+        if (timeSinceLastTap &lt; 300 &amp;&amp; timeSinceLastTap > 0) { // Duplo clique em 300ms
+            const postId = parseInt(mediaContainer.closest('.reel-item').dataset.postId);
+            const isLiked = gameState.userActions.likedPosts.includes(postId);
+            if (!isLiked) { // Só curte, não descurte com toque duplo
+                toggleLike(postId, gameState);
+            } else {
+                showLikeAnimation(mediaContainer); // Mostra a animação mesmo se já estiver curtido
+            }
+        }
+        lastTap = currentTime;
+        return;
+    }
+
+    // Ação de curtir (botão)
+    const likeBtn = target.closest('.like-btn');
+    if (likeBtn) {
+        const postId = parseInt(likeBtn.dataset.postId);
+        toggleLike(postId, gameState);
+        return;
+    }
+
+    // Ponto 5: Comentários (com suporte a threads em uma implementação futura)
+    const commentBtn = target.closest('.comment-btn');
+    if (commentBtn) {
+        const postId = parseInt(commentBtn.dataset.postId);
+        // O popupManager agora pode receber dados para renderizar comentários,
+        // incluindo respostas, formando threads.
+        popupManager.open('comments', { postId: postId });
+        return;
+    }
+
+    // Ponto 7: Funcionalidade de compartilhamento real
+    const shareBtn = target.closest('.share-btn');
+    if (shareBtn) {
+        const postId = parseInt(shareBtn.dataset.postId);
+        const post = POSTS_DATA.find(p => p.id === postId);
+        const philosopher = PHILOSOPHERS_DATA[post.philosopherId];
+
+        const shareData = {
+            title: `LOGOS: Um reel de ${philosopher.name}`,
+            text: post.caption,
+            url: window.location.href // Em um app real, seria um link direto para o post
+        };
+
+        if (navigator.share &amp;&amp; navigator.canShare(shareData)) {
+            navigator.share(shareData)
+                .catch(err => console.error('Erro ao compartilhar:', err));
+        } else {
+            // Fallback para desktop ou navegadores sem suporte
+            navigator.clipboard.writeText(shareData.url).then(() => {
+                toast.show('Link copiado para a área de transferência!', 'success');
+            });
+        }
+        return;
+    }
+
+    // Ponto 6: Abrir página de perfil do filósofo
+    const reelInfo = target.closest('.reel-info');
+    if (reelInfo &amp;&amp; reelInfo.dataset.philosopherId) {
+        const philosopherId = reelInfo.dataset.philosopherId;
+        // Aqui, em vez de um popup, você poderia navegar para uma nova "tela"
+        // que mostraria todos os posts e informações do filósofo.
+        // Usando o popupManager como simulação:
+        popupManager.open('philosopher-profile', { philosopherId: philosopherId });
+        return;
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Tue Nov 18 2025 21:20:50 GMT-0300 (Horário Padrão de Brasília) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

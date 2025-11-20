@@ -1,0 +1,27 @@
+{
+    "source": {
+        "include": [
+            "Frontend/js"
+        ],
+        "includePattern": ".+\\.js(doc|x)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "opts": {
+        "template": "node_modules/docdash",
+        "encoding": "utf8",
+        "destination": "docs/",
+        "recurse": true,
+        "verbose": true
+    },
+    "templates": {
+        "docdash": {
+            "static": true,
+            "sort": true,
+            "search": true,
+            "collapse": true,
+            "typedefs": true,
+            "removeQuotes": "none",
+            "scripts": []
+        }
+    }
+}

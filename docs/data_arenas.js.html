@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>data/arenas.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Card.html">Card</a><ul class='methods'><li data-type='method'><a href="Card.html#.create">create</a></li><li data-type='method'><a href="Card.html#.createConcept">createConcept</a></li></ul></li><li><a href="Modal.html">Modal</a><ul class='methods'><li data-type='method'><a href="Modal.html#hide">hide</a></li><li data-type='method'><a href="Modal.html#setContent">setContent</a></li><li data-type='method'><a href="Modal.html#show">show</a></li></ul></li><li><a href="Player.html">Player</a><ul class='methods'><li data-type='method'><a href="Player.html#.create">create</a></li></ul></li><li><a href="PopupManager.html">PopupManager</a><ul class='methods'><li data-type='method'><a href="PopupManager.html#close">close</a></li><li data-type='method'><a href="PopupManager.html#open">open</a></li></ul></li><li><a href="Toast.html">Toast</a><ul class='methods'><li data-type='method'><a href="Toast.html#show">show</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-GameConstants.html">GameConstants</a></li><li><a href="module-LoginScreen.html">LoginScreen</a></li><li><a href="module-Main.html">Main</a></li></ul><h3>Namespaces</h3><ul><li><a href="GameState.html">GameState</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CONCEPTS_DATA">CONCEPTS_DATA</a></li><li><a href="global.html#CONCEPTS_DATA_1">CONCEPTS_DATA_1</a></li><li><a href="global.html#PHILOSOPHERS_DATA">PHILOSOPHERS_DATA</a></li><li><a href="global.html#POSTS_DATA">POSTS_DATA</a></li><li><a href="global.html#SCHOOLS">SCHOOLS</a></li><li><a href="global.html#STUDY_CONTENT_DATA">STUDY_CONTENT_DATA</a></li><li><a href="global.html#arenas">arenas</a></li><li><a href="global.html#handleLibraryScreenClick">handleLibraryScreenClick</a></li><li><a href="global.html#handlePhilosophersScreenClick">handlePhilosophersScreenClick</a></li><li><a href="global.html#handlePlayScreenClick">handlePlayScreenClick</a></li><li><a href="global.html#handleReelsScreenClick">handleReelsScreenClick</a></li><li><a href="global.html#handleSchoolMembersScreenClick">handleSchoolMembersScreenClick</a></li><li><a href="global.html#handleSchoolsScreenClick">handleSchoolsScreenClick</a></li><li><a href="global.html#handleSymposiumScreenClick">handleSymposiumScreenClick</a></li><li><a href="global.html#initLibraryScreen">initLibraryScreen</a></li><li><a href="global.html#initPhilosophersScreen">initPhilosophersScreen</a></li><li><a href="global.html#initPlayScreen">initPlayScreen</a></li><li><a href="global.html#initReelsScreen">initReelsScreen</a></li><li><a href="global.html#initSchoolMembersScreen">initSchoolMembersScreen</a></li><li><a href="global.html#initSchoolsScreen">initSchoolsScreen</a></li><li><a href="global.html#initSymposiumScreen">initSymposiumScreen</a></li><li><a href="global.html#preloadAdjacentImages">preloadAdjacentImages</a></li><li><a href="global.html#renderMembers">renderMembers</a></li><li><a href="global.html#renderPosts">renderPosts</a></li><li><a href="global.html#renderReels">renderReels</a></li><li><a href="global.html#setupImageObserver">setupImageObserver</a></li><li><a href="global.html#setupReelsObserver">setupReelsObserver</a></li><li><a href="global.html#showLikeAnimation">showLikeAnimation</a></li><li><a href="global.html#toggleLike">toggleLike</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">data/arenas.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+/**
+ * arenas.js
+ * 
+ * Define as arenas de batalha do jogo. Cada arena representa uma era ou um
+ * grande movimento filosófico, servindo como "lar" para um conjunto específico
+ * de escolas de pensamento. A progressão pelas arenas guia o jogador através
+ * da história da filosofia.
+ */
+
+import { SCHOOLS } from './philosophers.js'; // Importa as escolas para garantir consistência
+
+/**
+ * List of Game Arenas.
+ * Each arena corresponds to a philosophical era or movement.
+ * @type {Array&lt;{
+ *   id: number,
+ *   name: string,
+ *   description: string,
+ *   trophyReq: number,
+ *   schools: string[],
+ *   image: string
+ * }>}
+ */
+export const arenas = [
+    {
+        id: 1,
+        name: "Berço do Pensamento",
+        description: "A costa da Jônia e as colônias gregas, onde os primeiros filósofos ousaram trocar o mito pelo logos. Batalhas aqui são sobre encontrar o princípio (Arché) de todas as coisas.",
+        trophyReq: 0,
+        schools: [
+            SCHOOLS.PRE_SOCRATICO_MILETO,
+            SCHOOLS.PRE_SOCRATICO_ELEIA,
+            SCHOOLS.PITAGORISMO,
+            SCHOOLS.PRE_SOCRATICO_PLURALISTA
+        ],
+        image: "assets/arenas/berco_do_pensamento.png" // Sugestão de nova imagem
+    },
+    {
+        id: 2,
+        name: "Ágora de Atenas",
+        description: "O coração da pólis, o palco do debate público. Aqui, a retórica afiada dos Sofistas enfrenta o método implacável de Sócrates. A verdade é forjada no fogo do diálogo.",
+        trophyReq: 400,
+        schools: [
+            SCHOOLS.SOFISMO,
+            SCHOOLS.GREGA
+        ],
+        image: "assets/arenas/atenas.png" // Renomeei Arena_1.png
+    },
+    {
+        id: 3,
+        name: "Jardim de Epicuro",
+        description: "Longe do barulho da política, um refúgio para buscar a ataraxia. Nesta arena, Estoicos, Epicuristas e Cínicos duelam sobre o verdadeiro caminho para a felicidade e a paz de espírito.",
+        trophyReq: 800,
+        schools: [
+            SCHOOLS.EPICURISMO,
+            SCHOOLS.ESTOICISMO,
+            SCHOOLS.CINISMO,
+            SCHOOLS.CETISCISMO
+        ],
+        image: "assets/arenas/jardim_de_epicuro.png" // Mantive seu .jpg
+    },
+    {
+        id: 4,
+        name: "Biblioteca de Alexandria",
+        description: "O último bastião do saber antigo. Sob a luz da grande biblioteca, os Neoplatônicos tecem complexos sistemas metafísicos, preparando a transição para uma nova era do pensamento.",
+        trophyReq: 1100,
+        schools: [
+            SCHOOLS.NEOPLATONISMO
+        ],
+        image: "assets/arenas/biblioteca_alexandria.png" // Sugestão de nova imagem
+    },
+    {
+        id: 5,
+        name: "Catedral Escolástica",
+        description: "Nas sombras imponentes das grandes catedrais, a fé busca o intelecto. Aqui, os mestres da Escolástica usam a lógica aristotélica para construir as fundações da teologia e da filosofia medieval.",
+        trophyReq: 1400,
+        schools: [
+            SCHOOLS.ESCOLASTICA
+        ],
+        image: "assets/arenas/catedral_escolastica.png" // Sugestão de nova imagem
+    },
+    {
+        id: 6,
+        name: "Salão do Iluminismo",
+        description: "A luz da razão contra as sombras do dogma. Racionalistas e Empiristas duelam para definir os limites do conhecimento humano, abrindo caminho para a era das revoluções.",
+        trophyReq: 1700,
+        schools: [
+            SCHOOLS.RACIONALISMO,
+            SCHOOLS.EMPIRISMO,
+            SCHOOLS.ILUMINISMO
+        ],
+        image: "assets/arenas/salao_iluminismo.png" // Sugestão de nova imagem
+    },
+    {
+        id: 7,
+        name: "Cume do Idealismo",
+        description: "O auge dos grandes sistemas filosóficos. No topo da montanha do pensamento alemão, a Dialética de Hegel desafia todos a compreenderem o desdobrar do Espírito Absoluto na história.",
+        trophyReq: 2000,
+        schools: [
+            SCHOOLS.IDEALISMO_ALEMAO
+        ],
+        image: "assets/arenas/cume_idealismo.png" // Sugestão de nova imagem
+    },
+    {
+        id: 8,
+        name: "Fábrica da Revolução",
+        description: "O chão de fábrica torna-se o campo de batalha das ideias. O Materialismo Histórico analisa as engrenagens da sociedade, prevendo um confronto inevitável que mudará o mundo.",
+        trophyReq: 2600,
+        schools: [
+            SCHOOLS.MATERIALISMO
+        ],
+        image: "assets/arenas/fabrica_revolucao.png" // Sugestão de nova imagem
+    },
+    {
+        id: 9,
+        name: "Café Existencialista",
+        description: "No coração da angústia e da liberdade do século XX. Entre a fumaça e o café, filósofos debatem a existência, o nada e a responsabilidade radical de criar a si mesmo.",
+        trophyReq: 3800,
+        schools: [
+            SCHOOLS.EXISTENCIALISMO,
+            SCHOOLS.FENOMENOLOGIA
+        ],
+        image: "assets/arenas/cafe_existencialista.png" // Sugestão de nova imagem
+    },
+    {
+        id: 10,
+        name: "Torre da Crítica",
+        description: "Uma arena contemporânea onde as estruturas do poder, do conhecimento e da linguagem são implacavelmente desconstruídas. Nada é o que parece sob o olhar da Teoria Crítica e do Pós-Estruturalismo.",
+        trophyReq: 4200,
+        schools: [
+            SCHOOLS.ESCOLA_DE_FRANKFURT,
+            SCHOOLS.ESTRUTURALISMO,
+            SCHOOLS.POS_ESTRUTURALISMO
+        ],
+        image: "assets/arenas/torre_da_critica.png" // Sugestão de nova imagem
+    }
+];</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Tue Nov 18 2025 21:20:50 GMT-0300 (Horário Padrão de Brasília) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>
