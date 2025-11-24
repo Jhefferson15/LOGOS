@@ -51,6 +51,7 @@ if (window.GameUI && typeof window.GameUI.cleanupEventListeners === 'function') 
         },
 
         endGame(winnerId) {
+            console.log('!!! DEBUG: endGame EXECUTED !!! Winner:', winnerId);
             this.state.isGameOver = true;
             const isPlayerWinner = winnerId === 'player-main';
 
@@ -59,15 +60,22 @@ if (window.GameUI && typeof window.GameUI.cleanupEventListeners === 'function') 
             const scrollsReward = isPlayerWinner ? 100 : 25;
             const chestReward = isPlayerWinner ? 'Baú de Madeira' : null;
 
-            // Open the new end game popup instead of the old overlay
-            popupManager.open('game:end-game', {
+            // Save result to localStorage to be shown in the main menu
+            const gameResult = {
                 isVictory: isPlayerWinner,
                 trophyChange: trophyChange,
                 scrollsReward: scrollsReward,
-                chestReward: chestReward
-            });
+                chestReward: chestReward,
+                winnerName: this.state.playersData[winnerId].name
+            };
+            localStorage.setItem('gameResult', JSON.stringify(gameResult));
 
             this.logEvent(`${this.state.playersData[winnerId].name} venceu a partida!`, 'game-event');
+
+            // Redirect to main menu immediately
+            setTimeout(() => {
+                window.location.href = '../index.html';
+            }, 1000); // Small delay to see the final move
         }
     };
 

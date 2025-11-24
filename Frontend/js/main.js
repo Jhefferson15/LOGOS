@@ -323,4 +323,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- START THE APPLICATION ---
     initialize();
+
+    // Check for pending game results (from exiting game.html)
+    const pendingGameResult = localStorage.getItem('gameResult');
+    if (pendingGameResult) {
+        try {
+            const resultData = JSON.parse(pendingGameResult);
+            // Add flag to indicate we are in main menu
+            resultData.isMainMenu = true;
+
+            // Wait a bit for UI to settle
+            setTimeout(() => {
+                popupManager.open('game:end-game', resultData);
+                localStorage.removeItem('gameResult');
+            }, 500);
+        } catch (e) {
+            console.error('Error parsing game result:', e);
+            localStorage.removeItem('gameResult');
+        }
+    }
 });

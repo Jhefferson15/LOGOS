@@ -121,26 +121,89 @@ export const PhilosopherStudyModulePopup = {
                     display: flex; justify-content: center;
                 }
                 .text-content-wrapper {
-                    padding: 3rem 2rem 5rem 2rem; /* Padding interno generoso */
+                    padding: 3rem 0 5rem 0; /* Remove padding lateral completamente */
                     width: 100%; display: flex; justify-content: center;
                 }
                 .text-content { 
-                    max-width: 800px; /* Largura ideal de leitura */
+                    max-width: 100%; /* Largura total sem margens laterais */
                     width: 100%; 
                     background: #fff; 
-                    padding: 4rem; /* Respiro interno do papel */
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.06); 
-                    border-radius: 4px;
+                    padding: 4rem 0; /* Remove padding lateral, mantém apenas vertical */
+                    box-shadow: none; /* Remove sombra para eliminar espaço visual */
+                    border-radius: 0;
                     transition: font-size 0.2s ease; 
                     color: #2c2c2c;
                     line-height: 1.8; /* Entrelinha confortável */
                 }
                 
                 /* Tipografia interna do Texto */
-                .text-content h1 { font-family: 'Cinzel', serif; color: #3e2723; border-bottom: 2px solid #efebe9; padding-bottom: 1rem; margin-bottom: 1.5rem; }
-                .text-content h2 { font-family: 'Merriweather', serif; color: #5d4037; margin-top: 2rem; font-size: 1.4em; }
-                .text-content p { margin-bottom: 1.2rem; text-align: justify; }
-                .text-content blockquote { border-left: 4px solid #8d6e63; margin: 1.5rem 0; padding-left: 1rem; color: #555; font-style: italic; background: #fafafa; padding: 1rem; }
+                .text-content h1 { font-family: 'Cinzel', serif; color: #3e2723; border-bottom: 2px solid #efebe9; padding: 1rem 2rem; margin: 0 0 1.5rem 0; }
+                .text-content h2 { font-family: 'Merriweather', serif; color: #5d4037; margin-top: 2rem; font-size: 1.4em; padding: 0 2rem; }
+                .text-content p { margin-bottom: 1.2rem; text-align: justify; padding: 0 2rem; }
+                .text-content blockquote { border-left: 4px solid #8d6e63; margin: 1.5rem 2rem; padding-left: 1rem; color: #555; font-style: italic; background: #fafafa; padding: 1rem; }
+                .text-content ul, .text-content ol { padding: 0 2rem 0 4rem; margin-bottom: 1.2rem; }
+                .text-content li { margin-bottom: 0.5rem; }
+
+                /* Sumário */
+                .summary-container {
+                    height: 100%; overflow-y: auto;
+                    padding: 0rem;
+                    background: #fdfbf7;
+                }
+                .summary-content {
+                    max-width: 800px;
+                    margin: 0 auto;
+                    background: #fff;
+                    padding: 2rem;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                }
+                .summary-content h2 {
+                    font-family: 'Cinzel', serif;
+                    color: #3e2723;
+                    margin-bottom: 1.5rem;
+                    padding-bottom: 0.5rem;
+                    border-bottom: 2px solid #efebe9;
+                }
+                .summary-list {
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                }
+                .summary-item {
+                    padding: 1rem;
+                    margin-bottom: 0.5rem;
+                    background: #fafafa;
+                    border-left: 4px solid #8d6e63;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                .summary-item:hover {
+                    background: #efebe9;
+                    border-left-color: #5d4037;
+                    transform: translateX(5px);
+                }
+                .summary-item.viewed {
+                    border-left-color: #4caf50;
+                }
+                .summary-item-title {
+                    font-weight: 600;
+                    color: #3e2723;
+                }
+                .summary-item-page {
+                    font-size: 0.85rem;
+                    color: #757575;
+                    background: #e0e0e0;
+                    padding: 2px 8px;
+                    border-radius: 4px;
+                }
+                .summary-item.viewed .summary-item-page {
+                    background: #c8e6c9;
+                    color: #2e7d32;
+                }
 
                 /* Área de HQ (Correção do Espaço Branco) */
                 .comic-scroll-area { 
@@ -226,6 +289,7 @@ export const PhilosopherStudyModulePopup = {
                         </div>
                     </div>
                     <div class="header-tabs">
+                        <button class="tab-btn" data-tab="summary">Sumário</button>
                         <button class="tab-btn active" data-tab="theory">Teoria</button>
                         <button class="tab-btn" data-tab="comic">HQ</button>
                         <button class="tab-btn" data-tab="quiz">Quiz</button>
@@ -355,7 +419,50 @@ export const PhilosopherStudyModulePopup = {
             const btnPrev = root.querySelector('#btn-prev');
             const btnNext = root.querySelector('#btn-next');
 
-            if (state.tab === 'theory') {
+            if (state.tab === 'summary') {
+                toolbar.style.display = 'none';
+                footer.style.display = 'none';
+
+                // Gera lista de páginas com títulos
+                const summaryItems = Object.entries(studyData.tableOfContents || {})
+                    .map(([pageNum, title]) => {
+                        const isViewed = gameState.studyProgress[philosopherId].pagesViewed.has(parseInt(pageNum));
+                        return `
+                            <li class="summary-item ${isViewed ? 'viewed' : ''}" data-page="${pageNum}">
+                                <span class="summary-item-title">${title}</span>
+                                <span class="summary-item-page">Página ${pageNum}</span>
+                            </li>
+                        `;
+                    })
+                    .join('');
+
+                viewport.innerHTML = `
+                    <div class="summary-container">
+                        <div class="summary-content animate__animated animate__fadeIn">
+                            <h2><i class="fas fa-list"></i> Sumário do Estudo</h2>
+                            <ul class="summary-list">
+                                ${summaryItems}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+
+                // Adiciona listeners para navegar ao clicar em um item
+                viewport.querySelectorAll('.summary-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const pageNum = parseInt(item.dataset.page);
+                        state.tab = 'theory';
+                        state.textPage = pageNum;
+
+                        // Atualiza as abas
+                        root.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                        root.querySelector('[data-tab="theory"]').classList.add('active');
+
+                        renderContent();
+                    });
+                });
+
+            } else if (state.tab === 'theory') {
                 renderTheoryToolbar();
                 footer.style.display = 'flex';
                 toolbar.style.display = 'flex';
@@ -429,7 +536,16 @@ export const PhilosopherStudyModulePopup = {
                 const scrollArea = root.querySelector('.text-scroll-area');
                 if (scrollArea) scrollArea.scrollTop = 0;
             }
-            else if (state.tab === 'comic' && state.comicIndex > 0) { state.comicIndex--; renderContent(); }
+            else if (state.tab === 'comic' && state.comicIndex > 0) {
+                state.comicIndex--;
+                renderContent();
+                // Scroll to top for comic
+                const comicScrollArea = root.querySelector('.comic-scroll-area');
+                if (comicScrollArea) {
+                    comicScrollArea.scrollTop = 0;
+                    comicScrollArea.scrollLeft = 0;
+                }
+            }
         });
 
         root.querySelector('#btn-next').addEventListener('click', () => {
@@ -448,6 +564,12 @@ export const PhilosopherStudyModulePopup = {
                 if (state.comicIndex < comics.length - 1) {
                     state.comicIndex++;
                     renderContent();
+                    // Scroll to top for comic
+                    const comicScrollArea = root.querySelector('.comic-scroll-area');
+                    if (comicScrollArea) {
+                        comicScrollArea.scrollTop = 0;
+                        comicScrollArea.scrollLeft = 0;
+                    }
                 }
             }
         });

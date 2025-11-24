@@ -66,10 +66,13 @@ export const EndGamePopup = {
                 }
             }
 
-            // In a real app, we would navigate back to the main menu/play screen
-            // For now, we just close the popup.
-            // A robust implementation would use a proper router.
-            window.location.href = '../index.html'; // Go back to main menu
+            // If we are in the main menu (data.isMainMenu is true), just close the popup
+            if (data.isMainMenu) {
+                popupManager.close();
+            } else {
+                // If we are in-game, redirect to main menu
+                window.location.href = '../index.html';
+            }
         });
     }
 };

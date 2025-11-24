@@ -58,13 +58,18 @@ export const EventsModule = {
         const scrollsReward = 10; // Small consolation reward
         const chestReward = null; // No chest for quitting
 
-        // Trigger endgame popup with reduced rewards
-        popupManager.open('game:end-game', {
+        // Save result to localStorage to be shown in the main menu
+        const gameResult = {
             isVictory: false,
             trophyChange: trophyChange,
             scrollsReward: scrollsReward,
-            chestReward: chestReward
-        });
+            chestReward: chestReward,
+            winnerName: 'Desistência'
+        };
+        localStorage.setItem('gameResult', JSON.stringify(gameResult));
+
+        // Redirect to main menu immediately
+        window.location.href = '../index.html';
     },
 
     // --- Pointer Logic & Drag ---
