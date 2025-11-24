@@ -29,7 +29,7 @@ export const ReelsSettingsPopup = {
      * @param {HTMLElement} element - O elemento do corpo do modal onde o HTML foi injetado.
      * @param {object} data - Dados para configuração (não utilizado neste popup).
      */
-    setupListeners: (element, data) => {
+    setupListeners: (element, data, popupManager) => {
         const clearBtn = element.querySelector('#clear-reels-history-btn');
         if (clearBtn) {
             clearBtn.addEventListener('click', () => {
@@ -39,7 +39,7 @@ export const ReelsSettingsPopup = {
                 } else {
                     toast.show('Histórico já está vazio.', 'info');
                 }
-                window.popupManager.close();
+                popupManager.close();
             });
         }
     }

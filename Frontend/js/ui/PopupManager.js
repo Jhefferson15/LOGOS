@@ -50,7 +50,7 @@ class PopupManager {
             }
 
             if (popupModule.setupListeners) {
-                popupModule.setupListeners(this.bodyElement, data);
+                popupModule.setupListeners(this.bodyElement, data, this);
             }
 
             this.container.classList.add('active');

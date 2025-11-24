@@ -1,0 +1,94 @@
+/* --- CSS PARA TELAS LARGAS (DESKTOP/LANDSCAPE) --- */
+@media (min-width: 768px) {
+    html { font-size: 16px; }
+    body { padding: 20px; display: flex; justify-content: center; align-items: center; }
+    
+    .game-screen {
+        position: relative; /* Para posicionar o botão de toggle */
+        display: grid;
+        grid-template-columns: 220px 1fr 1.5fr; /* Sidebar | Contexto | Debate */
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            "header header header"
+            "nav context-panel main-debate-panel";
+        width: 100%; height: 100vh; /* Ocupa a tela inteira */
+        border-radius: 20px; box-shadow: var(--box-shadow-strong);
+        gap: 15px; padding: 20px;
+        transition: grid-template-columns 0.3s ease-in-out;
+    }
+
+    #main-debate-panel { display: flex; } /* Mostra o painel de debate */
+    .game-header { grid-area: header; }
+    #context-panel { grid-area: context-panel; }
+    #main-debate-panel { grid-area: main-debate-panel; }
+    .main-nav { grid-area: nav; }
+    
+    .main-nav {
+        flex-direction: column; justify-content: flex-start;
+        gap: 10px; padding: 15px 0; margin-top: 0;
+        background: transparent; border: none; box-shadow: none;
+    }
+    .nav-item {
+        flex-direction: row; justify-content: flex-start;
+        align-items: center; gap: 15px; padding: 12px;
+        border-radius: var(--border-radius-sm); width: 100%;
+        transform: translateY(0) !important; /* Reseta o transform do mobile */
+    }
+    .nav-item.active {
+        background-color: rgba(74, 63, 53, 0.05);
+        color: var(--accent-sepia-darker);
+        font-weight: 600;
+    }
+    .nav-item.active::after { display: none; } /* Remove o sublinhado do mobile */
+    .nav-item i { font-size: 1.25rem; width: 25px; text-align: center; }
+    .nav-item span { font-size: 1rem; transition: opacity 0.2s ease, width 0.2s ease; }
+
+    /* --- ESTADO COLAPSADO --- */
+    .game-screen.sidebar-collapsed {
+        grid-template-columns: 80px 1fr 1.5fr; /* Largura da sidebar colapsada */
+    }
+    .game-screen.sidebar-collapsed .nav-item span {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+    }
+    .game-screen.sidebar-collapsed .nav-item {
+        justify-content: center;
+    }
+    .game-screen.sidebar-collapsed #sidebar-toggle-btn i {
+        transform: rotate(180deg);
+    }
+
+    /* --- BOTÃO DE TOGGLE DA SIDEBAR --- */
+    #sidebar-toggle-btn {
+        display: flex; /* Mostra o botão no desktop, com a especificidade correta */
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        width: 220px; /* Alinha com a sidebar */
+        background: transparent;
+        border: none;
+        border-top: 1px solid var(--border-light);
+        padding: 15px 0;
+        justify-content: flex-end;
+        align-items: center;
+        cursor: pointer;
+        color: var(--text-secondary-light);
+        transition: all 0.3s ease-in-out;
+    }
+    #sidebar-toggle-btn i {
+        font-size: 1.2rem;
+        padding-right: 20px;
+        transition: transform 0.3s ease-in-out;
+    }
+    #sidebar-toggle-btn:hover {
+        color: var(--text-dark-roast);
+    }
+    .game-screen.sidebar-collapsed #sidebar-toggle-btn {
+        width: 80px;
+        justify-content: center;
+    }
+     .game-screen.sidebar-collapsed #sidebar-toggle-btn i {
+        padding-right: 0;
+     }
+}

@@ -54,12 +54,12 @@ export const PhilosopherDetailsPopup = {
      * @param {HTMLElement} element - O elemento do corpo do modal onde o HTML foi injetado.
      * @param {object} data - Dados para configuração, esperando data.philosopherId.
      */
-    setupListeners: (element, data) => {
+    setupListeners: (element, data, popupManager) => {
         const upgradeBtn = element.querySelector('#upgrade-philosopher-btn');
         if (upgradeBtn && !upgradeBtn.classList.contains('disabled')) {
             upgradeBtn.addEventListener('click', () => {
                 toast.show(`Aprimorando ${PHILOSOPHERS_DATA[data.philosopherId].name}...`, 'success');
-                window.popupManager.close();
+                popupManager.close();
             });
         }
     }

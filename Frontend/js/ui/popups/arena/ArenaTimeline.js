@@ -91,7 +91,7 @@ export const ArenaTimelinePopup = {
      * @param {HTMLElement} element - O elemento do corpo do modal onde o HTML foi injetado.
      * @param {object} data - Dados para configuração.
      */
-    setupListeners: (element, data) => {
+    setupListeners: (element, data, popupManager) => {
         // Listener para selecionar arena
         const selectButtons = element.querySelectorAll('.select-arena-btn');
         selectButtons.forEach(btn => {
@@ -108,7 +108,7 @@ export const ArenaTimelinePopup = {
                 // Acessa o popupManager global para fechar
                 // Idealmente, isso seria feito através de um evento ou callback
                 // mas por simplicidade, usamos a instância global.
-                window.popupManager.close();
+                popupManager.close();
             });
         });
 

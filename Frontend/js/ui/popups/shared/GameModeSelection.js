@@ -64,7 +64,7 @@ export const GameModeSelectionPopup = {
      * @param {HTMLElement} element - O elemento do corpo do modal onde o HTML foi injetado.
      * @param {object} data - Dados para configuração (não utilizado neste popup).
      */
-    setupListeners: (element, data) => {
+    setupListeners: (element, data, popupManager) => {
         const cards = element.querySelectorAll('.game-mode-card');
         cards.forEach(card => {
             card.addEventListener('click', () => {
@@ -80,7 +80,7 @@ export const GameModeSelectionPopup = {
 
                 const modeName = card.querySelector('h3').innerText;
                 toast.show(`Modo ${modeName} selecionado!`, 'success');
-                window.popupManager.close();
+                popupManager.close();
             });
         });
     }

@@ -1,8 +1,3 @@
-/**
- * Main application entry point.
- * Orchestrates screen loading, navigation, and global event handling.
- * @module Main
- */
 import { initPlayScreen, handlePlayScreenClick } from './screens/play.js';
 import { initLibraryScreen, handleLibraryScreenClick } from './screens/library.js';
 import { initPhilosophersScreen, handlePhilosophersScreenClick } from './screens/philosophers.js';
@@ -15,6 +10,7 @@ import { gameState } from './data/gameState.js';
 import { popupManager } from './ui/PopupManager.js';
 import { logout, subscribeToAuthChanges } from './services/auth-service.js';
 import { saveUserProfile, saveGameProgress, loadGameProgress } from './services/db-service.js';
+import { initLayoutManager, isDesktopView } from './layout-manager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- LOGIN CHECK (Legacy/Fast check) ---
@@ -28,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const contextPanel = document.getElementById('context-panel'); // Main panel on mobile, side panel on desktop
     const mainDebatePanel = document.getElementById('main-debate-panel'); // Fixed debate panel on desktop
     const mainNav = document.querySelector('.main-nav');
-    const sidebarToggleButton = document.getElementById('sidebar-toggle-btn');
     const gameHeader = document.querySelector('.game-header');
     const logoutBtn = document.getElementById('logout-btn');
 
@@ -38,19 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
      * @type {string}
      */
     let currentContextScreenName = ''; // Tracks what's in the context panel
-    const DESKTOP_BREAKPOINT = 768;
     let currentUser = null; // Track current user for saving
 
     // --- HELPER FUNCTIONS (from your file, unchanged) ---
     const formatTime = (s) => { if (s <= 0) return "Pronto!"; const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60; return h > 0 ? `${h}H ${m}MIN` : m > 0 ? `${m}MIN ${sec}SEG` : `${sec}SEG`; };
     const getChestIcon = (t) => `fas ${{ Papiro: 'fa-scroll', Tomo: 'fa-book', 'Obra Rara': 'fa-gem' }[t] || 'fa-box'}`;
-
-    // --- NEW: HELPER TO CHECK VIEWPORT ---
-    /**
-     * Checks if the current viewport width corresponds to a desktop view.
-     * @returns {boolean} True if viewport width >= DESKTOP_BREAKPOINT.
-     */
-    const isDesktopView = () => window.innerWidth >= DESKTOP_BREAKPOINT;
 
     // --- UI UPDATE FUNCTION (from your file, unchanged) ---
     /**
@@ -178,15 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /**
-     * --- NEW: SIDEBAR TOGGLE FUNCTIONALITY ---
-     */
-    const toggleSidebar = () => {
-        gameScreen.classList.toggle('sidebar-collapsed');
-        const isCollapsed = gameScreen.classList.contains('sidebar-collapsed');
-        localStorage.setItem('sidebarState', isCollapsed ? 'collapsed' : 'expanded');
-    };
-
-    /**
      * --- INITIALIZATION FUNCTION ---
      */
     /**
@@ -194,10 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * Sets up sidebar state, loads initial screens, and attaches global event listeners.
      */
     const initialize = () => {
-        // Setup sidebar state from localStorage
-        if (isDesktopView() && localStorage.getItem('sidebarState') !== 'expanded') {
-            gameScreen.classList.add('sidebar-collapsed');
-        }
+        initLayoutManager();
 
         // Initial screen loading
         if (isDesktopView()) {
@@ -267,11 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-
-        // Sidebar toggle button listener
-        if (sidebarToggleButton) {
-            sidebarToggleButton.addEventListener('click', toggleSidebar);
-        }
 
         // Header click listener (for popups)
         gameHeader.addEventListener('click', (e) => {

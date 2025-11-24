@@ -245,7 +245,7 @@ export const PhilosopherStudyModulePopup = {
     /**
      * Configura os event listeners para o popup.
      */
-    setupListeners: (element, data) => {
+    setupListeners: (element, data, popupManager) => {
         const philosopherId = data.philosopherId;
         const root = element.querySelector('#study-root');
         if (!root) return;
@@ -441,7 +441,7 @@ export const PhilosopherStudyModulePopup = {
                     if (scrollArea) scrollArea.scrollTop = 0;
                 } else {
                     // Se tiver manager global, fecha
-                    if (window.popupManager) window.popupManager.close();
+                    if (popupManager) popupManager.close();
                 }
             } else if (state.tab === 'comic') {
                 const comics = studyData.comic || [];
