@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
     height: 100%;
 }
 
@@ -7,46 +8,57 @@ html, body {
     flex-direction: column;
     height: 100%;
 }
-.player-info-container, .timed-chests {
+
+.player-info-container,
+.timed-chests {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: rgba(0,0,0,0.1);
+    background-color: rgba(0, 0, 0, 0.1);
     padding: 0.6rem;
     border-radius: 0.6rem;
     margin-top: 1rem;
 }
+
 .player-profile {
     display: flex;
     align-items: center;
     gap: 0.6rem;
 }
+
 .profile-icon {
     font-size: 2.2rem;
 }
+
 .player-name {
     font-weight: bold;
 }
+
 .clan-name {
     font-size: 0.8em;
     opacity: 0.8;
 }
+
 .trophies {
     background-color: var(--bg-dark-alpha);
     padding: 0.4rem 1rem;
     border-radius: 1rem;
     font-weight: bold;
 }
+
 .trophies .fa-trophy {
     color: var(--accent-yellow);
 }
+
 .settings {
     font-size: 1.5rem;
     cursor: pointer;
 }
+
 .timed-chests {
     gap: 0.6rem;
 }
+
 .timed-chest {
     flex: 1;
     background: var(--bg-dark-alpha);
@@ -57,15 +69,25 @@ html, body {
     gap: 0.6rem;
     font-size: 0.8rem;
 }
+
 .timed-chest.ready {
     background: var(--green);
     cursor: pointer;
     animation: pulse 1.s infinite;
 }
+
 @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+    }
 }
 
 /* --- ESTILOS ATUALIZADOS --- */
@@ -82,7 +104,7 @@ html, body {
 
     text-align: center;
 
-    
+
 
     position: relative;
 
@@ -92,15 +114,17 @@ html, body {
 
     cursor: pointer;
 
-    
+
 
     /* Altura e margem para espaçamento */
 
-    flex: 1; /* This is the important part */
+    flex: 1;
+    /* This is the important part */
 
     margin-top: 1rem;
 
-    padding-top: 1.5rem; /* Empurra o texto um pouco para baixo do topo */
+    padding-top: 1.5rem;
+    /* Empurra o texto um pouco para baixo do topo */
 
 
 
@@ -108,7 +132,8 @@ html, body {
 
     background-size: contain;
 
-    background-position: center; /* Você pode usar 'top center' se preferir focar no topo da imagem */
+    background-position: center;
+    /* Você pode usar 'top center' se preferir focar no topo da imagem */
 
     background-repeat: no-repeat;
 
@@ -121,20 +146,24 @@ html, body {
     font-weight: bold;
     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
     /* Removemos margens para o posicionamento ser controlado pelo pai */
-    margin: 0; 
+    margin: 0;
 }
 
 .battle-button {
-    display: block; /* Para ocupar a largura e permitir margem auto */
-    width: 90%; /* Ocupa 90% da largura da tela */
-    margin: 1rem auto; /* Cria a "separação" vertical e centraliza horizontalmente */
+    display: block;
+    /* Para ocupar a largura e permitir margem auto */
+    width: 90%;
+    /* Ocupa 90% da largura da tela */
+    margin: 1rem auto;
+    /* Cria a "separação" vertical e centraliza horizontalmente */
 
-    background-color:#E0DDD8;
+    background-color: #E0DDD8;
     color: var(--text-dark);
     border: none;
     font-size: 1.8rem;
     font-weight: bold;
-    padding: 1rem 0; /* Ajustado padding para o novo tamanho */
+    padding: 1rem 0;
+    /* Ajustado padding para o novo tamanho */
     border-radius: 1rem;
     cursor: pointer;
     box-shadow: 0 5px 0 #c78f1e;
@@ -147,11 +176,13 @@ html, body {
     transform: translateY(3px);
     box-shadow: 0 2px 0 #c78f1e;
 }
+
 .chest-slots {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 0.6rem;
 }
+
 .chest-slot {
     background-color: var(--bg-dark-alpha);
     min-height: 6rem;
@@ -167,18 +198,22 @@ html, body {
     border: 2px solid transparent;
     font-size: 0.8rem;
 }
+
 .chest-slot:hover {
     position: relative;
     z-index: 10;
-    transform-origin: center bottom; 
+    transform-origin: center bottom;
 }
+
 .chest-slot.unlocking {
     border-color: var(--accent-yellow);
 }
+
 .chest-slot.ready {
     border-color: var(--green);
     animation: pulse 1.5s infinite;
 }
+
 .chest-slot button {
     background: var(--green);
     color: white;

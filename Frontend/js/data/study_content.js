@@ -1,5 +1,20 @@
 // data/study_content.js
 /**
+ * Study Content Database - Index File
+ * 
+ * This file aggregates all individual philosopher study content files.
+ * Each philosopher has their own file in the study_content/ directory.
+ * 
+ * To add a new philosopher:
+ * 1. Create a new file in study_content/ (use _template.js as a guide)
+ * 2. Import it here
+ * 3. Add it to the STUDY_CONTENT_DATA object with the philosopher's ID as the key
+ */
+
+// Import individual philosopher content files
+import { talesContent } from './study_content/tales.js';
+
+/**
  * Database of Study Content.
  * Contains detailed articles, quizzes, and comics for each philosopher.
  * @type {Object.<string, {
@@ -12,180 +27,14 @@
  * }>}
  */
 export const STUDY_CONTENT_DATA = {
-    '21': { // ID de Tales de Mileto
-        realImage: 'assets/game/images/philosophers/real/tales.jpg',
-        totalPages: 52, // Total de "páginas" para calcular o progresso
-        tableOfContents: { // Sumário detalhado baseado nos capítulos do livro
-            1: "Introdução: O Primeiro Filósofo e a Revolução do Logos",
-            4: "O Problema das Fontes: Reconstruindo Tales",
-            6: "Aristóteles como Fonte Primária",
-            8: "A Grande Pergunta: O que é a Arché?",
-            10: "A Resposta de Tales: 'A Arché é a Água'",
-            12: "As Razões de Aristóteles (I): 'O Alimento de Tudo é Úmido'",
-            15: "As Razões de Aristóteles (II): 'O Calor Vem da Umidade'",
-            18: "As Razões de Aristóteles (III): 'As Sementes de Tudo São Úmidas'",
-            20: "A Teoria Cíclica da Transformação da Água",
-            23: "Distanciamento do Mito: Tales vs. Teogonias",
-            25: "Novas Ideias Sobre a Terra (I): A Terra Flutua Sobre a Água",
-            28: "Novas Ideias Sobre a Terra (II): A Causa dos Terremotos",
-            31: "Novas Ideias Sobre a Terra (III): A Esfericidade da Terra?",
-            34: "Hilozoísmo: 'Todas as Coisas Estão Cheias de Deuses'",
-            37: "O Ímã e o Âmbar: Evidências da Alma na Matéria",
-            39: "Novas Ideias Sobre o Cosmos (I): A Previsão do Eclipse de 585 a.C.",
-            42: "Novas Ideias Sobre o Cosmos (II): Os Solstícios e o Calendário",
-            45: "Tales, o Matemático: A Geometria Grega Nasce",
-            47: "Os Teoremas Atribuídos a Tales",
-            50: "Legado: Cientificidade, Racionalidade e a Escola de Mileto"
-        },
-        pages: { // Conteúdo de cada página, expandido e com referências
-            '1': `<h1>Tales de Mileto (c. 624-546 a.C.)</h1>
-                    <h2>Introdução: O Primeiro Filósofo e a Revolução do Logos</h2>
-                    <p>Ao iniciarmos o estudo de Tales, mergulhamos nas próprias origens do pensamento ocidental. Ele é universalmente reconhecido não apenas como um indivíduo, mas como um marco, o ponto de inflexão onde a explicação do universo transita do <em>mythos</em> para o <em>logos</em>. Antes dele, a realidade era interpretada através de narrativas teogônicas, como as de Homero e Hesíodo, onde os fenômenos naturais eram manifestações da vontade de um panteão de deuses.</p>
-                    <p>A revolução de Tales, como argumenta Patricia O'Grady, foi a de buscar uma explicação para a Natureza (<em>Physis</em>) dentro da própria Natureza. Ele buscou um princípio unificador, uma causa material, observável e sujeita à investigação racional, inaugurando o que viria a ser conhecido como filosofia e ciência <strong>(O'GRADY, p. 1-2)</strong>.</p>`,
-            '2': `<blockquote>"A coisa mais difícil é conhecer a nós mesmos; a mais fácil é falar mal dos outros." - Máxima atribuída a Tales.</blockquote>
-                    <p>Ele substituiu a pergunta "Quem causou isso?" (referindo-se a uma divindade) pela pergunta "Do que isso é feito e como funciona?". Essa mudança de perspectiva é o verdadeiro legado de Tales, mais importante do que qualquer resposta específica que ele tenha proposto. Ele nos ensinou a olhar para o mundo e ver não um palco para o drama divino, mas um 'cosmos' — um todo ordenado e inteligível.</p>`,
-            '3': `<h2>O Contexto de Mileto: O Berço da Filosofia</h2>
-                    <p>O surgimento de um pensador como Tales não foi um evento isolado, mas o produto de um ambiente cultural, econômico e geográfico único. Mileto, no século VI a.C., era a mais próspera cidade portuária da Jônia, um caldeirão de culturas e um centro nevrálgico de comércio que conectava a Grécia com o Egito, a Babilônia e a Lídia. Este ambiente cosmopolita foi crucial para o nascimento da filosofia <strong>(O'GRADY, p. 24-26)</strong>.</p>
-                    <p>O contato com diferentes mitos e costumes levou a uma relativização das verdades tradicionais, enquanto a riqueza gerada pelo comércio proporcionou a uma elite o 'ócio' (<em>scholé</em>) necessário para a especulação teórica. Além disso, a necessidade prática de navegação e comércio estimulou o desenvolvimento de conhecimentos em astronomia, geografia e matemática, que Tales soube aproveitar de maneira inovadora.</p>`,
-            '4': `<h2>O Problema das Fontes: Reconstruindo Tales</h2>
-                    <p>Um desafio fundamental no estudo de Tales é a ausência de escritos de sua autoria. Ele, como muitas figuras de sua época, pertencia a uma cultura primariamente oral. Portanto, tudo o que sabemos sobre ele é de segunda ou terceira mão, proveniente de autores posteriores que o citaram ou interpretaram.</p>
-                    <p>Isso nos obriga a agir como "arqueólogos textuais", analisando cuidadosamente as fontes para separar o que é plausivelmente o pensamento original de Tales das interpretações e projeções de filósofos posteriores. O'Grady dedica uma parte substancial de seu livro a essa análise crítica das fontes, argumentando que, apesar da escassez, é possível reconstruir um retrato coerente de suas realizações <strong>(O'GRADY, p. 8)</strong>.</p>`,
-            '5': `<p>Nossas fontes incluem:</p>
-                    <ul>
-                        <li><strong>Relatos Filosóficos:</strong> Principalmente Aristóteles, mas também Platão e Teofrasto.</li>
-                        <li><strong>Doxógrafos:</strong> Compiladores posteriores (como Aécio e Diógenes Laércio) que registraram as "opiniões" (<em>doxai</em>) dos filósofos antigos.</li>
-                        <li><strong>Historiadores:</strong> Como Heródoto, que relata seus feitos práticos.</li>
-                        <li><strong>Outros Autores:</strong> Que mencionam Tales em contextos diversos, de poesia a matemática (ex: Proclo, Plutarco).</li>
-                    </ul>`,
-            '6': `<h2>Aristóteles como Fonte Primária</h2>
-                    <p>Aristóteles (c. 384-322 a.C.), escrevendo cerca de dois séculos depois de Tales, é, sem dúvida, nossa fonte mais importante e sistemática. Em sua <em>Metafísica</em>, ele identifica explicitamente Tales como o "fundador deste tipo de filosofia" (a filosofia natural) por ser o primeiro a investigar as causas materiais do universo.</p>
-                    <p>Contudo, é preciso cautela. Aristóteles não era um historiador imparcial; ele analisava seus predecessores através das lentes de sua própria filosofia, procurando neles os primórdios de suas "Quatro Causas". Ele frequentemente traduzia as ideias arcaicas de Tales para sua própria terminologia mais técnica. Apesar disso, sua posição como um dos maiores intelectos da história e seu acesso a fontes que se perderam nos dão a base mais sólida para entender o núcleo do pensamento de Tales <strong>(O'GRADY, p. 14-15)</strong>.</p>`,
-            '7': `<p>A análise cuidadosa dos textos de Aristóteles permite distinguir quando ele está relatando um fato ("Tales diz que...") de quando está especulando sobre as razões por trás do fato ("Sua suposição pode ter surgido da observação de que..."). Essa distinção é crucial para uma reconstrução precisa de suas ideias.</p>`,
-            '8': `<h2>A Grande Pergunta: O que é a Arché?</h2>
-                    <p>A questão fundamental que inaugura a filosofia pré-socrática é a busca pela <strong>Arché</strong>. Este termo grego multifacetado significa simultaneamente o <strong>princípio</strong> originário, o <strong>substrato</strong> permanente e a <strong>causa</strong> governante de todas as coisas. Os filósofos de Mileto observaram a multiplicidade desconcertante do mundo — nascimento, morte, mudança, diversidade de formas — e postularam que, por trás dessa aparência caótica, deveria existir uma unidade fundamental, uma substância primordial da qual tudo deriva e para a qual tudo retorna <strong>(O'GRADY, p. 37)</strong>.</p>`,
-            '9': `<p>A busca pela Arché é a busca pelo "Um" que subjaz ao "Múltiplo". É uma tentativa de encontrar uma explicação econômica e unificada para a totalidade da existência, reduzindo a complexidade do universo a um único princípio inteligível. Esta é a essência do projeto monista que Tales iniciou.</p>`,
-            '10': `<h2>A Resposta de Tales: 'A Arché é a Água'</h2>
-                     <p>A resposta de Tales, segundo o relato de Aristóteles, foi que este princípio fundamental é a <strong>água (<em>hydor</em>)</strong>. A importância desta afirmação não está em sua "veracidade" científica, mas em sua natureza conceitual. Pela primeira vez, um elemento natural, observável e imanente ao mundo foi proposto como a explicação última para todo o cosmos.</p>
-                     <p>Tales não invocou Oceanus ou Tétis, as divindades primordiais da água na mitologia grega. Ele propôs a água em si mesma, como uma substância física com propriedades intrínsecas, como a causa de tudo. Esta é a transição do mito à razão em sua forma mais pura <strong>(O'GRADY, p. 29)</strong>.</p>`,
-            '11': `<p>A proposta de Tales implicava que todas as outras formas de matéria — terra, ar, fogo, rochas, plantas, animais — eram, em última análise, diferentes manifestações ou transformações desta única substância primordial. O universo inteiro era, em sua essência, água em diferentes estados.</p>`,
-            '12': `<h2>As Razões de Aristóteles (I): 'O Alimento de Tudo é Úmido'</h2>
-                     <p>Aristóteles, ao relatar a tese de Tales, especula sobre as observações empíricas que podem tê-lo levado a essa conclusão. A primeira e mais poderosa é a conexão onipresente entre água e vida.</p>
-                     <p>Tales teria observado que "o alimento de todas as coisas é úmido" <strong>(Aristóteles, Metafísica, 983b)</strong>. A vida, em todas as suas formas, depende da umidade para surgir e se sustentar. Plantas murcham sem água, animais morrem de sede. O próprio processo da morte era visto como um ressecamento, enquanto a vida era caracterizada pela umidade e pelo calor <strong>(O'GRADY, p. 47)</strong>.</p>`,
-            '13': `<p>Esta observação biológica fundamental fornecia uma forte evidência indutiva. Se a água é a condição necessária para toda a vida que observamos, não seria razoável inferir que ela também foi a condição originária de toda a existência?</p>`,
-            '14': `<p>Além disso, o próprio corpo dos seres vivos é predominantemente composto de fluidos. O sangue, o leite, o sêmen – todos os fluidos vitais são aquosos. A associação entre água e vida era, portanto, direta, inescapável e observável em toda a parte.</p>`,
-            '15': `<h2>As Razões de Aristóteles (II): 'O Calor Vem da Umidade'</h2>
-                     <p>Uma segunda linha de raciocínio sugerida por Aristóteles é que "o próprio calor é gerado pela umidade e vive por ela". Esta ideia, que pode parecer estranha para nós, estava ligada a fenômenos como a fermentação e a decomposição.</p>
-                     <p>Tales pode ter observado o calor gerado em matéria orgânica úmida em decomposição (como pilhas de composto ou pântanos). Esse fenômeno da "geração espontânea", onde a vida e o calor pareciam brotar da lama úmida sob o sol, reforçava a ideia de que a umidade era a fonte não apenas da vida, mas também do calor vital, que era considerado um princípio ativo da natureza <strong>(O'GRADY, p. 52-54)</strong>.</p>`,
-            '16': `<p>O fogo do sol parecia "puxar" a umidade da terra (evaporação), e a vida surgia da interação entre o calor e a umidade. Nesse ciclo, a água não era um elemento passivo, mas a fonte ativa que gerava outros princípios fundamentais como o calor.</p>`,
-            '17': `<p>Fenômenos como o metano ("fogo-fátuo") que emerge de pântanos poderiam ter sido interpretados como a prova de que a água tinha a potencialidade de se transformar em fogo, conectando assim todos os elementos em um ciclo originado na água.</p>`,
-            '18': `<h2>As Razões de Aristóteles (III): 'As Sementes de Tudo São Úmidas'</h2>
-                     <p>Finalmente, Aristóteles aponta para a observação de que "as sementes (<em>sperma</em>) de todas as coisas têm uma natureza úmida" <strong>(O'GRADY, p. 58)</strong>. A semente, seja de uma planta ou de um animal, é o ponto de partida de uma nova vida, o princípio em microcosmo. E essa semente é, invariavelmente, úmida.</p>
-                     <p>Por analogia, se o princípio de cada ser vivo individual é uma semente úmida, então o princípio do cosmos como um todo (a Arché) também deveria ter uma natureza úmida. Tales estava aplicando um raciocínio analógico do micro para o macrocosmo, uma ferramenta poderosa e característica do pensamento filosófico inicial.</p>`,
-            '19': `<h2>A Teoria Cíclica da Transformação da Água</h2>
-                     <p>A tese de que "tudo é água" só é sustentável se houver um mecanismo de transformação. O'Grady argumenta que Tales provavelmente concebeu um processo cíclico de transformações da matéria <strong>(O'GRADY, p. 45, 60-61)</strong>:</p>
-                     <ul>
-                         <li><strong>Evaporação:</strong> A água, sob a ação do calor, se transforma em vapor (ar/névoa).</li>
-                         <li><strong>Condensação:</strong> O ar/névoa, nas alturas, se condensa para formar nuvens e depois chuva (água novamente).</li>
-                         <li><strong>Solidificação/Sedimentação:</strong> A água, ao se misturar com a terra, gera lodo, que se solidifica em terra e rochas. Isso era visível nos deltas de rios como o Meandro, perto de Mileto, que depositava sedimentos e criava novas terras.</li>
-                         <li><strong>Liquefação:</strong> Metais e rochas, através do calor intenso (fusibilidade), podiam retornar a um estado líquido, fechando o ciclo e retornando à sua natureza aquosa primordial.</li>
-                     </ul>`,
-            '20': `<p>Este ciclo explica como a multiplicidade de substâncias do mundo poderia emergir de um único elemento. Não é apenas uma afirmação estática ("tudo é água"), mas uma teoria dinâmica sobre os processos da natureza. Mostra Tales não apenas como um metafísico, mas como um observador atento dos processos geológicos e meteorológicos.</p>`,
-            '21': `<p>A capacidade de explicar a mudança era tão importante quanto a de postular a unidade. O ciclo de transformações da água fornecia a Tales um modelo racional e observável para o dinamismo do cosmos.</p>`,
-            '22': `<h2>Distanciamento do Mito: Tales vs. Teogonias</h2>
-                     <p>É crucial contrastar a abordagem de Tales com as mitologias grega e do Oriente Próximo. Muitas dessas mitologias (babilônica, egípcia) também começam com um caos aquoso primordial. No entanto, a semelhança é superficial.</p>
-                     <p>No mito, a água primordial (como Apsu e Tiamat na Babilônia, ou Nun no Egito) é uma entidade divina, e a criação ocorre através de atos de vontade, geração ou conflito entre deuses. Em Tales, a água é uma substância material, e as transformações ocorrem através de processos naturais e impessoais como aquecimento, resfriamento e condensação. Ele removeu a agência divina da equação <strong>(O'GRADY, p. 71, 81)</strong>.</p>`,
-            '23': `<p>Essa despersonalização da natureza é um passo gigantesco. Tales não estava "recontando velhas histórias sem os deuses"; ele estava propondo um paradigma explicativo completamente novo. Sua teoria era, por natureza, falseável e aberta ao debate crítico — como de fato foi debatida e criticada por seus sucessores, Anaximandro e Anaxímenes —, algo que o mito, por sua natureza dogmática, não permite.</p>`,
-            '24': `<h2>Novas Ideias Sobre a Terra (I): A Terra Flutua Sobre a Água</h2>
-                     <p>Consistente com sua teoria fundamental, Tales propôs um modelo cosmológico para a Terra. Segundo Aristóteles, Tales declarou que a Terra "repousa sobre a água" <strong>(Aristóteles, De Caelo, 294a)</strong>. A Terra, para ele, era como um pedaço de madeira ou um navio, cuja natureza flutuante lhe permitia ser sustentada pela água subjacente.</p>
-                     <p>Novamente, o que é revolucionário aqui não é a imagem em si (que era comum em mitos egípcios e babilônicos), mas a explicação. A Terra flutua não porque um deus a sustenta, mas devido a uma propriedade natural, análoga à flutuabilidade que ele podia observar em seu porto em Mileto <strong>(O'GRADY, p. 87, 90-91)</strong>.</p>`,
-            '25': `<p>Essa teoria, embora incorreta, era uma tentativa de fornecer uma causa mecânica e natural para a estabilidade da Terra, um dos maiores quebra-cabeças da cosmologia antiga. Ela era racional, baseada em analogia e observação, e livre de intervenção sobrenatural.</p>`,
-            '26': `<h2>Novas Ideias Sobre a Terra (II): A Causa dos Terremotos</h2>
-                     <p>A teoria da Terra flutuante levou a uma consequência lógica e a uma nova explicação para outro fenômeno aterrorizante: os terremotos. Se a Terra flutua sobre a água como um navio, então os terremotos são causados pela agitação dessa água subjacente.</p>
-                     <p>Assim como um navio balança em um mar agitado, a Terra treme quando o oceano sobre o qual ela repousa está em tumulto. Esta explicação, relatada por Sêneca, é um exemplo brilhante do poder unificador da teoria de Tales. Ele conectou um fenômeno geológico (terremotos) à sua hipótese cosmológica fundamental (a Terra sobre a água), explicando o desconhecido (a causa dos tremores) em termos do conhecido (o movimento de objetos na água) <strong>(O'GRADY, p. 100-102)</strong>.</p>`,
-            '27': `<p>Ele substituiu Poseidon, o "Abalador da Terra", por um mecanismo puramente natural e físico. O poder da explicação de Tales estava em sua consistência interna e em sua capacidade de explicar múltiplos fenômenos com um único conjunto de princípios.</p>`,
-            '28': `<h2>Novas Ideias Sobre a Terra (III): A Esfericidade da Terra?</h2>
-                     <p>Uma questão mais controversa é se Tales acreditava que a Terra era um disco plano ou uma esfera. As fontes doxográficas tardias, como Aécio, atribuem a Tales a crença em uma Terra esférica <strong>(O'GRADY, p. 95)</strong>.</p>
-                     <p>Embora seja impossível ter certeza, O'Grady explora os argumentos que poderiam ter levado Tales a essa conclusão notável:</p>
-                     <ul>
-                         <li><strong>Observação de Navios no Horizonte:</strong> Em um porto como Mileto, é facilmente observável que, quando um navio se afasta, seu casco desaparece primeiro, seguido por seus mastros, um fenômeno explicado pela curvatura da Terra.</li>
-                         <li><strong>A Sombra da Terra na Lua:</strong> Durante um eclipse lunar, a sombra que a Terra projeta na Lua é sempre circular. Tales, que previu um eclipse solar, certamente tinha interesse em tais fenômenos. A única forma que projeta consistentemente uma sombra circular, não importa a orientação, é uma esfera.</li>
-                         <li><strong>Mudança na Posição das Estrelas:</strong> Marinheiros e viajantes sabiam que certas estrelas se tornam visíveis ou invisíveis à medida que se viaja para o norte ou para o sul, o que é facilmente explicado em um modelo de Terra esférica.</li>
-                     </ul>`,
-            '29': `<p>Se Tales de fato propôs a esfericidade da Terra, ele estava séculos à frente de seu tempo, demonstrando uma capacidade extraordinária de conectar observações sutis a uma conclusão geométrica profunda. Mesmo que a evidência seja incerta, ela se encaixa no perfil de Tales como um astrônomo e geômetra pioneiro.</p>`,
-            '30': `<h2>Hilozoísmo: 'Todas as Coisas Estão Cheias de Deuses'</h2>
-                     <p>A doutrina do <strong>Hilozoísmo</strong> (matéria-vida) é central para entender a física de Tales. Para ele, o movimento e a mudança no universo não precisavam de um motor externo; a própria matéria primordial era viva e possuía a capacidade de se mover e se transformar. Aristóteles relata que Tales acreditava que a alma era "misturada" ao universo e que, "talvez por isso, Tales pensou que todas as coisas estão cheias de deuses" <strong>(Aristóteles, De Anima, 411a)</strong>.</p>`,
-            '31': `<p>Como já mencionado, os "deuses" aqui não são as divindades olímpicas, mas o princípio anímico, a força vital universal que permeia toda a matéria. A água, como Arché, não era uma substância inerte, mas uma fonte perene de vida e movimento. Esta força vital é a causa última de todas as transformações observadas na natureza, desde o crescimento de uma planta até o movimento dos planetas <strong>(O'GRADY, p. 117-121)</strong>.</p>`,
-            '32': `<p>A alma (<em>psyché</em>) para Tales, portanto, não é uma entidade individual e humana, mas uma força cósmica, o princípio do movimento. Onde há movimento, há alma. E como todo o universo está em constante estado de fluxo e mudança, o universo inteiro é ensouled (animado).</p>`,
-            '33': `<h2>O Ímã e o Âmbar: Evidências da Alma na Matéria</h2>
-                     <p>Para Tales, essa força anímica não era uma mera especulação abstrata. Ele encontrou evidências empíricas em dois fenômenos extraordinários: o magnetismo e a eletricidade estática. Aristóteles relata: "Tales, a julgar pelo que se recorda dele, parece ter suposto que a alma é algo que produz movimento, se é que ele disse que a pedra (magnética) tem alma porque move o ferro" <strong>(De Anima, 405a)</strong>.</p>
-                     <p>O ímã (pedra de Magnésia) e o âmbar (<em>elektron</em>), que quando friccionado atrai objetos leves, eram para Tales as provas manifestas do Hilozoísmo. Eles demonstravam que objetos aparentemente inanimados possuíam um poder, uma "alma", capaz de iniciar o movimento em outros objetos. Eles eram a janela para a natureza viva e dinâmica do universo <strong>(O'GRADY, p. 112-114)</strong>.</p>`,
-            '34': `<p>Esses exemplos não eram meras curiosidades, mas experimentos naturais que validavam sua teoria mais ampla. Se uma pedra podia mover o ferro, e o âmbar podia mover a palha, então o princípio do movimento era de fato uma propriedade da matéria, e não o privilégio de deuses ou seres vivos.</p>`,
-            '35': `<h2>Novas Ideias Sobre o Cosmos (I): A Previsão do Eclipse de 585 a.C.</h2>
-                     <p>O feito mais famoso de Tales é a previsão do eclipse solar total que ocorreu em 28 de maio de 585 a.C. O'Grady analisa extensivamente este evento, descartando a ideia de que Tales poderia ter usado o Ciclo de Saros (um período de aproximadamente 18 anos) para prever com precisão um eclipse *solar* em um local específico, algo que a astronomia babilônica da época não conseguia fazer.</p>
-                     <p>A previsão de eclipses solares é notoriamente mais difícil do que a de eclipses lunares, pois a sombra da Lua na Terra cobre uma faixa muito estreita <strong>(O'GRADY, p. 129-132)</strong>.</p>`,
-            '36': `<p>O'Grady propõe uma alternativa mais plausível: Tales pode ter descoberto um padrão empírico mais simples, o <strong>ciclo lunar-solar de 23,5 meses</strong>. Analisando os registros de eclipses, é possível notar uma tendência de um eclipse solar ocorrer aproximadamente 23,5 meses após um eclipse lunar. Embora não seja uma regra infalível, ela oferece uma possibilidade estatística de previsão.</p>
-                     <p>Tales, com acesso aos registros babilônicos e com sua própria observação diligente, pode ter notado essa correlação e feito uma previsão de alta probabilidade "para o ano em que de fato ocorreu", como relata Heródoto. Mesmo que contivesse um elemento de sorte, o método em si — buscar padrões cíclicos em dados empíricos — era profundamente científico <strong>(O'GRADY, p. 140-142)</strong>.</p>`,
-            '37': `<p>Além da previsão, fontes mais recentes (mas plausivelmente baseadas em fontes antigas como Demócrito) sugerem que Tales compreendia a <strong>causa mecânica</strong> dos eclipses: a interposição da Lua entre a Terra e o Sol. Ele sabia que eles ocorriam apenas na Lua Nova. Isso demonstra um nível de compreensão astronômica muito além da mera repetição de ciclos <strong>(O'GRADY, p. 142)</strong>.</p>`,
-            '38': `<h2>Novas Ideias Sobre o Cosmos (II): Os Solstícios e o Calendário</h2>
-                     <p>Diógenes Laércio credita a Tales a "descoberta das estações do ano e a divisão do ano em 365 dias" <strong>(D.L. 1.27)</strong>. Isso não significa que ele "descobriu" o verão e o inverno, mas que ele foi o primeiro a determinar com precisão os pontos de virada do ciclo solar: os <strong>solstícios</strong>.</p>
-                     <p>Usando um gnômon (uma simples vareta vertical), ele podia marcar o comprimento da sombra ao meio-dia, dia após dia. O solstício de verão seria o dia da sombra mais curta, e o solstício de inverno, o dia da sombra mais longa. Ao medir o tempo entre dois solstícios de verão consecutivos, ele pôde calcular a duração do ano solar em aproximadamente 365 dias, um conhecimento provavelmente refinado com dados egípcios <strong>(O'GRADY, p. 147-148)</strong>.</p>`,
-            '39': `<p>Este trabalho tinha implicações práticas imensas para a agricultura e a navegação, mas também um significado teórico profundo. Demonstrava que o movimento do Sol, a base de toda a vida, não era errático, mas seguia um ciclo ordenado e matematicamente mensurável. Mais uma vez, Tales estava revelando a ordem racional subjacente aos fenômenos naturais.</p>`,
-            '40': `<p>Sua proposta de um ano de 365 dias era uma tentativa de racionalizar os confusos e inconsistentes calendários lunares usados pelas cidades-estado gregas, propondo um sistema mais estável e alinhado com o ciclo solar, muito superior para fins práticos e científicos.</p>`,
-            '41': `<h2>Tales, o Matemático: O Nascimento da Geometria Grega</h2>
-                     <p>A tradição, relatada por Proclo (baseado no historiador da matemática Eudemo), afirma que Tales, após viajar ao Egito, "introduziu pela primeira vez esta ciência na Grécia" <strong>(O'GRADY, p. 201)</strong>. No entanto, a contribuição de Tales foi muito além de simplesmente importar conhecimento. A geometria egípcia era eminentemente prática: um conjunto de regras empíricas para medir campos e construir edifícios.</p>`,
-            '42': `<p>Tales foi o primeiro a abstrair dessas regras práticas os <strong>princípios gerais e universais</strong>. Ele transformou a "mensuração de terras" (geo-metria) em uma ciência dedutiva abstrata. Ele começou a demonstrar proposições geométricas não apenas como fatos úteis, mas como verdades necessárias que podiam ser provadas através do raciocínio lógico.</p>`,
-            '43': `<h2>Os Teoremas Atribuídos a Tales</h2>
-                     <p>A Proclo e outras fontes atribuem a Tales a "descoberta" ou "demonstração" de vários teoremas fundamentais da geometria:</p>
-                     <ol>
-                         <li><strong>Um círculo é bissectado por seu diâmetro.</strong></li>
-                         <li><strong>Os ângulos da base de um triângulo isósceles são iguais.</strong></li>
-                         <li><strong>Os ângulos opostos pelo vértice, formados pelo cruzamento de duas retas, são iguais.</strong></li>
-                         <li><strong>Dois triângulos são congruentes se tiverem dois ângulos e um lado correspondente iguais (critério ALA ou LAA).</strong></li>
-                     </ol>
-                     <p>Esta última proposição foi a base teórica que ele usou para calcular a distância de navios no mar, um problema de imensa importância prática para uma potência naval como Mileto <strong>(O'GRADY, p. 203-206)</strong>.</p>`,
-            '44': `<p>O quinto e mais famoso teorema é o <strong>Teorema de Tales</strong>: um ângulo inscrito em um semicírculo é sempre um ângulo reto. Diógenes Laércio relata que, ao descobrir isso, Tales sacrificou um boi, tamanha a importância da descoberta. É o primeiro exemplo de uma propriedade geométrica universal e não óbvia sendo provada.</p>`,
-            '45': `<p>É importante notar que a "prova" de Tales provavelmente não era uma dedução axiomática formal como a de Euclides, mas uma demonstração lógica geral baseada em argumentos de simetria ou superposição. Mesmo assim, representou o passo decisivo da observação de casos particulares para a formulação de uma lei universal e abstrata.</p>`,
-            '46': `<h2>Legado: Cientificidade, Racionalidade e a Escola de Mileto</h2>
-                     <p>O legado de Tales é a própria fundação do nosso modo de pensar. Suas hipóteses foram avaliadas por critérios que ainda hoje definem a boa ciência: eram <strong>testáveis, falseáveis, econômicas e racionais</strong> <strong>(O'GRADY, p. 222-223)</strong>.</p>
-                     <ul>
-                         <li><strong>Testáveis/Falseáveis:</strong> Suas teorias eram sobre o mundo observável e podiam ser criticadas com base em novas observações, como fizeram seus sucessores.</li>
-                         <li><strong>Econômicas (Princípio da Parcimônia):</strong> Ele explicou uma vasta gama de fenômenos com um único princípio (água) e uma única força (alma/movimento), eliminando a necessidade do panteão de deuses.</li>
-                         <li><strong>Racionais:</strong> Ele forneceu razões e argumentos baseados na observação e na analogia para suas conclusões.</li>
-                     </ul>`,
-            '47': `<p>Mais do que isso, Tales fundou uma <strong>tradição de crítica</strong>. Anaximandro, seu pupilo, não aceitou passivamente a doutrina do mestre. Ele a criticou e propôs uma alternativa (o *ápeiron*). Anaxímenes, por sua vez, criticou ambos e propôs o ar. Essa dinâmica de conjectura e refutação, de debate aberto e progresso através da crítica, é a essência do método científico e nasceu em Mileto, com Tales <strong>(O'GRADY, p. 226-227)</strong>.</p>`,
-            '48': `<p>Ele não foi apenas o primeiro filósofo; foi o primeiro cientista, o primeiro matemático, o primeiro astrônomo. Ele personifica o momento em que a humanidade decidiu que o universo não era um mistério a ser temido, mas um enigma a ser resolvido.</p>`,
-            '49': `<p>Sua vida e obra demonstram uma confiança audaciosa na capacidade da razão humana para desvendar os segredos mais profundos do cosmos. Ele não nos deu um mapa completo do universo, mas nos ensinou a desenhar o mapa e nos deu a bússola da razão para nos guiarmos.</p>`,
-            '50': `<h1>Fim do Estudo Detalhado sobre Tales de Mileto.</h1>
-                     <p>Você concluiu o material de estudo. A jornada do <em>mythos</em> ao <em>logos</em> se revelou em sua profundidade. Agora, teste seu conhecimento aprofundado com este quiz desafiador.</p>`
-        },
-        quiz: [ // Quiz expandido e mais difícil
-            { question: "Qual conceito, fundamental para a filosofia de Tales, foi herdado da prática egípcia de agrimensura, mas elevado por ele a um princípio abstrato?", options: ["A noção de Arché", "A previsão de eclipses", "A geometria como ciência de princípios universais", "O Hilozoísmo"], answer: "A geometria como ciência de princípios universais" },
-            { question: "A explicação de Tales para os terremotos estava diretamente conectada a qual de suas outras hipóteses cosmológicas?", options: ["A de que 'tudo está cheio de deuses'.", "À sua previsão do eclipse solar.", "À sua crença de que a Terra flutua sobre a água.", "À sua teoria sobre a imortalidade da alma."], answer: "À sua crença de que a Terra flutua sobre a água." },
-            { question: "Qual filósofo posterior é nossa principal, porém crítica, fonte para o pensamento de Tales, interpretando-o através de sua própria terminologia?", options: ["Platão", "Heródoto", "Diógenes Laércio", "Aristóteles"], answer: "Aristóteles" },
-            { question: "O'Grady argumenta que a previsão do eclipse por Tales foi mais provavelmente baseada em:", options: ["Um profundo conhecimento do Ciclo de Saros para eclipses solares.", "Uma revelação divina de Apolo.", "Na observação de um ciclo empírico de 23,5 meses entre eclipses lunares e solares.", "Pura sorte, sem qualquer método por trás."], answer: "Na observação de um ciclo empírico de 23,5 meses entre eclipses lunares e solares." },
-            { question: "A frase 'todas as coisas estão cheias de deuses' atribuída a Tales é melhor interpretada como uma expressão da doutrina do:", options: ["Politeísmo olímpico tradicional.", "Monoteísmo.", "Hilozoísmo (a matéria é inerentemente viva e animada).", "Ateísmo, sendo uma frase irônica."], answer: "Hilozoísmo (a matéria é inerentemente viva e animada)." },
-            { question: "Qual observação, segundo Aristóteles, NÃO foi uma das razões que levaram Tales a escolher a água como Arché?", options: ["O alimento de todos os seres vivos é úmido.", "As sementes de todas as coisas são úmidas.", "O calor vital parece ser gerado pela umidade.", "A água é o elemento mais leve e, portanto, mais primordial."], answer: "A água é o elemento mais leve e, portanto, mais primordial." },
-            { question: "O que diferencia fundamentalmente a cosmogonia de Tales das mitologias babilônica e egípcia, apesar de ambas começarem com a água?", options: ["Tales acreditava em múltiplos mundos.", "Tales propôs processos naturais e impessoais em vez de atos de vontade divina.", "Os mitos não mencionavam a terra.", "Tales foi o único a incluir o fogo em seu sistema."], answer: "Tales propôs processos naturais e impessoais em vez de atos de vontade divina." },
-            { question: "Qual feito prático de Tales demonstra sua aplicação genial de um teorema sobre a semelhança de triângulos?", options: ["A previsão do eclipse.", "O desvio do rio Halys.", "A medição da altura da Grande Pirâmide.", "A criação do primeiro mapa-múndi."], answer: "A medição da altura da Grande Pirâmide." },
-            { question: "O termo 'Arché', central para os filósofos de Mileto, NÃO implica:", options: ["A substância original de onde tudo veio.", "O substrato material que compõe tudo agora.", "A separação completa entre matéria e espírito.", "O princípio que governa as mudanças no cosmos."], answer: "A separação completa entre matéria e espírito." },
-            { question: "A observação do ímã (pedra de Magnésia) serviu para Tales como uma prova empírica de qual de suas doutrinas?", options: ["De que a Terra é esférica.", "De que a matéria possui um princípio intrínseco de movimento (alma).", "De que a água pode se transformar em metal.", "De que os deuses se comunicam através de pedras."], answer: "De que a matéria possui um princípio intrínseco de movimento (alma)." },
-            { question: "A determinação dos solstícios por Tales foi um passo crucial para:", options: ["Provar que o Sol era um deus.", "Estabelecer uma medida precisa para a duração do ano solar.", "Prever terremotos.", "Navegar até a Babilônia."], answer: "Estabelecer uma medida precisa para a duração do ano solar." },
-            { question: "Qual dos seguintes teoremas NÃO é tradicionalmente atribuído a Tales?", options: ["Os ângulos da base de um triângulo isósceles são iguais.", "A soma dos ângulos internos de um triângulo é igual a dois ângulos retos.", "Um ângulo inscrito em um semicírculo é um ângulo reto.", "Os ângulos opostos pelo vértice são iguais."], answer: "A soma dos ângulos internos de um triângulo é igual a dois ângulos retos." },
-            { question: "A importância da cidade de Mileto para o surgimento da filosofia reside em sua:", options: ["Localização isolada, que protegia os pensadores de influências externas.", "Poderio militar, que conquistou a sabedoria de outros povos.", "Condição de centro comercial cosmopolita, que promovia o ceticismo e o ócio.", "Devoção religiosa estrita, que incentivava a especulação sobre os deuses."], answer: "Condição de centro comercial cosmopolita, que promovia o ceticismo e o ócio." },
-            { question: "O que é o 'Monismo Materialista', exemplificado pela primeira vez por Tales?", options: ["A crença em muitos deuses que criaram a matéria.", "A crença de que a realidade é fundamentalmente uma única substância de natureza física.", "A crença de que a matéria é uma ilusão e apenas o espírito é real.", "A crença de que existem dois princípios opostos, matéria e espírito."], answer: "A crença de que a realidade é fundamentalmente uma única substância de natureza física." },
-            { question: "A 'Teoria Cíclica da Transformação', proposta por O'Grady como pertencente a Tales, explica como:", options: ["As almas reencarnam em um ciclo contínuo.", "As estações do ano se sucedem.", "A água pode se transformar em ar, terra e outras substâncias através de processos naturais.", "Os planetas giram em torno do Sol."], answer: "A água pode se transformar em ar, terra e outras substâncias através de processos naturais." },
-            { question: "A principal característica que torna a teoria de Tales 'científica', em contraste com o mito, é sua:", options: ["Origem divina e autoridade inquestionável.", "Beleza poética e apelo emocional.", "Capacidade de ser testada, criticada e potencialmente falseada.", "Aceitação universal por todos os gregos da época."], answer: "Capacidade de ser testada, criticada e potencialmente falseada." },
-            { question: "O uso do gnômon (vareta vertical) foi fundamental para qual das investigações de Tales?", options: ["Determinar a composição da lua.", "Medir a profundidade do oceano.", "Determinar os pontos dos solstícios através do comprimento da sombra.", "Provar que os ângulos opostos pelo vértice são iguais."], answer: "Determinar os pontos dos solstícios através do comprimento da sombra." },
-            { question: "A análise de O'Grady sobre as fontes nos leva a concluir que nosso conhecimento de Tales é:", options: ["Direto, baseado em seus próprios livros e cartas.", "Inexistente, sendo ele uma figura puramente lendária.", "Indireto e fragmentário, exigindo uma reconstrução crítica a partir de autores posteriores.", "Completo e definitivo, sem margem para dúvidas."], answer: "Indireto e fragmentário, exigindo uma reconstrução crítica a partir de autores posteriores." },
-            { question: "Qual foi a grande inovação de Tales ao 'importar' a geometria do Egito para a Grécia?", options: ["Ele descobriu novos métodos para construir pirâmides maiores.", "Ele traduziu os papiros matemáticos egípcios para o grego.", "Ele abstraiu as regras práticas dos egípcios em princípios teóricos e gerais, buscando provas lógicas.", "Ele aplicou a geometria egípcia para criar armas de guerra."], answer: "Ele abstraiu as regras práticas dos egípcios em princípios teóricos e gerais, buscando provas lógicas." },
-            { question: "O fato de Anaximandro e Anaxímenes terem proposto teorias diferentes das de Tales para a Arché demonstra o estabelecimento de uma:", options: ["Rivalidade política que destruiu Mileto.", "Tradição de crítica e debate racional, fundamental para a ciência.", "Decadência do pensamento, já que se afastaram da verdade da água.", "Seita secreta onde as doutrinas não podiam ser alteradas."], answer: "Tradição de crítica e debate racional, fundamental para a ciência." },
-            { question: "A teoria de que a Terra é esférica, embora controversa, pode ser atribuída a Tales com base em qual evidência observacional?", options: ["A forma como os terremotos ocorrem.", "A sombra sempre circular que a Terra projeta na Lua durante um eclipse lunar.", "A análise da composição das rochas.", "A observação de que o Sol parece um disco plano."], answer: "A sombra sempre circular que a Terra projeta na Lua durante um eclipse lunar." }
-        ],
-        comic: [
-            'assets/comics/tales/panel_1.png',
-            'assets/comics/tales/panel_2.png',
-            'assets/comics/tales/panel_3.png',
-        ]
-    }
-    // ... dados para outros filósofos
+    // Pre-Socratic Philosophers
+    '21': talesContent,  // Tales de Mileto
+
+    // Add more philosophers here as you create their content files:
+    // '22': anaximandroContent,  // Anaximandro
+    // '23': anaximenes Content,   // Anaxímenes
+    // '1': socratesContent,       // Sócrates
+    // '2': plataoContent,         // Platão
+    // '3': aristotelesContent,    // Aristóteles
+    // ... etc
 };

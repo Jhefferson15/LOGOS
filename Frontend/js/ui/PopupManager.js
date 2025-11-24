@@ -1,6 +1,4 @@
 
-
-
 import { gameState } from '../data/gameState.js';
 import { arenas } from '../data/arenas.js';
 import { toast } from './Toast.js';
@@ -46,16 +44,18 @@ class PopupManager {
         let title = '';
         let contentHTML = '';
 
+        // --- BIBLIOTECA (Seu arquivo principal) ---
         if (popupId === 'philosopher-study-module') {
             const philosopherStudy = PHILOSOPHERS_DATA[data.philosopherId];
-            if (!philosopherStudy || !STUDY_CONTENT_DATA[data.philosopherId]) {
-                console.error(`Dados de estudo para o filósofo com ID ${data.philosopherId} não encontrados.`);
-                toast.show('Material de estudo indisponível para este filósofo.', 'error');
-                return;
-            }
-            title = `Estudando: ${philosopherStudy.name}`;
+            // ... validações ...
+
+            // MUDANÇA: Envie NULL ou VAZIO para não gerar o texto duplicado no topo
+            title = null;
+
             contentHTML = this._renderPhilosopherStudyModulePopup(data.philosopherId);
-        } else if (popupId === 'philosopher-details') {
+        }
+        // --- FILÓSOFOS ---
+        else if (popupId === 'philosopher-details') {
             const philosopher = PHILOSOPHERS_DATA[data.philosopherId];
             if (!philosopher) {
                 console.error(`Filósofo com ID ${data.philosopherId} não encontrado.`);
@@ -63,28 +63,36 @@ class PopupManager {
             }
             title = philosopher.name;
             contentHTML = this._renderPhilosopherCardPopup(philosopher, data.philosopherState);
-        } else if (popupId === 'full-profile') {
+        }
+        // --- PERFIL ---
+        else if (popupId === 'full-profile') {
             title = 'Perfil do Filósofo';
             contentHTML = this._renderFullProfilePopup();
-        } else if (popupId === 'settings') {
+        } else if (popupId === 'level-xp') {
+            title = `Nível ${gameState.level} - Progresso`;
+            contentHTML = this._renderLevelXpPopup();
+        }
+        // --- GERAL / CONFIGURAÇÕES ---
+        else if (popupId === 'settings') {
             title = 'Configurações';
             contentHTML = this._renderSettingsPopup();
-        } else if (popupId === 'chest-rewards') {
+        }
+        // --- DEBATER (ARENA) ---
+        else if (popupId === 'chest-rewards') {
             title = `Recompensas da Obra "${data.chestType}"`;
             contentHTML = this._renderChestRewardsPopup(data.rewards);
         } else if (popupId === 'arena-timeline') {
             title = 'Jornada Filosófica';
             contentHTML = this._renderArenaTimelinePopup();
-        } else if (popupId === 'level-xp') {
-            title = `Nível ${gameState.level} - Progresso`;
-            contentHTML = this._renderLevelXpPopup();
         } else if (popupId === 'chest-info') {
             title = `Obra: ${data.chest.type}`;
             contentHTML = this._renderChestInfoPopup(data.chest);
         } else if (popupId === 'timed-chest-info') {
             title = data.type === 'free' ? 'Conceito Grátis' : 'Coroa da Sabedoria';
             contentHTML = this._renderTimedChestInfoPopup(data.type);
-        } else if (popupId === 'reels-settings') {
+        }
+        // --- REELS ---
+        else if (popupId === 'reels-settings') {
             title = 'Configurações do Reels';
             contentHTML = this._renderReelsSettingsPopup();
         } else {
@@ -107,89 +115,372 @@ class PopupManager {
         setTimeout(() => { this.bodyElement.innerHTML = ''; }, 300);
     }
 
-    // --- MÉTODO DE RENDERIZAÇÃO DO NOVO MÓDULO DE ESTUDO ---
+    // ==================================================================================
+    // --- SEÇÃO: BIBLIOTECA ---
+    // ==================================================================================
 
     _renderPhilosopherStudyModulePopup(philosopherId) {
         const studyData = STUDY_CONTENT_DATA[philosopherId];
         const philosopher = PHILOSOPHERS_DATA[philosopherId];
 
-        // Inicializa o progresso no gameState se não existir (robusto)
+        // Lógica de Progresso
         if (!gameState.studyProgress) gameState.studyProgress = {};
-        if (!gameState.studyProgress[philosopherId]) {
-            gameState.studyProgress[philosopherId] = { pagesViewed: new Set() };
-        }
-
+        if (!gameState.studyProgress[philosopherId]) gameState.studyProgress[philosopherId] = { pagesViewed: new Set() };
         const progress = gameState.studyProgress[philosopherId];
         const percentage = Math.floor((progress.pagesViewed.size / studyData.totalPages) * 100);
+
         const css = `
             <style>
-            .study-module { display: flex; flex-direction: column; height: 100%; }
-            .study-header { display: flex; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
-            .study-header img { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 3px solid var(--bg-darker); }
-            .study-header .header-info { flex: 1; }
-            .study-progress-bar { background: var(--bg-dark); border-radius: 5px; height: 10px; margin-top: 5px; overflow: hidden; }
-            .study-progress-bar div { background: var(--accent-yellow); height: 100%; transition: width 0.5s ease; }
-            .study-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-top: 1rem; }
-            .study-tabs .tab-btn { background: none; border: none; padding: 0.8rem 1rem; cursor: pointer; border-bottom: 3px solid transparent; }
-            .study-tabs .tab-btn.active { border-bottom-color: var(--accent-yellow); font-weight: bold; }
-            .study-content-area { flex: 1; padding: 1rem 0; overflow-y: auto; font-family: 'Times New Roman', serif; line-height: 1.6; }
-            .study-content-area h1, .study-content-area h2 { font-family: var(--font-title); }
-            .study-content-area .comic-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-            .study-content-area .comic-grid img { width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-            .study-content-area .quiz-question { background: var(--bg-light); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
-            .study-content-area .toc-list { list-style: none; padding: 0; }
-            .study-content-area .toc-list li { padding: 0.5rem; border-bottom: 1px dashed var(--border-color); cursor: pointer; }
-            .study-content-area .toc-list li:hover { background: var(--bg-darker-alpha); }
-            .study-navigation { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid var(--border-color); }
-            .study-navigation button { background: var(--bg-darker); border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; }
-            .study-navigation button:disabled { opacity: 0.5; cursor: not-allowed; }
+                /* Container Raiz - Ocupa 100% do espaço do popup pai */
+                .study-module-root {
+                    display: flex; flex-direction: column;
+                    height: 100%; width: 100%;
+                    background: #f9f9f9;
+                    font-family: 'Lato', sans-serif;
+                    overflow: hidden;
+                    /* Removemos bordas arredondadas aqui para preencher o modal completamente */
+                }
+
+                /* --- 1. HEADER PRINCIPAL --- */
+                .study-header {
+                    background: #fff;
+                    border-bottom: 1px solid #e0e0e0;
+                    padding: 0.8rem 1rem;
+                    display: flex; align-items: center; justify-content: space-between;
+                    flex-shrink: 0; z-index: 20;
+                }
+                .header-left { display: flex; align-items: center; gap: 10px; }
+                .header-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3e2723; }
+                .header-title h3 { margin: 0; color: #3e2723; font-size: 1rem; font-weight: 700; }
+                .header-xp { font-size: 0.75rem; color: #8d6e63; }
+
+                /* Abas Integradas no Header (lado direito) */
+                .header-tabs { display: flex; gap: 5px; background: #f5f5f5; padding: 4px; border-radius: 8px; }
+                .tab-btn {
+                    border: none; background: none; padding: 6px 12px; border-radius: 6px;
+                    font-size: 0.85rem; font-weight: 600; color: #757575; cursor: pointer; transition: 0.2s;
+                }
+                .tab-btn.active { background: #fff; color: #3e2723; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+                /* --- 2. BARRA DE FERRAMENTAS (Contextual) --- */
+                .study-toolbar {
+                    background: #fff; border-bottom: 1px solid #eee;
+                    padding: 0.5rem 1rem; display: flex; justify-content: center; gap: 1.5rem;
+                    flex-shrink: 0; align-items: center;
+                    height: 40px;
+                }
+                .tool-group { display: flex; align-items: center; gap: 10px; }
+                .tool-btn {
+                    background: #f0f0f0; border: none; width: 28px; height: 28px; border-radius: 4px;
+                    display: flex; align-items: center; justify-content: center; cursor: pointer; color: #333;
+                }
+                .tool-btn:hover { background: #e0e0e0; }
+                .tool-label { font-size: 0.8rem; color: #666; font-weight: 600; min-width: 40px; text-align: center; }
+
+                /* --- 3. ÁREA DE CONTEÚDO --- */
+                .study-viewport {
+                    flex: 1; position: relative; overflow: hidden; background: #f9f9f9;
+                }
+                
+                /* Scroll interno para Texto */
+                .text-scroll-area {
+                    height: 100%; overflow-y: auto; padding: 2rem 1rem;
+                    display: flex; justify-content: center;
+                }
+                .text-content {
+                    max-width: 700px; width: 100%; background: #fff; 
+                    padding: 3rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                    transition: font-size 0.2s ease; /* Suaviza mudança de fonte */
+                }
+                
+                /* Área da HQ (Fundo Branco + Zoom) */
+                .comic-scroll-area {
+                    height: 100%; width: 100%; overflow: auto; /* Permite scroll se der zoom */
+                    background: #ffffff; /* FUNDO BRANCO PEDIDO */
+                    display: flex; align-items: flex-start; justify-content: center;
+                    padding: 1rem;
+                }
+                .comic-img-wrapper {
+                    transition: transform 0.2s ease-out; /* Suaviza zoom */
+                    transform-origin: top center;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                }
+                .comic-img { display: block; max-width: 100%; height: auto; }
+
+                /* --- 4. RODAPÉ --- */
+                .study-footer {
+                    background: #fff; border-top: 1px solid #e0e0e0; padding: 0.8rem 1.5rem;
+                    display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+                }
+                .nav-btn {
+                    background: #3e2723; color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 4px;
+                    font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;
+                }
+                .nav-btn:disabled { background: #ccc; cursor: not-allowed; }
+                .nav-btn.secondary { background: #fff; border: 1px solid #ccc; color: #555; }
+
+                /* Mobile Adjustments */
+                @media (max-width: 600px) {
+                    .text-content { padding: 1.5rem; }
+                    .study-header { flex-direction: column; gap: 10px; align-items: stretch; }
+                    .header-left { justify-content: center; }
+                    .header-tabs { justify-content: center; }
+                }
             </style>
         `;
+
         return `
             ${css}
-            <div class="study-module" data-id="${philosopherId}" data-current-page="1" data-total-pages="${studyData.totalPages}">
-                <div class="study-header">
-                    <img src="${studyData.realImage}" alt="Retrato de ${philosopher.name}">
-                    <div class="header-info">
-                        <h2>${philosopher.name}</h2>
-                        <span>Progresso de Maestria: <span id="study-progress-text">${percentage}</span>%</span>
-                        <div class="study-progress-bar"><div id="study-progress-fill" style="width:${percentage}%"></div></div>
+            <div class="study-module-root" id="study-root">
+                
+                <!-- HEADER -->
+                <header class="study-header">
+                    <div class="header-left">
+                        <img src="${studyData.realImage}" class="header-avatar">
+                        <div class="header-title">
+                            <h3>${philosopher.name}</h3>
+                            <span class="header-xp">${percentage}% Concluído</span>
+                        </div>
                     </div>
+                    <div class="header-tabs">
+                        <button class="tab-btn active" data-tab="theory">Teoria</button>
+                        <button class="tab-btn" data-tab="comic">HQ</button>
+                        <button class="tab-btn" data-tab="quiz">Quiz</button>
+                    </div>
+                </header>
+
+                <!-- TOOLBAR (Muda conforme a aba) -->
+                <div class="study-toolbar" id="study-toolbar">
+                    <!-- Injetado via JS -->
                 </div>
 
-                <div class="study-tabs">
-                    <button class="tab-btn active" data-tab="theory">Teoria</button>
-                    <button class="tab-btn" data-tab="quiz">Quiz</button>
-                    <button class="tab-btn" data-tab="comic">HQ</button>
-                </div>
+                <!-- VIEWPORT -->
+                <main class="study-viewport" id="study-viewport">
+                    <!-- Conteúdo Injetado via JS -->
+                </main>
 
-                <div id="study-content-area" class="study-content-area">
-                    <!-- Conteúdo dinâmico será injetado aqui -->
-                </div>
-
-                <div id="study-navigation" class="study-navigation">
-                    <button id="study-prev-btn"><i class="fas fa-arrow-left"></i> Anterior</button>
-                    <button id="study-toc-btn"><i class="fas fa-list-ul"></i> Sumário</button>
-                    <span id="study-page-counter">Página 1 de ${studyData.totalPages}</span>
-                    <button id="study-next-btn">Próxima <i class="fas fa-arrow-right"></i></button>
-                </div>
+                <!-- FOOTER -->
+                <footer class="study-footer" id="study-footer">
+                    <button class="nav-btn secondary" id="btn-prev">Anterior</button>
+                    <span id="page-indicator" style="font-size:0.9rem; font-weight:600; color:#555;">Página 1</span>
+                    <button class="nav-btn" id="btn-next">Próxima <i class="fas fa-arrow-right"></i></button>
+                </footer>
             </div>
         `;
     }
 
+    _setupStudyModuleListeners(philosopherId) {
+        const root = this.bodyElement.querySelector('#study-root');
+        if (!root) return;
 
-    // --- MÉTODOS DE RENDERIZAÇÃO ANTIGOS (SEM ALTERAÇÃO) ---
-    _renderReelsSettingsPopup() {
-        return `
-            <div class="reels-settings-popup">
-                <div class="settings-section">
-                    <h4><i class="fas fa-history"></i> Histórico de Reels</h4>
-                    <p>Limpe seu histórico de reels para vê-los novamente.</p>
-                    <button id="clear-reels-history-btn" class="action-button red">Limpar Histórico</button>
+        const studyData = STUDY_CONTENT_DATA[philosopherId];
+        const viewport = root.querySelector('#study-viewport');
+        const toolbar = root.querySelector('#study-toolbar');
+
+        // Estado
+        let state = {
+            tab: 'theory',
+            textPage: 1,
+            comicIndex: 0,
+            // Configurações de Usuário
+            textSize: 16, // px
+            fontFamily: 'serif', // serif ou sans
+            zoomLevel: 1.0 // 100%
+        };
+
+        // --- RENDERIZADORES DE TOOLBAR ---
+
+        const renderTheoryToolbar = () => {
+            toolbar.innerHTML = `
+                <div class="tool-group">
+                    <span class="tool-label">Fonte:</span>
+                    <button class="tool-btn" id="cmd-font-serif" style="font-family:serif; font-weight:bold;">T</button>
+                    <button class="tool-btn" id="cmd-font-sans" style="font-family:sans-serif;">T</button>
                 </div>
-            </div>
-        `;
+                <div class="tool-group" style="margin-left: 20px;">
+                    <span class="tool-label">Tamanho:</span>
+                    <button class="tool-btn" id="cmd-size-down"><i class="fas fa-minus"></i></button>
+                    <span class="tool-label" id="lbl-size">${state.textSize}px</span>
+                    <button class="tool-btn" id="cmd-size-up"><i class="fas fa-plus"></i></button>
+                </div>
+            `;
+
+            // Listeners da Toolbar de Texto
+            root.querySelector('#cmd-font-serif').onclick = () => { state.fontFamily = 'serif'; updateTextStyle(); };
+            root.querySelector('#cmd-font-sans').onclick = () => { state.fontFamily = 'sans'; updateTextStyle(); };
+            root.querySelector('#cmd-size-up').onclick = () => { if (state.textSize < 24) state.textSize += 2; updateTextStyle(); };
+            root.querySelector('#cmd-size-down').onclick = () => { if (state.textSize > 12) state.textSize -= 2; updateTextStyle(); };
+        };
+
+        const renderComicToolbar = () => {
+            toolbar.innerHTML = `
+                <div class="tool-group">
+                    <span class="tool-label">Zoom:</span>
+                    <button class="tool-btn" id="cmd-zoom-out"><i class="fas fa-search-minus"></i></button>
+                    <span class="tool-label" id="lbl-zoom">${Math.round(state.zoomLevel * 100)}%</span>
+                    <button class="tool-btn" id="cmd-zoom-in"><i class="fas fa-search-plus"></i></button>
+                    <button class="tool-btn" id="cmd-zoom-reset" title="Resetar"><i class="fas fa-compress"></i></button>
+                </div>
+            `;
+
+            // Listeners da Toolbar de HQ
+            root.querySelector('#cmd-zoom-in').onclick = () => {
+                if (state.zoomLevel < 2.5) state.zoomLevel += 0.25;
+                updateComicZoom();
+            };
+            root.querySelector('#cmd-zoom-out').onclick = () => {
+                if (state.zoomLevel > 0.5) state.zoomLevel -= 0.25;
+                updateComicZoom();
+            };
+            root.querySelector('#cmd-zoom-reset').onclick = () => {
+                state.zoomLevel = 1.0;
+                updateComicZoom();
+            };
+        };
+
+        // --- ATUALIZADORES VISUAIS ---
+
+        const updateTextStyle = () => {
+            const textContent = root.querySelector('.text-content');
+            const label = root.querySelector('#lbl-size');
+            if (textContent && label) {
+                textContent.style.fontSize = `${state.textSize}px`;
+                textContent.style.fontFamily = state.fontFamily === 'serif' ? "'Merriweather', serif" : "'Lato', sans-serif";
+                label.textContent = `${state.textSize}px`;
+
+                // Destaque visual nos botões
+                const btnSerif = root.querySelector('#cmd-font-serif');
+                const btnSans = root.querySelector('#cmd-font-sans');
+                btnSerif.style.background = state.fontFamily === 'serif' ? '#d7ccc8' : '#f0f0f0';
+                btnSans.style.background = state.fontFamily === 'sans' ? '#d7ccc8' : '#f0f0f0';
+            }
+        };
+
+        const updateComicZoom = () => {
+            const imgWrapper = root.querySelector('.comic-img-wrapper');
+            const label = root.querySelector('#lbl-zoom');
+            if (imgWrapper && label) {
+                imgWrapper.style.transform = `scale(${state.zoomLevel})`;
+                // Ajusta margem para permitir scroll quando zoom aumenta
+                imgWrapper.style.margin = state.zoomLevel > 1 ? `${(state.zoomLevel - 1) * 10}rem` : '0';
+                label.textContent = `${Math.round(state.zoomLevel * 100)}%`;
+            }
+        };
+
+        // --- RENDERIZAÇÃO DE CONTEÚDO PRINCIPAL ---
+
+        const renderContent = () => {
+            const footer = root.querySelector('#study-footer');
+            const pageInd = root.querySelector('#page-indicator');
+            const btnPrev = root.querySelector('#btn-prev');
+            const btnNext = root.querySelector('#btn-next');
+
+            if (state.tab === 'theory') {
+                renderTheoryToolbar();
+                footer.style.display = 'flex';
+
+                const html = studyData.pages[state.textPage];
+                viewport.innerHTML = `
+                    <div class="text-scroll-area">
+                        <div class="text-content animate__animated animate__fadeIn">
+                            ${html}
+                        </div>
+                    </div>
+                `;
+                updateTextStyle(); // Aplica configs salvas
+
+                pageInd.textContent = `Página ${state.textPage} de ${studyData.totalPages}`;
+                btnPrev.disabled = state.textPage === 1;
+                btnNext.innerHTML = state.textPage === studyData.totalPages ? 'Concluir' : 'Próxima <i class="fas fa-arrow-right"></i>';
+
+                // Salva progresso
+                gameState.studyProgress[philosopherId].pagesViewed.add(state.textPage);
+
+            } else if (state.tab === 'comic') {
+                renderComicToolbar();
+                footer.style.display = 'flex';
+                const comics = studyData.comic || [];
+
+                if (comics.length > 0) {
+                    viewport.innerHTML = `
+                        <div class="comic-scroll-area">
+                            <div class="comic-img-wrapper">
+                                <img src="${comics[state.comicIndex]}" class="comic-img" alt="HQ">
+                            </div>
+                        </div>
+                    `;
+                    // Reseta zoom ao mudar de página, ou mantém? Geralmente resetar é melhor UX ao trocar de img
+                    state.zoomLevel = 1.0;
+                    updateComicZoom();
+                } else {
+                    viewport.innerHTML = '<div style="padding:2rem; text-align:center;">Sem HQ.</div>';
+                }
+
+                pageInd.textContent = `Quadro ${state.comicIndex + 1} de ${comics.length}`;
+                btnPrev.disabled = state.comicIndex === 0;
+                btnNext.innerHTML = state.comicIndex === comics.length - 1 ? 'Fim' : 'Próxima <i class="fas fa-arrow-right"></i>';
+
+            } else {
+                // Quiz
+                toolbar.innerHTML = ''; // Sem toolbar pro quiz
+                footer.style.display = 'none';
+                viewport.innerHTML = '<div style="display:flex; height:100%; align-items:center; justify-content:center; color:#aaa;">Quiz em breve</div>';
+            }
+        };
+
+        // --- LISTENERS DE NAVEGAÇÃO ---
+
+        // Abas
+        root.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                root.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.tab = btn.dataset.tab;
+                renderContent();
+            });
+        });
+
+        // Botões Rodapé
+        root.querySelector('#btn-prev').addEventListener('click', () => {
+            if (state.tab === 'theory' && state.textPage > 1) {
+                state.textPage--;
+                renderContent();
+            } else if (state.tab === 'comic' && state.comicIndex > 0) {
+                state.comicIndex--;
+                renderContent();
+            }
+        });
+
+        root.querySelector('#btn-next').addEventListener('click', () => {
+            if (state.tab === 'theory') {
+                if (state.textPage < studyData.totalPages) {
+                    state.textPage++;
+                    renderContent();
+                } else {
+                    // Fecha popup se concluir
+                    const closeBtn = this.bodyElement.querySelector('.popup-overlay');
+                    if (closeBtn) closeBtn.remove();
+                }
+            } else if (state.tab === 'comic') {
+                const comics = studyData.comic || [];
+                if (state.comicIndex < comics.length - 1) {
+                    state.comicIndex++;
+                    renderContent();
+                }
+            }
+        });
+
+        // Inicializa
+        renderContent();
     }
+
+    _handleLibraryListeners(data) {
+        this._setupStudyModuleListeners(data.philosopherId);
+    }
+
+    // ==================================================================================
+    // --- SEÇÃO: FILÓSOFOS ---
+    // ==================================================================================
 
     _renderPhilosopherCardPopup(philosopher, state) {
         const keyConceptsHTML = philosopher.keyConcepts.map(conceptId => {
@@ -213,8 +504,21 @@ class PopupManager {
             </div>`;
     }
 
+    _handlePhilosophersListeners(data) {
+        const upgradeBtn = this.bodyElement.querySelector('#upgrade-philosopher-btn');
+        if (upgradeBtn && !upgradeBtn.classList.contains('disabled')) {
+            upgradeBtn.addEventListener('click', () => {
+                toast.show(`Aprimorando ${PHILOSOPHERS_DATA[data.philosopherId].name}...`, 'success');
+                this.close();
+            });
+        }
+    }
+
+    // ==================================================================================
+    // --- SEÇÃO: DEBATER (ARENA) ---
+    // ==================================================================================
+
     _renderArenaTimelinePopup() {
-        // ... (código original sem alterações)
         const playerTrophies = gameState.trophies;
         let currentArena = arenas.slice().reverse().find(arena => playerTrophies >= arena.trophyReq) || arenas[0];
         const arenasHTML = arenas.map(arena => {
@@ -226,31 +530,12 @@ class PopupManager {
         return `${css}<div class="arena-timeline-popup"><div class="arenas-container">${arenasHTML}</div></div>`;
     }
 
-    _renderLevelXpPopup() {
-        // ... (código original sem alterações)
-        const winRate = gameState.totalDebates > 0 ? ((gameState.wins / gameState.totalDebates) * 100).toFixed(1) : 0;
-        return `<div class="level-xp-popup"><div class="popup-card"><h4>Progresso Atual</h4><div class="xp-bar-popup"><div class="xp-fill-popup" style="width: ${(gameState.xp / gameState.xpMax) * 100}%"></div><span class="xp-text">${gameState.xp} / ${gameState.xpMax} XP</span></div><p class="xp-remaining">Faltam ${gameState.xpMax - gameState.xp} XP para o próximo nível.</p></div><div class="popup-card"><h4>Recompensas do Nível ${gameState.level + 1}</h4><ul class="rewards-list"><li><i class="fas fa-coins"></i> +500 Ouro</li><li><i class="fas fa-scroll"></i> +100 Pergaminhos</li><li><i class="fas fa-unlock-alt"></i> Nova Arena Desbloqueada</li></ul></div><div class="popup-card"><h4>Estatísticas de Batalha</h4><div class="stats-grid"><div class="stat-item"><span>Vitórias</span><strong>${gameState.wins}</strong></div><div class="stat-item"><span>Derrotas</span><strong>${gameState.totalDebates - gameState.wins}</strong></div><div class="stat-item"><span>Coroas</span><strong>${gameState.crowns}</strong></div><div class="stat-item"><span>Taxa de Vit.</span><strong>${winRate}%</strong></div><div class="stat-item"><span>Filósofo Fav.</span><strong>Platão</strong></div><div class="stat-item"><span>Escola Fav.</span><strong>Grega</strong></div></div></div></div>`;
-    }
-
-    _renderFullProfilePopup() {
-        // ... (código original sem alterações)
-        const winRate = gameState.totalDebates > 0 ? ((gameState.wins / gameState.totalDebates) * 100).toFixed(1) : 0;
-        return `<div class="profile-popup"><div class="profile-main-info"><div class="profile-avatar-container"><img src="assets/avatars/socrates.png" alt="Avatar" class="profile-avatar"><button class="avatar-change-btn"><i class="fas fa-pencil-alt"></i></button></div><div class="profile-details"><h3>${gameState.playerName}</h3><div class="profile-sub-details"><span><i class="fas fa-shield-alt"></i> ${gameState.clanName}</span><span><i class="fas fa-trophy"></i> ${gameState.trophies} Troféus</span></div></div></div><div class="profile-tabs"><button class="tab-btn active" data-tab="stats">Perfil</button><button class="tab-btn" data-tab="battles">Debates</button><button class="tab-btn" data-tab="friends">Amigos</button></div><div class="tab-content-container"><div class="tab-content active" id="stats-content"><div class="stats-grid"><div class="stat-item"><span>Vitórias</span><strong>${gameState.wins}</strong></div><div class="stat-item"><span>Vitórias 3 Coroas</span><strong>${gameState.threeCrownWins || 0}</strong></div><div class="stat-item"><span>Total Debates</span><strong>${gameState.totalDebates}</strong></div><div class="stat-item"><span>Taxa de Vit.</span><strong>${winRate}%</strong></div><div class="stat-item"><span>Filósofo Favorito</span><strong>Platão</strong></div><div class="stat-item"><span>Doações de Cartas</span><strong>${gameState.donations || 0}</strong></div></div></div><div class="tab-content" id="battles-content"><p>Histórico de debates aparecerá aqui.</p></div><div class="tab-content" id="friends-content"><p>Lista de amigos e convites.</p></div></div></div>`;
-    }
-
-    _renderSettingsPopup() {
-        // ... (código original sem alterações)
-        return `<div class="settings-popup"><div class="settings-section"><h4><i class="fas fa-volume-up"></i> Áudio</h4><div class="setting-item"><span>Música</span><div class="range-slider"><input type="range" min="0" max="100" value="80"></div></div><div class="setting-item"><span>Efeitos Sonoros</span><div class="range-slider"><input type="range" min="0" max="100" value="100"></div></div></div><div class="settings-section"><h4><i class="fas fa-user-circle"></i> Conta</h4><button class="action-button-secondary"><i class="fab fa-google"></i> Vincular ao Google</button><button class="action-button-secondary"><i class="fab fa-facebook"></i> Vincular ao Facebook</button></div><div class="settings-section"><h4><i class="fas fa-info-circle"></i> Outros</h4><button id="fullscreen-btn" class="action-button-secondary"><i class="fas fa-expand"></i> <span>Tela Cheia</span></button><button class="action-button-secondary">Termos de Serviço</button><button class="action-button-secondary">Política de Privacidade</button><button id="logout-btn" class="action-button red">Sair da Conta</button></div></div>`;
-    }
-
     _renderChestInfoPopup(chest) {
-        // ... (código original sem alterações)
         const formatTime = (s) => { const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60); return `${h}h ${m}m`; };
         return `<div class="chest-info-popup"><img src="assets/chests/${chest.type.toLowerCase().replace(' ', '-')}.png" alt="${chest.type}" class="chest-info-image"><p class="chest-arena-text">Obtido na Arena ${chest.arena}</p><div class="chest-unlock-info"><i class="fas fa-clock"></i><span>Tempo para estudar: <strong>${formatTime(chest.totalTime)}</strong></span></div><h4>Recompensas Possíveis</h4><div class="possible-rewards"><span><i class="fas fa-scroll"></i> Pergaminhos</span><span><i class="fas fa-book"></i> Livros</span><span><i class="fas fa-users"></i> Novos Filósofos</span></div></div>`;
     }
 
     _renderTimedChestInfoPopup(type) {
-        // ... (código original sem alterações)
         const chest = type === 'free' ? gameState.timers.freeChest : gameState.timers.crownChest;
         const isReady = chest <= 0;
         const formatTime = (s) => { const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60; return h > 0 ? `${h}:${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}` : `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`; };
@@ -258,141 +543,9 @@ class PopupManager {
         return `<div class="timed-chest-popup"><i class="fas ${info[type].icon} chest-icon"></i><p>${info[type].desc}</p>${isReady ? `<button class="action-button">Coletar Agora!</button>` : `<div class="timed-chest-timer">Próximo em: <strong>${formatTime(chest)}</strong></div>`}</div>`;
     }
 
-    // --- LISTENERS INTERNOS: ADIÇÃO DA LÓGICA DO MÓDULO DE ESTUDO ---
-
-    _addInternalListeners(popupId, data) {
-
-        if (popupId === 'philosopher-study-module') {
-            this._setupStudyModuleListeners(data.philosopherId);
-        }
-
-        if (popupId === 'full-profile') {
-            const tabs = this.bodyElement.querySelectorAll('.tab-btn');
-            const contents = this.bodyElement.querySelectorAll('.tab-content');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    contents.forEach(c => c.classList.remove('active'));
-                    tab.classList.add('active');
-                    this.bodyElement.querySelector(`#${tab.dataset.tab}-content`).classList.add('active');
-                    if (tab.dataset.tab !== 'stats') {
-                        toast.show('Funcionalidade em desenvolvimento!', 'info');
-                    }
-                });
-            });
-            this.bodyElement.querySelector('.avatar-change-btn').addEventListener('click', () => {
-                toast.show('Customização de avatar em breve!', 'info');
-            });
-        }
-        if (popupId === 'philosopher-details') {
-            const upgradeBtn = this.bodyElement.querySelector('#upgrade-philosopher-btn');
-            if (upgradeBtn && !upgradeBtn.classList.contains('disabled')) {
-                upgradeBtn.addEventListener('click', () => {
-                    toast.show(`Aprimorando ${PHILOSOPHERS_DATA[data.philosopherId].name}...`, 'success');
-                    this.close();
-                });
-            }
-        }
-        if (popupId === 'settings') {
-            this._setupFullscreenButton();
-            const logoutBtn = this.bodyElement.querySelector('#logout-btn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    localStorage.removeItem('isLoggedIn');
-                    window.location.href = 'login.html';
-                });
-            }
-        }
-    }
-
-    // --- LÓGICA DE INTERAÇÃO DO MÓDULO DE ESTUDO ---
-
-    _setupStudyModuleListeners(philosopherId) {
-        const module = this.bodyElement.querySelector('.study-module');
-        const contentArea = this.bodyElement.querySelector('#study-content-area');
-        const navigation = this.bodyElement.querySelector('#study-navigation');
-        const tabs = this.bodyElement.querySelectorAll('.study-tabs .tab-btn');
-
-        const updatePage = (pageNumber) => {
-            const studyData = STUDY_CONTENT_DATA[philosopherId];
-            const totalPages = studyData.totalPages;
-
-            // Valida a página
-            let newPage = Math.max(1, Math.min(pageNumber, totalPages));
-            module.dataset.currentPage = newPage;
-
-            // Renderiza conteúdo
-            contentArea.innerHTML = studyData.pages[newPage] || `<p>Conteúdo para esta página ainda não foi escrito.</p>`;
-
-            // Salva progresso
-            gameState.studyProgress[philosopherId].pagesViewed.add(newPage);
-
-            // Atualiza UI
-            const progress = gameState.studyProgress[philosopherId];
-            const percentage = Math.floor((progress.pagesViewed.size / totalPages) * 100);
-            this.bodyElement.querySelector('#study-progress-text').textContent = percentage;
-            this.bodyElement.querySelector('#study-progress-fill').style.width = `${percentage}%`;
-            this.bodyElement.querySelector('#study-page-counter').textContent = `Página ${newPage} de ${totalPages}`;
-
-            // Atualiza botões
-            this.bodyElement.querySelector('#study-prev-btn').disabled = (newPage === 1);
-            this.bodyElement.querySelector('#study-next-btn').disabled = (newPage === totalPages);
-        };
-
-        const showTableOfContents = () => {
-            const studyData = STUDY_CONTENT_DATA[philosopherId];
-            const tocHTML = Object.entries(studyData.tableOfContents).map(([page, title]) =>
-                `<li data-page="${page}"><strong>Pág. ${page}:</strong> ${title}</li>`
-            ).join('');
-            contentArea.innerHTML = `<ul class="toc-list">${tocHTML}</ul>`;
-
-            contentArea.querySelectorAll('.toc-list li').forEach(item => {
-                item.addEventListener('click', (e) => {
-                    const page = parseInt(e.currentTarget.dataset.page);
-                    // Retorna para a aba de teoria e pula para a página
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.bodyElement.querySelector('.tab-btn[data-tab="theory"]').classList.add('active');
-                    navigation.style.display = 'flex';
-                    updatePage(page);
-                });
-            });
-        };
-
-        // Listeners dos botões de navegação
-        navigation.querySelector('#study-prev-btn').addEventListener('click', () => {
-            let currentPage = parseInt(module.dataset.currentPage);
-            updatePage(currentPage - 1);
-        });
-
-        navigation.querySelector('#study-next-btn').addEventListener('click', () => {
-            let currentPage = parseInt(module.dataset.currentPage);
-            updatePage(currentPage + 1);
-        });
-
-        navigation.querySelector('#study-toc-btn').addEventListener('click', showTableOfContents);
-
-        // Listeners das abas
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-
-                const tabType = tab.dataset.tab;
-                navigation.style.display = (tabType === 'theory') ? 'flex' : 'none';
-
-                if (tabType === 'theory') {
-                    updatePage(parseInt(module.dataset.currentPage));
-                } else if (tabType === 'quiz') {
-                    contentArea.innerHTML = `<div class="quiz-question">O sistema de Quiz está em desenvolvimento!</div>`;
-                } else if (tabType === 'comic') {
-                    const comicPanels = STUDY_CONTENT_DATA[philosopherId].comic.map(panelUrl => `<img src="${panelUrl}" alt="Painel da HQ">`).join('');
-                    contentArea.innerHTML = `<div class="comic-grid">${comicPanels}</div>`;
-                }
-            });
-        });
-
-        // Carrega a primeira página ao abrir
-        updatePage(1);
+    _renderChestRewardsPopup(rewards) {
+        // Implementação básica se não existir
+        return `<div>Recompensas: ${JSON.stringify(rewards)}</div>`;
     }
 
     _setupFullscreenButton() {
@@ -418,6 +571,120 @@ class PopupManager {
         });
         document.addEventListener('fullscreenchange', updateButtonUI);
         updateButtonUI();
+    }
+
+    _handleDebateListeners(data) {
+        // Listeners específicos para a área de debate/arena
+    }
+
+    // ==================================================================================
+    // --- SEÇÃO: REELS ---
+    // ==================================================================================
+
+    _renderReelsSettingsPopup() {
+        return `
+            <div class="reels-settings-popup">
+                <div class="settings-section">
+                    <h4><i class="fas fa-history"></i> Histórico de Reels</h4>
+                    <p>Limpe seu histórico de reels para vê-los novamente.</p>
+                    <button id="clear-reels-history-btn" class="action-button red">Limpar Histórico</button>
+                </div>
+            </div>
+        `;
+    }
+
+    _handleReelsListeners(data) {
+        // Listener para limpar histórico de reels
+        const clearBtn = this.bodyElement.querySelector('#clear-reels-history-btn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                // Lógica para limpar histórico (exemplo)
+                if (gameState.reelsHistory) {
+                    gameState.reelsHistory = [];
+                    toast.show('Histórico de Reels limpo!', 'success');
+                } else {
+                    toast.show('Histórico já está vazio.', 'info');
+                }
+                this.close();
+            });
+        }
+    }
+
+    // ==================================================================================
+    // --- SEÇÃO: ESCOLAS ---
+    // ==================================================================================
+
+    // Espaço reservado para futuros popups relacionados às Escolas de Pensamento
+
+    // ==================================================================================
+    // --- SEÇÃO: PERFIL ---
+    // ==================================================================================
+
+    _renderFullProfilePopup() {
+        const winRate = gameState.totalDebates > 0 ? ((gameState.wins / gameState.totalDebates) * 100).toFixed(1) : 0;
+        return `<div class="profile-popup"><div class="profile-main-info"><div class="profile-avatar-container"><img src="assets/avatars/socrates.png" alt="Avatar" class="profile-avatar"><button class="avatar-change-btn"><i class="fas fa-pencil-alt"></i></button></div><div class="profile-details"><h3>${gameState.playerName}</h3><div class="profile-sub-details"><span><i class="fas fa-shield-alt"></i> ${gameState.clanName}</span><span><i class="fas fa-trophy"></i> ${gameState.trophies} Troféus</span></div></div></div><div class="profile-tabs"><button class="tab-btn active" data-tab="stats">Perfil</button><button class="tab-btn" data-tab="battles">Debates</button><button class="tab-btn" data-tab="friends">Amigos</button></div><div class="tab-content-container"><div class="tab-content active" id="stats-content"><div class="stats-grid"><div class="stat-item"><span>Vitórias</span><strong>${gameState.wins}</strong></div><div class="stat-item"><span>Vitórias 3 Coroas</span><strong>${gameState.threeCrownWins || 0}</strong></div><div class="stat-item"><span>Total Debates</span><strong>${gameState.totalDebates}</strong></div><div class="stat-item"><span>Taxa de Vit.</span><strong>${winRate}%</strong></div><div class="stat-item"><span>Filósofo Favorito</span><strong>Platão</strong></div><div class="stat-item"><span>Doações de Cartas</span><strong>${gameState.donations || 0}</strong></div></div></div><div class="tab-content" id="battles-content"><p>Histórico de debates aparecerá aqui.</p></div><div class="tab-content" id="friends-content"><p>Lista de amigos e convites.</p></div></div></div>`;
+    }
+
+    _renderLevelXpPopup() {
+        const winRate = gameState.totalDebates > 0 ? ((gameState.wins / gameState.totalDebates) * 100).toFixed(1) : 0;
+        return `<div class="level-xp-popup"><div class="popup-card"><h4>Progresso Atual</h4><div class="xp-bar-popup"><div class="xp-fill-popup" style="width: ${(gameState.xp / gameState.xpMax) * 100}%"></div><span class="xp-text">${gameState.xp} / ${gameState.xpMax} XP</span></div><p class="xp-remaining">Faltam ${gameState.xpMax - gameState.xp} XP para o próximo nível.</p></div><div class="popup-card"><h4>Recompensas do Nível ${gameState.level + 1}</h4><ul class="rewards-list"><li><i class="fas fa-coins"></i> +500 Ouro</li><li><i class="fas fa-scroll"></i> +100 Pergaminhos</li><li><i class="fas fa-unlock-alt"></i> Nova Arena Desbloqueada</li></ul></div><div class="popup-card"><h4>Estatísticas de Batalha</h4><div class="stats-grid"><div class="stat-item"><span>Vitórias</span><strong>${gameState.wins}</strong></div><div class="stat-item"><span>Derrotas</span><strong>${gameState.totalDebates - gameState.wins}</strong></div><div class="stat-item"><span>Coroas</span><strong>${gameState.crowns}</strong></div><div class="stat-item"><span>Taxa de Vit.</span><strong>${winRate}%</strong></div><div class="stat-item"><span>Filósofo Fav.</span><strong>Platão</strong></div><div class="stat-item"><span>Escola Fav.</span><strong>Grega</strong></div></div></div></div>`;
+    }
+
+    _handleProfileListeners(data) {
+        const tabs = this.bodyElement.querySelectorAll('.tab-btn');
+        const contents = this.bodyElement.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                this.bodyElement.querySelector(`#${tab.dataset.tab}-content`).classList.add('active');
+                if (tab.dataset.tab !== 'stats') {
+                    toast.show('Funcionalidade em desenvolvimento!', 'info');
+                }
+            });
+        });
+        const avatarBtn = this.bodyElement.querySelector('.avatar-change-btn');
+        if (avatarBtn) {
+            avatarBtn.addEventListener('click', () => {
+                toast.show('Customização de avatar em breve!', 'info');
+            });
+        }
+    }
+
+    // ==================================================================================
+    // --- SEÇÃO: GERAL / CONFIGURAÇÕES ---
+    // ==================================================================================
+
+    _renderSettingsPopup() {
+        return `<div class="settings-popup"><div class="settings-section"><h4><i class="fas fa-volume-up"></i> Áudio</h4><div class="setting-item"><span>Música</span><div class="range-slider"><input type="range" min="0" max="100" value="80"></div></div><div class="setting-item"><span>Efeitos Sonoros</span><div class="range-slider"><input type="range" min="0" max="100" value="100"></div></div></div><div class="settings-section"><h4><i class="fas fa-user-circle"></i> Conta</h4><button class="action-button-secondary"><i class="fab fa-google"></i> Vincular ao Google</button><button class="action-button-secondary"><i class="fab fa-facebook"></i> Vincular ao Facebook</button></div><div class="settings-section"><h4><i class="fas fa-info-circle"></i> Outros</h4><button id="fullscreen-btn" class="action-button-secondary"><i class="fas fa-expand"></i> <span>Tela Cheia</span></button><button class="action-button-secondary">Termos de Serviço</button><button class="action-button-secondary">Política de Privacidade</button><button id="logout-btn" class="action-button red">Sair da Conta</button></div></div>`;
+    }
+
+    _handleSettingsListeners(data) {
+        this._setupFullscreenButton();
+        const logoutBtn = this.bodyElement.querySelector('#logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('isLoggedIn');
+                window.location.href = 'login.html';
+            });
+        }
+    }
+
+    _addInternalListeners(popupId, data) {
+        if (popupId === 'philosopher-study-module') {
+            this._handleLibraryListeners(data);
+        } else if (popupId === 'philosopher-details') {
+            this._handlePhilosophersListeners(data);
+        } else if (popupId === 'full-profile') {
+            this._handleProfileListeners(data);
+        } else if (popupId === 'settings') {
+            this._handleSettingsListeners(data);
+        } else if (popupId === 'reels-settings') {
+            this._handleReelsListeners(data);
+        } else if (['arena-timeline', 'chest-info', 'timed-chest-info', 'chest-rewards'].includes(popupId)) {
+            this._handleDebateListeners(data);
+        }
     }
 }
 

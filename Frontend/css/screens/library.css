@@ -1,100 +1,222 @@
-/* Importa as fontes, se ainda não estiverem no CSS principal */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap');
-
-/* As variáveis de cor devem idealmente estar no seu CSS global (:root) */
 :root {
-    --bg-light: #f8f9fa; /* Exemplo */
-    --text-dark: #212529;
-    --text-muted: #6c757d;
-    --border-color: #dee2e6;
-    --card-bg: #ffffff;
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-    --shadow-md: 0 4px 15px rgba(0,0,0,0.08);
+    /* Cores baseadas no seu tema, mas adaptadas para o estilo 'Button 3D' */
+    --node-size: 80px;
+    --btn-depth: 6px;
+    /* Profundidade do botão 3D */
 
-    --c-escola-antiga: #a8763e;
-    --c-escola-antiga-light: #fdf8f2;
-    --c-escola-antiga-glow: rgba(168, 118, 62, 0.4);
-    
-    --c-escola-medieval: #6c757d;
-    --c-escola-medieval-light: #f8f9fa;
-    --c-escola-medieval-glow: rgba(108, 117, 125, 0.4);
+    /* Cores de Estado */
+    --locked-color: #e5e5e5;
+    --locked-depth: #cecece;
+    --active-color: #ffc800;
+    /* Amarelo Ouro (Foco) */
+    --active-depth: #e5b400;
+    --completed-color: #58cc02;
+    /* Verde Conquista */
+    --completed-depth: #46a302;
 
-    --c-escola-moderna: #3a5a92;
-    --c-escola-moderna-light: #f5f7fa;
-    --c-escola-moderna-glow: rgba(58, 90, 146, 0.4);
-    
-    --c-escola-contemporanea: #8a3c3c;
-    --c-escola-contemporanea-light: #fcf6f6;
-    --c-escola-contemporanea-glow: rgba(138, 60, 60, 0.4);
+    /* Card Flutuante */
+    --popover-bg: #ffffff;
+    --popover-text: #3c3c3c;
 }
 
-.library-header {
-    text-align: center;
-    padding: 1rem;
-}
-
-.main-container {
+/* --- CONTAINER DA TRILHA --- */
+.timeline-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2.5rem;
-    padding: 1rem;
+    padding: 40px 0;
+    position: relative;
     width: 100%;
-    box-sizing: border-box;
 }
 
-/* --- DIVISORES DE ERA --- */
-.era-divider { width: 90%; max-width: 800px; text-align: center; margin-top: 2rem; }
-.era-divider h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 5vw, 2.2rem); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; position: relative; display: inline-block; padding: 0 1rem; }
-.era-divider h2::before, .era-divider h2::after { content: ''; position: absolute; top: 50%; width: 100vw; height: 1px; background: var(--border-color); }
-.era-divider h2::before { right: 100%; }
-.era-divider h2::after { left: 100%; }
-.era-divider-antiga h2 { color: var(--c-escola-antiga); }
-.era-divider-medieval h2 { color: var(--c-escola-medieval); }
-.era-divider-moderna h2 { color: var(--c-escola-moderna); }
-.era-divider-contemporanea h2 { color: var(--c-escola-contemporanea); }
+/* Oculta as linhas SVG antigas pois faremos via CSS ou simplificado */
+.timeline-content svg {
+    display: none;
+}
 
-/* --- ESTILOS DOS CARDS DAS ESCOLAS --- */
-.school-timeline { width: 90%; max-width: 800px; height: auto; border: 1px solid var(--border-color); border-radius: 16px; padding: 1.5rem; box-shadow: var(--shadow-sm); transition: all 0.3s ease; border-left-width: 5px; }
-.school-timeline:hover { box-shadow: var(--shadow-md); transform: translateY(-5px); }
-.era-antiga { background-color: var(--c-escola-antiga-light); border-left-color: var(--c-escola-antiga); }
-.era-medieval { background-color: var(--c-escola-medieval-light); border-left-color: var(--c-escola-medieval); }
-.era-moderna { background-color: var(--c-escola-moderna-light); border-left-color: var(--c-escola-moderna); }
-.era-contemporanea { background-color: var(--c-escola-contemporanea-light); border-left-color: var(--c-escola-contemporanea); }
-.timeline-header h3 { margin: 0 0 1.5rem 0; font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 4vw, 1.8rem); }
-.timeline-content { position: relative; width: 100%; min-height: 150px; }
+/* --- NÓ DO FILÓSOFO (ESTILO DUOLINGO) --- */
+.philosopher-node {
+    position: relative !important;
+    /* Sobrescreve o inline style do JS */
+    left: auto !important;
+    top: auto !important;
+    width: var(--node-size);
+    height: var(--node-size);
+    margin: 15px 0;
+    /* Espaçamento vertical */
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.1s;
+    z-index: 2;
+    background-color: white;
+    /* Fundo para imagem transparente */
 
-/* --- ESTILOS DAS LINHAS DE CONEXÃO --- */
-.timeline-content svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-.timeline-content svg line { stroke-width: 2.5px; stroke: #e0e0e0; stroke-linecap: round; transition: stroke 0.4s ease; }
-.era-antiga line.active { stroke: var(--c-escola-antiga); }
-.era-medieval line.active { stroke: var(--c-escola-medieval); }
-.era-moderna line.active { stroke: var(--c-escola-moderna); }
-.era-contemporanea line.active { stroke: var(--c-escola-contemporanea); }
+    /* O Efeito 3D do Botão */
+    box-shadow: 0 var(--btn-depth) 0 var(--locked-depth);
+    border: 2px solid var(--locked-depth);
+}
 
-/* --- ESTILOS DOS NÓS (FILÓSOFOS) --- */
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0, 123, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); } }
-.philosopher-node { position: absolute; width: 65px; height: 65px; border-radius: 50%; background-color: var(--card-bg); border: 3px solid var(--border-color); cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); transform: translate(-50%, -50%); user-select: none; box-shadow: var(--shadow-sm); z-index: 2; overflow: hidden; }
-.philosopher-node img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(80%); opacity: 0.6; transition: all 0.3s ease; }
-.philosopher-node .progress-label { position: absolute; bottom: 0; left: 0; right: 0; font-size: 0.7rem; font-weight: 700; background-color: rgba(0,0,0,0.4); padding: 3px 0; color: white; text-align: center; opacity: 0; transform: translateY(100%); transition: all 0.3s ease; }
+.philosopher-node img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    padding: 4px;
+    /* Borda interna branca */
+    background: white;
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
 
-/* --- ESTADOS DOS NÓS --- */
-.philosopher-node.locked { cursor: not-allowed; filter: grayscale(100%) brightness(0.9); }
-.philosopher-node.available:not(.active) { border-color: #007bff; animation: pulse 2s infinite; }
-.philosopher-node.available:not(.active):hover { transform: translate(-50%, -50%) scale(1.1); }
-.philosopher-node.active { border-width: 3px; }
-.philosopher-node.active .progress-label { opacity: 1; transform: translateY(0); }
-.philosopher-node.active img { filter: grayscale(0%); opacity: 1; }
-.era-antiga .active { border-color: var(--c-escola-antiga); }
-.era-medieval .active { border-color: var(--c-escola-medieval); }
-.era-moderna .active { border-color: var(--c-escola-moderna); }
-.era-contemporanea .active { border-color: var(--c-escola-contemporanea); }
-.philosopher-node.maxed { transform: translate(-50%, -50%) scale(1.1); }
-.era-antiga .maxed { box-shadow: 0 0 20px 4px var(--c-escola-antiga-glow); }
-.era-medieval .maxed { box-shadow: 0 0 20px 4px var(--c-escola-medieval-glow); }
-.era-moderna .maxed { box-shadow: 0 0 20px 4px var(--c-escola-moderna-glow); }
-.era-contemporanea .maxed { box-shadow: 0 0 20px 4px var(--c-escola-contemporanea-glow); }
+/* --- ESTADOS DO NÓ --- */
 
-/* --- TOOLTIP --- */
-#tooltip { position: fixed; background-color: rgba(33, 37, 41, 0.9); backdrop-filter: blur(4px); color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; pointer-events: none; opacity: 0; transform: translate(-50%, -100%) translateY(-10px); transition: opacity 0.2s, transform 0.2s; z-index: 9999; white-space: nowrap; }
-#tooltip.visible { opacity: 1; transform: translate(-50%, -100%); }
+/* Bloqueado */
+.philosopher-node.locked {
+    pointer-events: none;
+}
+
+/* Disponível / Atual (Onde o jogador está) */
+.philosopher-node.available,
+.philosopher-node.active {
+    box-shadow: 0 var(--btn-depth) 0 var(--active-depth);
+    border-color: var(--active-depth);
+    animation: bounce 2s infinite;
+}
+
+.philosopher-node.available img,
+.philosopher-node.active img {
+    filter: none;
+    opacity: 1;
+}
+
+/* Completado (Dourado/Masterizado) */
+.philosopher-node.maxed {
+    box-shadow: 0 var(--btn-depth) 0 var(--completed-depth);
+    border-color: var(--completed-depth);
+}
+
+.philosopher-node.maxed img {
+    filter: none;
+    opacity: 1;
+    border: 4px solid var(--completed-color);
+}
+
+/* Efeito de Clique (Afunda o botão) */
+.philosopher-node:active {
+    transform: translateY(var(--btn-depth));
+    box-shadow: 0 0 0 var(--active-depth);
+}
+
+/* --- PROGRESSO CIRCULAR (Anel ao redor) --- */
+.progress-ring {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: calc(100% + 16px);
+    height: calc(100% + 16px);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* --- MINI CARD FLUTUANTE (O "Start Popup") --- */
+.mini-lesson-card {
+    position: absolute;
+    background: var(--popover-bg);
+    border: 2px solid #e5e5e5;
+    border-radius: 16px;
+    padding: 15px;
+    width: 260px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+}
+
+.mini-lesson-card.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* Setinha do card */
+.mini-lesson-card::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px 10px 0;
+    border-style: solid;
+    border-color: var(--popover-bg) transparent transparent transparent;
+}
+
+.mini-card-header {
+    font-family: 'Playfair Display', serif;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.mini-card-desc {
+    font-size: 0.85rem;
+    color: #777;
+    margin-bottom: 15px;
+}
+
+.mini-start-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: var(--active-color);
+    /* Cor do tema */
+    color: #333;
+    font-weight: 800;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 0 var(--active-depth);
+    /* Efeito 3D no botão */
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.mini-start-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 var(--active-depth);
+}
+
+/* --- EFEITO ZIG-ZAG (CAMINHO) --- */
+/* Move os nós para esquerda/direita alternadamente */
+.philosopher-node:nth-child(odd) {
+    transform: translateX(-30px);
+}
+
+.philosopher-node:nth-child(even) {
+    transform: translateX(30px);
+}
+
+/* Correção para o clique (manter o translate e somar o active) */
+.philosopher-node:nth-child(odd):active {
+    transform: translateX(-30px) translateY(var(--btn-depth));
+}
+
+.philosopher-node:nth-child(even):active {
+    transform: translateX(30px) translateY(var(--btn-depth));
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateX(var(--offset-x, -30px)) scale(1);
+    }
+
+    50% {
+        transform: translateX(var(--offset-x, -30px)) scale(1.05);
+    }
+}
