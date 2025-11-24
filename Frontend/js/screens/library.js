@@ -181,7 +181,7 @@ function showMiniCard(nodeElement, nodeData) {
 
     // Adiciona o evento de clique ao botão "COMEÇAR"
     card.querySelector('.mini-start-btn').addEventListener('click', () => {
-        popupManager.open('philosopher-study-module', { philosopherId: nodeData.id });
+        popupManager.open('library:philosopher-study-module', { philosopherId: nodeData.id });
         closeMiniCard();
     });
 }

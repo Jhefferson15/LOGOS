@@ -215,7 +215,7 @@ export function handleSchoolMembersScreenClick(event, gameState, toast) {
         }
 
         const philosopherState = gameState.collection.philosophers[philosopherId] || { level: 0, count: 0 };
-        popupManager.open('philosopher-details', {
+        popupManager.open('philosophers:details', {
             philosopherId: philosopherId,
             philosopherState: philosopherState
         });
@@ -229,7 +229,7 @@ export function handleSchoolMembersScreenClick(event, gameState, toast) {
         const philosopherId = reelInfo.dataset.philosopherId;
         const philosopherState = gameState.collection.philosophers[philosopherId] || { level: 0, count: 0 };
 
-        popupManager.open('philosopher-details', {
+        popupManager.open('philosophers:details', {
             philosopherId: philosopherId,
             philosopherState: philosopherState
         });

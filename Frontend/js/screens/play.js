@@ -10,7 +10,9 @@ import { popupManager } from '../../js/ui/PopupManager.js';
  */
 export function initPlayScreen(gameState, updateDynamicUI, toast) {
     // Código de inicialização da tela, permanece o mesmo.
-    const arena = arenas[1];
+    const currentArenaId = gameState.currentArena || 1;
+    const arena = arenas.find(a => a.id === currentArenaId) || arenas[0];
+
     const arenaSection = document.querySelector('.arena-section');
     if (arenaSection) {
         arenaSection.style.backgroundImage = `url('${arena.image}')`;
@@ -19,6 +21,53 @@ export function initPlayScreen(gameState, updateDynamicUI, toast) {
             arenaName.innerText = arena.name;
         }
     }
+
+    // Listener para mudança de arena
+    if (!window._arenaChangedListener) {
+        window._arenaChangedListener = (e) => {
+            const newArenaId = e.detail.arenaId;
+            const newArena = arenas.find(a => a.id === newArenaId);
+            if (newArena) {
+                if (arenaSection) {
+                    arenaSection.style.backgroundImage = `url('${newArena.image}')`;
+                    const arenaName = arenaSection.querySelector('.arena-name');
+                    if (arenaName) {
+                        arenaName.innerText = newArena.name;
+                    }
+                }
+            }
+        };
+        document.addEventListener('arena-changed', window._arenaChangedListener);
+    }
+
+    // --- GAME MODE UI ---
+    let gameModeBtn = document.querySelector('.game-mode-btn');
+    if (!gameModeBtn && arenaSection) {
+        gameModeBtn = document.createElement('div');
+        gameModeBtn.className = 'game-mode-btn';
+        // Estilos inline para garantir visibilidade imediata
+        gameModeBtn.style.cssText = 'position: absolute; top: 80px; right: 20px; background: rgba(0,0,0,0.6); color: #fff; padding: 8px 15px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.3); z-index: 10; transition: all 0.2s;';
+        gameModeBtn.onmouseover = () => gameModeBtn.style.background = 'rgba(0,0,0,0.8)';
+        gameModeBtn.onmouseout = () => gameModeBtn.style.background = 'rgba(0,0,0,0.6)';
+        arenaSection.appendChild(gameModeBtn);
+    }
+
+    const updateGameModeUI = () => {
+        if (gameModeBtn && gameState.gameModes) {
+            const mode = gameState.gameModes[gameState.gameMode || 'classic'];
+            gameModeBtn.innerHTML = `<i class="fas ${mode.icon}"></i> <span>${mode.name}</span> <i class="fas fa-chevron-down" style="font-size: 0.8em; margin-left: 5px; opacity: 0.7;"></i>`;
+        }
+    };
+    updateGameModeUI();
+
+    // Listener para mudança de modo de jogo
+    if (!window._gameModeChangedListener) {
+        window._gameModeChangedListener = (e) => {
+            updateGameModeUI();
+        };
+        document.addEventListener('gamemode-changed', window._gameModeChangedListener);
+    }
+
     updateDynamicUI();
 }
 
@@ -48,23 +97,27 @@ export function handlePlayScreenClick(e, gameState, updateDynamicUI, toast) {
 
     // O restante do seu código para outros cliques permanece o mesmo.
     if (t.closest('.player-profile')) {
-        popupManager.open('full-profile');
+        popupManager.open('profile:full');
         return;
     }
     if (t.closest('.settings')) {
-        popupManager.open('settings');
+        popupManager.open('shared:settings');
+        return;
+    }
+    if (t.closest('.game-mode-btn')) {
+        popupManager.open('shared:game-mode-selection');
         return;
     }
     if (t.closest('.arena-section') && !t.matches('.battle-button')) {
-        popupManager.open('arena-timeline');
+        popupManager.open('arena:timeline');
         return;
     }
     if (t.closest('#free-chest')) {
-        popupManager.open('timed-chest-info', { type: 'free' });
+        popupManager.open('arena:timed-chest-info', { type: 'free' });
         return;
     }
     if (t.closest('#crown-chest')) {
-        popupManager.open('timed-chest-info', { type: 'crown' });
+        popupManager.open('arena:timed-chest-info', { type: 'crown' });
         return;
     }
     const cs = t.closest('.chest-slot');
@@ -78,14 +131,14 @@ export function handlePlayScreenClick(e, gameState, updateDynamicUI, toast) {
             const rewards = { scrolls: 50, books: 1 };
             gameState.scrolls += rewards.scrolls;
             gameState.books += rewards.books;
-            popupManager.open('chest-rewards', { chestType: chest.type, rewards: rewards });
+            popupManager.open('arena:chest-rewards', { chestType: chest.type, rewards: rewards });
             gameState.chestSlots[i] = null;
             // É importante chamar updateDynamicUI após modificar o estado
             updateDynamicUI();
             return;
         }
         if (c.status === 'locked' || c.status === 'unlocking') {
-            popupManager.open('chest-info', { chest: c });
+            popupManager.open('arena:chest-info', { chest: c });
             return;
         }
     }

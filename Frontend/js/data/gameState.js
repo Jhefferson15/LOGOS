@@ -10,7 +10,14 @@ export let gameState = {
     level: 49,
     xp: 420,
     xpMax: 1000,
-    trophies: 4242,
+    trophies: 420,
+    currentArena: 1,
+    gameMode: 'classic', // 'classic', 'ranked', 'friendly'
+    gameModes: {
+        classic: { name: 'Clássico', desc: 'Debate padrão sem riscos.', icon: 'fa-scroll' },
+        ranked: { name: 'Ranqueado', desc: 'Valendo troféus! (Req. 1000 Troféus)', icon: 'fa-trophy', req: 1000 },
+        friendly: { name: 'Amistoso', desc: 'Pratique com amigos.', icon: 'fa-user-friends' }
+    },
 
     // --- Moedas e Recursos ---
     scrolls: 15,   // Moeda premium (antigo 'books')

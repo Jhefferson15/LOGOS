@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Header click listener (for popups)
         gameHeader.addEventListener('click', (e) => {
             if (e.target.closest('.xp-bar-container')) {
-                popupManager.open('level-xp');
+                popupManager.open('profile:level-xp');
             }
         });
 

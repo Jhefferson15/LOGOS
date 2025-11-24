@@ -68,7 +68,7 @@ export function handlePhilosophersScreenClick(e, gameState, updateDynamicUI, toa
             return;
         }
 
-        popupManager.open('philosopher-details', {
+        popupManager.open('philosophers:details', {
             philosopherId: philosopherId,
             philosopherState: philosopherState
         });

@@ -25,7 +25,7 @@ function renderReels(gameState) {
     `;
 
     document.getElementById('reels-settings-btn').addEventListener('click', () => {
-        popupManager.open('reels-settings');
+        popupManager.open('reels:settings');
     });
 
     loader.style.display = 'flex'; // Mostra o skeleton
