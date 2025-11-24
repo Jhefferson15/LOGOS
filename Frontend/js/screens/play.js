@@ -86,11 +86,22 @@ export function handlePlayScreenClick(e, gameState, updateDynamicUI, toast) {
     if (t.matches('.battle-button')) {
         // Desabilita o botão para evitar cliques múltiplos
         t.disabled = true;
-        t.textContent = 'Carregando Batalha...';
+        const originalText = t.textContent;
+        t.textContent = 'Aguarde...';
 
-        // Redireciona diretamente para a página do jogo para um carregamento limpo
-        window.location.href = './views/game.html';
-        return; // Encerra a função aqui
+        // Abre diretamente o popup de matchmaking, conforme solicitado.
+        popupManager.open('play:matchmaking', {}, () => {
+            // Se o matchmaking for cancelado (por exemplo, fechando o popup),
+            // reabilita o botão de batalha.
+            t.disabled = false;
+            t.textContent = originalText;
+        });
+        return;
+    }
+
+    if (t.matches('.deck-builder-btn')) {
+        popupManager.open('play:deck-builder');
+        return;
     }
 
     // --- FIM DA LÓGICA DO BOTÃO DE BATALHA ---
@@ -128,12 +139,20 @@ export function handlePlayScreenClick(e, gameState, updateDynamicUI, toast) {
 
         if (c.status === 'ready') {
             const chest = gameState.chestSlots[i];
-            const rewards = { scrolls: 50, books: 1 };
+            // Simulate rewards. In a real scenario, this would come from a service.
+            const rewards = { scrolls: 50, books: 1, cardCount: 5 }; 
+            
+            // Add rewards to gameState
             gameState.scrolls += rewards.scrolls;
             gameState.books += rewards.books;
-            popupManager.open('arena:chest-rewards', { chestType: chest.type, rewards: rewards });
+            
+            // Open the new chest opening animation popup
+            popupManager.open('arena:chest-opening', { chestType: chest.type, rewards: rewards });
+
+            // Remove the chest from the slot
             gameState.chestSlots[i] = null;
-            // É importante chamar updateDynamicUI após modificar o estado
+            
+            // Update the UI to reflect changes
             updateDynamicUI();
             return;
         }

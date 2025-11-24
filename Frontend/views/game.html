@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +8,13 @@
     <!-- Link para o arquivo de estilos CSS -->
     <link rel="stylesheet" href="./../css/screens/game.css">
 </head>
+
 <body>
 
     <!-- TELA PRINCIPAL DO JOGO -->
     <div id="game-screen">
         <div id="game-board-container">
-            
+
             <!-- ÁREA CENTRAL DO TABULEIRO -->
             <div id="table-center">
                 <!-- Deck de Compra -->
@@ -21,17 +23,17 @@
                     <!-- Contador de Cartas -->
                     <span id="draw-deck-counter" class="deck-counter"></span>
                 </div>
-                
+
                 <!-- Pilha de Descarte -->
                 <div id="discard-pile" class="card-pile">
                     <!-- Contador de Cartas -->
                     <span id="discard-pile-counter" class="deck-counter"></span>
                 </div>
             </div>
-            
+
             <!-- ÁREAS DOS JOGADORES OPONENTES -->
             <!-- Esta seção agora está vazia. O JavaScript irá gerar e posicionar os oponentes dinamicamente aqui dentro de #game-board-container. -->
-            
+
             <!-- ÁREA DO JOGADOR PRINCIPAL (única área de jogador fixa no HTML) -->
             <div id="player-main" class="player-area">
                 <!-- Indicador de Status -->
@@ -47,7 +49,7 @@
                     <span>Próximo Poder:</span>
                     <div id="next-power-card" class="cr-card"></div>
                 </div>
-                
+
                 <!-- ÁREA DE PODERES -->
                 <div id="powers-container">
                     <!-- Os slots de poder em formato de carta serão gerados dinamicamente pelo JavaScript -->
@@ -58,13 +60,13 @@
                     <span>Próxima:</span>
                     <div id="next-card" class="cr-card"></div>
                 </div>
-                
+
                 <!-- Mão do Jogador (Contêiner para o arco de cartas) -->
                 <div id="cr-hand"></div>
 
                 <!-- Slot para a carta selecionada -->
                 <div id="selected-card-slot"></div>
-                
+
                 <!-- Barra de Elixir -->
                 <div id="elixir-bar-container">
                     <div id="elixir-bar-fill"></div>
@@ -72,21 +74,30 @@
                 </div>
             </div>
             <div id="hud-toggle">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 15l-6-6-6 6" />
+                </svg>
             </div>
         </div>
 
         <!-- LOG DE EVENTOS DO JOGO (COM BOTÃO DE TOGGLE) -->
         <div id="game-log">
             <div id="log-toggle">
-                <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 12h18M3 6h18M3 18h18" />
+                </svg>
             </div>
             <ul id="log-list"></ul>
         </div>
 
         <!-- BOTÃO DE PAUSA -->
         <div id="pause-button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="4" x2="6" y2="20"></line><line x1="18" y1="4" x2="18" y2="20"></line></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                stroke-linejoin="round">
+                <line x1="6" y1="4" x2="6" y2="20"></line>
+                <line x1="18" y1="4" x2="18" y2="20"></line>
+            </svg>
         </div>
 
         <!-- TOOLTIP PARA DETALHES DA CARTA/PODER -->
@@ -138,7 +149,19 @@
         </div>
     </div>
 
+    <!-- MODAL CONTAINER (Adicionado para PopupManager) -->
+    <div id="modal-container" class="modal-container">
+        <div class="modal-content">
+            <span id="modal-close-btn" class="close-btn">&times;</span>
+            <h2 id="modal-title">Título do Modal</h2>
+            <div id="modal-body">
+                <!-- Conteúdo do modal será injetado aqui -->
+            </div>
+        </div>
+    </div>
+
     <!-- Link para o arquivo de lógica JavaScript -->
     <script type="module" src="./../js/game/game.js"></script>
 </body>
+
 </html>

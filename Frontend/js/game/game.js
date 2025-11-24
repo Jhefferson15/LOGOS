@@ -8,6 +8,7 @@ import { RendererModule } from './modules/renderer.js';
 import { AnimationsModule } from './modules/animations.js';
 import { EventsModule } from './modules/events.js';
 import { Utils } from './modules/utils.js'; // Importar se quiser expor utilitários globalmente, opcional
+import { popupManager } from '../ui/PopupManager.js';
 
 // Inicializa o SoundManager imediatamente
 SoundManager.init();
@@ -23,7 +24,7 @@ if (window.GameUI && typeof window.GameUI.cleanupEventListeners === 'function') 
 
     // --- AUTH CHECK ---
     if (!localStorage.getItem('isLoggedIn')) {
-        window.location.href = './../login.html';
+        window.location.href = '../login.html';
     }
 
     // --- OBJETO PRINCIPAL (GameUI) ---
@@ -51,15 +52,22 @@ if (window.GameUI && typeof window.GameUI.cleanupEventListeners === 'function') 
 
         endGame(winnerId) {
             this.state.isGameOver = true;
-            const winnerData = this.state.playersData[winnerId];
             const isPlayerWinner = winnerId === 'player-main';
-            SoundManager.play(isPlayerWinner ? 'win' : 'lose');
 
-            this.elements.gameOverTitle.textContent = isPlayerWinner ? "Vitória!" : "Derrota!";
-            this.elements.gameOverMessage.textContent = `${winnerData.name} venceu a partida com ${this.state.game.players[winnerId].score} pontos!`;
-            this.elements.gameOverWinnerAvatar.innerHTML = winnerData.avatarSVG;
-            this.elements.gameOverOverlay.classList.remove('hidden');
-            this.logEvent(`${winnerData.name} venceu a partida!`, 'game-event');
+            // Simulate rewards
+            const trophyChange = isPlayerWinner ? 30 : -20;
+            const scrollsReward = isPlayerWinner ? 100 : 25;
+            const chestReward = isPlayerWinner ? 'Baú de Madeira' : null;
+
+            // Open the new end game popup instead of the old overlay
+            popupManager.open('game:end-game', {
+                isVictory: isPlayerWinner,
+                trophyChange: trophyChange,
+                scrollsReward: scrollsReward,
+                chestReward: chestReward
+            });
+
+            this.logEvent(`${this.state.playersData[winnerId].name} venceu a partida!`, 'game-event');
         }
     };
 

@@ -1,0 +1,111 @@
+/* Frontend/css/components/end-game.css */
+
+.end-game-popup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100%;
+    padding: 2rem;
+    box-sizing: border-box;
+    color: white;
+}
+
+.end-game-popup.victory {
+    background: linear-gradient(to bottom, var(--color-primary), var(--color-primary-dark));
+}
+
+.end-game-popup.defeat {
+    background: linear-gradient(to bottom, #6c757d, #343a40);
+}
+
+.end-game-banner {
+    margin-bottom: 2rem;
+}
+
+.end-game-banner h1 {
+    font-family: var(--font-title);
+    font-size: 4rem;
+    text-transform: uppercase;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    animation: zoomIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.end-game-summary {
+    background: rgba(0,0,0,0.2);
+    padding: 1rem 2rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 2rem;
+}
+
+.summary-item .summary-label {
+    font-size: 1.2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.summary-item .summary-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.summary-value.gain {
+    color: var(--color-success);
+}
+.summary-value.loss {
+    color: var(--color-error);
+}
+
+.end-game-popup h2 {
+    font-family: var(--font-title);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.end-game-rewards {
+    display: flex;
+    gap: 2rem;
+    background: rgba(0,0,0,0.2);
+    padding: 1rem 2rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 2rem;
+}
+
+.reward-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reward-item .fa-2x {
+    font-size: 2.5rem;
+    color: var(--accent-yellow);
+}
+
+.reward-item .reward-amount {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+#end-game-continue-btn {
+    font-size: 1.5rem;
+    padding: 1rem 3rem;
+    margin-top: 1rem;
+}

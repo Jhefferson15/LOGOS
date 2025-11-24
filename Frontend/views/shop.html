@@ -1,0 +1,54 @@
+<!-- views/shop.html -->
+<div class="shop-screen">
+    <header class="shop-header">
+        <h1>Loja Filosófica</h1>
+        <p>Invista seu conhecimento e ouro sabiamente.</p>
+    </header>
+
+    <section id="daily-deals-section" class="shop-section">
+        <h2>Ofertas do Dia</h2>
+        <div class="shop-grid" id="daily-deals-grid"></div>
+    </section>
+
+    <section id="chests-section" class="shop-section">
+        <h2>Baús de Sabedoria</h2>
+        <div class="shop-grid" id="chests-grid"></div>
+    </section>
+
+    <section id="currency-section" class="shop-section">
+        <h2>Tesouro</h2>
+        <div class="shop-grid" id="currency-grid"></div>
+    </section>
+</div>
+
+<!-- TEMPLATE PARA O JAVASCRIPT USAR -->
+<template id="shop-card-template">
+    <div class="shop-item-card">
+        <!-- Badge será inserido via JS se necessário -->
+        <div class="shop-item-header">
+            <h3 class="shop-item-name">Nome do Item</h3>
+        </div>
+
+        <div class="shop-item-image">
+            <!-- Imagem ou Ícone será inserido aqui -->
+        </div>
+
+        <div class="shop-item-details">
+            <p class="shop-item-description">Descrição</p>
+        </div>
+
+        <div class="shop-item-footer">
+            <button class="btn-purchase">
+                <span class="cost-amount">0</span>
+                <!-- Ícone da moeda -->
+                <i class="cost-currency-icon fas"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- CSS da Loja -->
+<link rel="stylesheet" href="css/screens/shop.css">
+
+<!-- Importante: Carregar FontAwesome para os ícones -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

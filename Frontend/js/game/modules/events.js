@@ -1,4 +1,5 @@
 import { SoundManager } from './audio.js';
+import { popupManager } from '../../ui/PopupManager.js';
 
 export const EventsModule = {
     listeners: [],
@@ -35,7 +36,7 @@ export const EventsModule = {
         this.addListener(this.elements.restartButton, 'click', () => { SoundManager.play('button_click'); this.restartGame(); });
         this.addListener(this.elements.playAgainButton, 'click', () => { SoundManager.play('button_click'); this.restartGame(); });
         this.addListener(this.elements.soundToggle, 'change', e => SoundManager.toggleMute(!e.target.checked));
-        this.addListener(this.elements.quitButton, 'click', () => { window.location.href = './../index.html'; });
+        this.addListener(this.elements.quitButton, 'click', () => { SoundManager.play('button_click'); this.handleQuit(); });
         this.addListener(window, 'keydown', e => { if (e.key === 'Escape') this.togglePause(!this.state.isPaused); });
 
         this.addListener(this.elements.hudToggle, 'click', () => document.getElementById('bottom-hud').classList.toggle('collapsed'));
@@ -45,6 +46,25 @@ export const EventsModule = {
     togglePause(pauseState) {
         this.state.isPaused = pauseState;
         this.elements.pauseMenuOverlay.classList.toggle('hidden', !this.state.isPaused);
+    },
+
+    handleQuit() {
+        // Close pause menu
+        this.togglePause(false);
+
+        // Calculate partial rewards for quitting mid-game
+        // Player gets reduced rewards for quitting
+        const trophyChange = -10; // Penalty for quitting
+        const scrollsReward = 10; // Small consolation reward
+        const chestReward = null; // No chest for quitting
+
+        // Trigger endgame popup with reduced rewards
+        popupManager.open('game:end-game', {
+            isVictory: false,
+            trophyChange: trophyChange,
+            scrollsReward: scrollsReward,
+            chestReward: chestReward
+        });
     },
 
     // --- Pointer Logic & Drag ---

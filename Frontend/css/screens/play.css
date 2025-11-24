@@ -149,21 +149,40 @@ body {
     margin: 0;
 }
 
-.battle-button {
-    display: block;
-    /* Para ocupar a largura e permitir margem auto */
-    width: 90%;
-    /* Ocupa 90% da largura da tela */
+.battle-actions-container {
+    display: flex;
+    gap: 10px;
     margin: 1rem auto;
-    /* Cria a "separação" vertical e centraliza horizontalmente */
+    width: 90%;
+}
 
+.deck-builder-btn {
+    flex-grow: 1;
+    background-color: #a0a0a0;
+    color: white;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 1rem 0;
+    border-radius: 1rem;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #6e6e6e;
+    transition: all 0.1s ease;
+}
+
+.deck-builder-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #6e6e6e;
+}
+
+.battle-button {
+    flex-grow: 2; /* Ocupa o dobro do espaço do outro botão */
     background-color: #E0DDD8;
     color: var(--text-dark);
     border: none;
     font-size: 1.8rem;
     font-weight: bold;
     padding: 1rem 0;
-    /* Ajustado padding para o novo tamanho */
     border-radius: 1rem;
     cursor: pointer;
     box-shadow: 0 5px 0 #c78f1e;

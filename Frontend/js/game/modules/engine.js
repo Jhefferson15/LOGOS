@@ -51,8 +51,9 @@ export const EngineModule = {
         const discardRect = this.elements.discardPile.getBoundingClientRect();
         this.triggerVFX(discardRect.left + discardRect.width / 2, discardRect.top + discardRect.height / 2, color);
 
-        const newCard = await this.drawCardFromDeck();
-        if (newCard) player.hand.push(newCard);
+        // --- ALTERAÇÃO AQUI ---
+        // As linhas que compravam uma nova carta foram removidas.
+        // O jogador agora ficará com uma carta a menos na mão após jogar.
 
         this.state.selectedCardIndex = null;
         this.render();
@@ -150,6 +151,7 @@ export const EngineModule = {
             });
         }
 
+        // Lógica da IA: Se não tiver boa jogada, compra carta
         if (bestCardIndex === -1 || (maxScore <= 2 && Math.random() < 0.5)) {
             const newCard = await this.drawCardFromDeck();
             if (newCard) {
@@ -175,8 +177,10 @@ export const EngineModule = {
         this.state.game.lastPlayedCard = playedCardId;
         this.logEvent(`jogou ${PHILOSOPHERS_DATA[playedCardId].name} e ganhou ${maxScore} pts!`, 'play-card', opponentId);
 
-        const newCard = await this.drawCardFromDeck();
-        if (newCard) opponent.hand.push(newCard);
+        // --- ALTERAÇÃO AQUI ---
+        // Também removi a compra automática da IA para manter as regras iguais para todos.
+        // const newCard = await this.drawCardFromDeck();
+        // if (newCard) opponent.hand.push(newCard);
 
         this.render();
         this.checkForWinner();
@@ -191,7 +195,10 @@ export const EngineModule = {
     },
 
     checkForWinner() {
-        if (this.state.game.drawDeck.length === 0 && this.state.game.playerOrder.every(id => this.state.game.players[id].hand.length === 0)) {
+        // Verifica se alguém ficou sem cartas na mão OU se o deck acabou
+        const anyPlayerHandEmpty = this.state.game.playerOrder.some(id => this.state.game.players[id].hand.length === 0);
+
+        if (this.state.game.drawDeck.length === 0 || anyPlayerHandEmpty) {
             let winnerId = this.state.game.playerOrder[0];
             let highScore = -1;
             this.state.game.playerOrder.forEach(id => {

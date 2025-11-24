@@ -1,0 +1,127 @@
+/* Frontend/css/components/chest-opening.css */
+
+.chest-opening-popup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    background: radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.95) 100%);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.chest-container {
+    text-align: center;
+}
+
+.chest-image-wrapper {
+    position: relative;
+    margin-bottom: 2rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.chest-image {
+    max-width: 250px;
+    transition: transform 0.5s ease-in-out;
+}
+
+.chest-container.opening .chest-image {
+    animation: shake 0.8s, glow-and-fade 1s forwards;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+    20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+@keyframes glow-and-fade {
+    0% { filter: drop-shadow(0 0 10px #fff) brightness(1); }
+    50% { filter: drop-shadow(0 0 30px #fff) brightness(3); }
+    100% { filter: drop-shadow(0 0 50px #fff) brightness(5); transform: scale(1.5); opacity: 0; }
+}
+
+
+#open-chest-btn {
+    font-size: 1.5rem;
+    padding: 1rem 3rem;
+}
+
+.rewards-container {
+    display: none;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 800px;
+    position: relative;
+}
+
+.reward-card {
+    background-color: var(--bg-paper);
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+    border: 2px solid var(--border-light);
+    box-shadow: var(--box-shadow-light);
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.reward-card.revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.reward-image {
+    width: 100%;
+    height: 120px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.reward-image.gold-reward {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: var(--accent-yellow);
+    background: #fff8e1;
+}
+
+.reward-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: var(--text-primary);
+}
+
+.reward-amount {
+    font-size: 1em;
+    color: var(--text-secondary);
+}
+
+.duplicate-indicator {
+    background-color: var(--color-accent);
+    color: white;
+    font-size: 0.7em;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+.btn-done {
+    grid-column: 1 / -1; /* Make button span all columns */
+    margin-top: 20px;
+    padding: 1rem;
+    font-size: 1.2rem;
+}

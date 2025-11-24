@@ -80,7 +80,13 @@ export const GameModeSelectionPopup = {
 
                 const modeName = card.querySelector('h3').innerText;
                 toast.show(`Modo ${modeName} selecionado!`, 'success');
-                popupManager.close();
+                // Assume that the `onSuccess` callback from PopupManager.open will be passed here.
+                // This callback will be responsible for opening the next popup in the chain.
+                popupManager.close(() => {
+                    if (data.onGameModeSelected) {
+                        data.onGameModeSelected();
+                    }
+                });
             });
         });
     }

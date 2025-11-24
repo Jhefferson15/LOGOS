@@ -1,0 +1,187 @@
+/* Frontend/css/screens/shop.css */
+
+/* Variáveis de fallback para garantir que o visual funcione */
+:root {
+    --font-title: 'Cinzel', serif;
+    --text-primary: #3d2b1f;
+    --text-secondary: #6b584a;
+    --bg-paper-light: #fdfbf7;
+    --border-light: #e6dfd1;
+    --color-primary: #8b5a2b;
+    --color-primary-dark: #6e4620;
+    --color-accent: #d4af37;
+    /* Dourado */
+    --color-success: #2e7d32;
+    --border-radius-md: 12px;
+    --border-radius-sm: 8px;
+    --box-shadow-light: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.shop-screen {
+    padding: 1rem;
+    height: 100%;
+    overflow-y: auto;
+    background-color: #f4f1ea;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.shop-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-light);
+}
+
+.shop-header h1 {
+    font-family: var(--font-title);
+    font-size: 2.2em;
+    color: var(--color-primary);
+    margin: 0;
+}
+
+.shop-header p {
+    margin-top: 5px;
+    color: var(--text-secondary);
+}
+
+.shop-section {
+    margin-bottom: 2.5rem;
+}
+
+.shop-section h2 {
+    font-family: var(--font-title);
+    font-size: 1.6em;
+    margin-bottom: 1.2rem;
+    padding-left: 15px;
+    border-left: 5px solid var(--color-primary);
+    color: var(--text-primary);
+}
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    /* Melhor responsividade */
+    gap: 1.5rem;
+}
+
+.shop-item-card {
+    background: var(--bg-paper-light);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--box-shadow-light);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-light);
+    position: relative;
+    /* Para posicionar badges */
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.shop-item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.shop-item-header {
+    padding: 1rem 0.5rem;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.shop-item-name {
+    font-size: 1.1em;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+/* Área da Imagem */
+.shop-item-image {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    min-height: 140px;
+    background-color: #fff;
+}
+
+/* Ícones FontAwesome dentro dos cards */
+.shop-item-image i {
+    font-size: 4rem;
+    /* Tamanho controlado */
+    color: var(--color-primary);
+}
+
+/* Imagens (Retratos) */
+.shop-item-image img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--border-light);
+}
+
+.shop-item-details {
+    padding: 0.8rem;
+    text-align: center;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    min-height: 50px;
+    /* Alinha os botões */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shop-item-footer {
+    padding: 1rem;
+    background: #fff;
+    border-top: 1px solid var(--border-light);
+}
+
+.btn-purchase {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1em;
+    font-weight: bold;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-purchase:hover {
+    background-color: var(--color-primary-dark);
+}
+
+/* Badge de Quantidade para Filósofos */
+.philosopher-quantity {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: var(--color-accent);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+/* Cores específicas por tipo */
+.shop-item-card[data-type="chest"] .shop-item-image i {
+    color: #8d6e63;
+}
+
+.shop-item-card[data-type="currency"] .shop-item-image i {
+    color: #fbc02d;
+}

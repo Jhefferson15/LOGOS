@@ -2,14 +2,16 @@ export const SoundManager = {
     isMuted: false,
     sounds: {},
     soundFiles: {
-        play_card: './../assets/game/audio/flipcard.mp3',
-        draw_card: './../assets/game/audio/flipcard.mp3',
-        button_click: './../assets/game/audio/flipcard.mp3',
-        shuffle: './../assets/game/audio/flipcard.mp3',
-        win: './../assets/game/audio/game_start.mp3',
-        lose: './../assets/game/audio/flipcard.mp3',
-        error: './../assets/game/audio/flipcard.mp3',
-        power_activate: './../assets/game/audio/flipcard.mp3'
+        play_card: '../assets/game/audio/flipcard.mp3',
+        draw_card: '../assets/game/audio/flipcard.mp3',
+        button_click: '../assets/game/audio/flipcard.mp3',
+        shuffle: '../assets/game/audio/flipcard.mp3',
+        win: '../assets/game/audio/flipcard.mp3',
+        lose: '../assets/game/audio/flipcard.mp3',
+        error: '../assets/game/audio/flipcard.mp3',
+        power_activate: '../assets/game/audio/flipcard.mp3',
+        matchmaking_start: '../assets/game/audio/flipcard.mp3',
+        match_found: '../assets/game/audio/flipcard.mp3'
     },
     init() {
         for (const key in this.soundFiles) {

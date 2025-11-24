@@ -1,0 +1,110 @@
+/* Frontend/css/components/level-up.css */
+
+.level-up-popup {
+    padding: 2rem;
+    text-align: center;
+}
+
+.level-up-animation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.level-display {
+    background-color: var(--bg-paper-light);
+    border: 2px solid var(--border-light);
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.5s ease-in-out;
+}
+
+.level-display .level-label {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.level-display .level-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.arrow-separator .fas {
+    font-size: 3rem;
+    color: var(--text-secondary);
+}
+
+.new-level {
+    transform: scale(0.8);
+    opacity: 0.8;
+}
+
+.new-level.animate {
+    transform: scale(1.2);
+    opacity: 1;
+    background-color: var(--color-success-light);
+    border-color: var(--color-success);
+}
+
+.new-level.animate .level-number {
+    color: var(--color-success-dark);
+}
+
+.level-up-popup h2 {
+    font-family: var(--font-title);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.level-up-rewards {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.reward-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background-color: var(--bg-paper-light);
+    border-radius: var(--border-radius-md);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease-out;
+}
+
+.reward-item.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reward-item .fa-2x {
+    font-size: 2rem;
+    color: var(--accent-yellow);
+}
+
+.reward-item .reward-amount {
+    font-weight: bold;
+}
+
+.level-up-message {
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+#level-up-continue-btn {
+    font-size: 1.2rem;
+    padding: 0.8rem 2rem;
+}

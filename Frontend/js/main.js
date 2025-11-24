@@ -5,6 +5,7 @@ import { initSchoolsScreen, handleSchoolsScreenClick } from './screens/schools.j
 import { initSymposiumScreen, handleSymposiumScreenClick } from './screens/symposium.js';
 import { initSchoolMembersScreen, handleSchoolMembersScreenClick } from './screens/school_members.js';
 import { initReelsScreen, handleReelsScreenClick } from './screens/reels.js';
+import { initShopScreen, handleShopScreenClick } from './screens/shop.js';
 import { toast } from './ui/Toast.js';
 import { gameState } from './data/gameState.js';
 import { popupManager } from './ui/PopupManager.js';
@@ -120,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'symposium': initSymposiumScreen(gameState, updateDynamicUI, toast); break;
                 case 'school_members': initSchoolMembersScreen(params, gameState); break;
                 case 'reels': initReelsScreen(gameState); break;
+                case 'shop': initShopScreen(gameState, updateDynamicUI, toast); break;
                 default: console.warn(`No specific init function for screen: ${screenName}`);
             }
 
@@ -265,6 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         case 'philosophers': handlePhilosophersScreenClick(e, gameState, updateDynamicUI, toast); break;
                         case 'school_members': handleSchoolMembersScreenClick(e, gameState, toast); break;
                         case 'reels': handleReelsScreenClick(e, gameState, toast); break;
+                        case 'shop': handleShopScreenClick(e, gameState, updateDynamicUI, toast); break;
                     }
                 } else if (e.target.closest('#main-debate-panel')) {
                     // Click was in the fixed debate panel
@@ -280,6 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'philosophers': handlePhilosophersScreenClick(e, gameState, updateDynamicUI, toast); break;
                     case 'school_members': handleSchoolMembersScreenClick(e, gameState, toast); break;
                     case 'reels': handleReelsScreenClick(e, gameState, toast); break;
+                    case 'shop': handleShopScreenClick(e, gameState, updateDynamicUI, toast); break;
                 }
             }
 

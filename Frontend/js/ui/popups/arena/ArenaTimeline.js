@@ -89,7 +89,7 @@ export const ArenaTimelinePopup = {
     /**
      * Configura os event listeners para o popup.
      * @param {HTMLElement} element - O elemento do corpo do modal onde o HTML foi injetado.
-     * @param {object} data - Dados para configuração.
+     * @param {object} data - Dados para configuração. Pode incluir `onArenaSelected` (callback).
      */
     setupListeners: (element, data, popupManager) => {
         // Listener para selecionar arena
@@ -105,10 +105,12 @@ export const ArenaTimelinePopup = {
 
                 toast.show(`Arena ${arenaId} selecionada!`, 'success');
                 
-                // Acessa o popupManager global para fechar
-                // Idealmente, isso seria feito através de um evento ou callback
-                // mas por simplicidade, usamos a instância global.
-                popupManager.close();
+                // Fecha o popup, passando o callback de sucesso para o popupManager
+                popupManager.close(() => {
+                    if (data.onArenaSelected) {
+                        data.onArenaSelected();
+                    }
+                });
             });
         });
 
