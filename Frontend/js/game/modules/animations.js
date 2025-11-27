@@ -2,7 +2,21 @@ import { ERA_COLOR_MAP } from './constants.js';
 import { PHILOSOPHERS_DATA } from '../../data/philosophers.js';
 import { SoundManager } from './audio.js';
 
+/**
+ * Module responsible for handling game animations.
+ * Includes card movements, visual effects, and UI transitions.
+ * @namespace AnimationsModule
+ */
 export const AnimationsModule = {
+    /**
+     * Animates a card flying from a start element to an end element.
+     * @async
+     * @param {HTMLElement} startElement - The starting element.
+     * @param {HTMLElement} endElement - The destination element.
+     * @param {object} cardData - Data of the card being animated.
+     * @param {boolean} [isOpponent=false] - Whether the card belongs to an opponent (shows card back).
+     * @returns {Promise<void>}
+     */
     async animateCardFly(startElement, endElement, cardData, isOpponent = false) {
         const startRect = startElement.getBoundingClientRect();
         const endRect = endElement.getBoundingClientRect();
@@ -30,6 +44,12 @@ export const AnimationsModule = {
         cardEl.remove();
     },
 
+    /**
+     * Triggers a visual effect (particle explosion) at a specific coordinate.
+     * @param {number} x - The x-coordinate for the effect.
+     * @param {number} y - The y-coordinate for the effect.
+     * @param {string} color - The color of the particles (based on era).
+     */
     triggerVFX(x, y, color) {
         const particleColor = color === 'wild' ? '#ffffff' : `var(--card-${color})`;
         for (let i = 0; i < 12; i++) {
@@ -44,6 +64,11 @@ export const AnimationsModule = {
         }
     },
 
+    /**
+     * Animates the shuffling of the discard pile back into the draw deck.
+     * @async
+     * @returns {Promise<void>}
+     */
     async animateShuffle() {
         this.state.isAnimating = true;
         SoundManager.play('shuffle');
@@ -79,6 +104,9 @@ export const AnimationsModule = {
         this.state.isAnimating = false;
     },
 
+    /**
+     * Animates the entry of player areas when the game starts.
+     */
     animatePlayerEntry() {
         document.querySelectorAll('.player-area.pre-enter').forEach((el, i) => {
             setTimeout(() => el.classList.remove('pre-enter'), 200 * (i + 1));

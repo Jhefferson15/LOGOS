@@ -9,6 +9,7 @@
  * 1. Create a new file in study_content/ (use _template.js as a guide)
  * 2. Import it here
  * 3. Add it to the STUDY_CONTENT_DATA object with the philosopher's ID as the key
+ * @namespace Data
  */
 
 // Import individual philosopher content files
@@ -17,6 +18,7 @@ import { talesContent } from './study_content/tales.js';
 /**
  * Database of Study Content.
  * Contains detailed articles, quizzes, and comics for each philosopher.
+ * @memberof Data
  * @type {Object.<string, {
  *   realImage: string,
  *   totalPages: number,

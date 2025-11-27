@@ -1,6 +1,7 @@
 /**
  * Database Service.
  * Handles saving and loading user data and game progress to Firestore.
+ * @module Services/Database
  */
 import { db } from './firebase-config.js';
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";

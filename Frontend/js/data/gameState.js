@@ -1,7 +1,7 @@
 /**
  * Global object tracking the entire state of the game.
  * Persists player data, resources, timers, and collection status.
- * @namespace GameState
+ * @memberof Data
  */
 export let gameState = {
     // --- Dados do Perfil ---

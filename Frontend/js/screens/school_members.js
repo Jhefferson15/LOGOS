@@ -136,6 +136,7 @@ function setupReelsObserver() {
 /**
  * Initializes the School Members Screen.
  * Sets the title, renders members and posts, and sets up tab navigation.
+ * @module Screens/SchoolMembers
  * @param {object} params - Route parameters (e.g., { school: 'Stoicism' }).
  * @param {object} gameState - The global game state.
  */

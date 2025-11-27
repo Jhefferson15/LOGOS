@@ -18,9 +18,11 @@ import { EndGamePopup } from './game/EndGamePopup.js';
 /**
  * Mapeia os IDs de popup (com namespace) para seus respectivos módulos de implementação.
  * Cada módulo deve exportar no mínimo os métodos `getHTML(data)` e `setupListeners(element, data)`.
- *
+ * 
  * Exemplo de chave: 'tela:nome-do-popup'
  * Exemplo de valor: o módulo importado.
+ * 
+ * @namespace Popups
  */
 export const popupRegistry = {
     'profile:full': FullProfilePopup,

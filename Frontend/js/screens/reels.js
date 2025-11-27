@@ -312,6 +312,7 @@ function toggleLike(postId, gameState) {
 /**
  * Initializes the Reels Screen.
  * Triggers the rendering of the reels feed.
+ * @module Screens/Reels
  * @param {object} gameState - The global game state.
  */
 export function initReelsScreen(gameState) {

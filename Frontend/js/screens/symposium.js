@@ -1,6 +1,7 @@
 /**
  * Initializes the Symposium Screen.
  * Currently a placeholder for future event functionality.
+ * @module Screens/Symposium
  * @param {object} gameState - The global game state.
  * @param {function} updateDynamicUI - Function to refresh the UI.
  * @param {object} toast - Toast notification utility.

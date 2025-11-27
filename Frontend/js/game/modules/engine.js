@@ -4,7 +4,18 @@ import { ERA_COLOR_MAP, OPPONENT_PLAY_DELAY } from './constants.js';
 import { SoundManager } from './audio.js';
 import { Utils } from './utils.js';
 
+/**
+ * Core game logic module.
+ * Handles card interactions, turn management, scoring, and win conditions.
+ * @namespace EngineModule
+ */
 export const EngineModule = {
+    /**
+     * Draws a card from the draw deck.
+     * If the deck is empty, it reshuffles the discard pile (excluding the top card) to form a new deck.
+     * @async
+     * @returns {Promise<string|null>} The ID of the drawn card, or null if the deck and discard pile are empty.
+     */
     async drawCardFromDeck() {
         if (this.state.game.drawDeck.length === 0) {
             if (this.state.game.discardPile.length <= 1) {
@@ -22,6 +33,13 @@ export const EngineModule = {
         return this.state.game.drawDeck.pop();
     },
 
+    /**
+     * Executes the logic for a player playing a card.
+     * Calculates score, triggers animations, updates game state, and advances the turn.
+     * @async
+     * @param {number} cardIndex - The index of the card in the player's hand.
+     * @returns {Promise<void>}
+     */
     async playCard(cardIndex) {
         if (this.state.isAnimating || this.state.isGameOver) return;
 
@@ -69,6 +87,11 @@ export const EngineModule = {
         this.state.isAnimating = false;
     },
 
+    /**
+     * Calculates the score based on the chronological distance between the played card and the last played card.
+     * @param {string} playedPhilosopherId - The ID of the philosopher card being played.
+     * @returns {number} The calculated score points.
+     */
     calculateChronologicalScore(playedPhilosopherId) {
         const topOfPileId = this.state.game.lastPlayedCard;
         const orderedList = this.state.game.orderedPhilosophers;
@@ -87,6 +110,13 @@ export const EngineModule = {
         return Math.max(0, points);
     },
 
+    /**
+     * Handles the action of the main player drawing a card.
+     * Plays sound, triggers animation, and updates the player's hand.
+     * @async
+     * @param {boolean} shouldAdvanceTurn - Whether to advance the turn after drawing.
+     * @returns {Promise<void>}
+     */
     async playerDrawsCard(shouldAdvanceTurn) {
         if (this.state.isAnimating) return;
         const newCard = await this.drawCardFromDeck();
@@ -103,6 +133,10 @@ export const EngineModule = {
         }
     },
 
+    /**
+     * Advances the game to the next player's turn.
+     * Handles status effects (like skipping turns) and triggers opponent AI if applicable.
+     */
     advanceTurn() {
         const game = this.state.game;
         let currentId = game.currentPlayerId;
@@ -132,6 +166,12 @@ export const EngineModule = {
         }
     },
 
+    /**
+     * Simulates the AI opponent's turn.
+     * The AI tries to find the best card to play or draws a card if no good move is available.
+     * @async
+     * @returns {Promise<void>}
+     */
     async simulateOpponentTurn() {
         if (this.state.isGameOver || this.state.isPaused) return;
 
@@ -190,10 +230,18 @@ export const EngineModule = {
         this.state.isAnimating = false;
     },
 
+    /**
+     * Applies any special effects associated with the played card.
+     * @param {object} card - The card data object.
+     */
     applyCardEffect(card) {
         // Placeholder
     },
 
+    /**
+     * Checks if the game has ended (deck empty or player hand empty).
+     * Determines the winner based on the highest score.
+     */
     checkForWinner() {
         // Verifica se alguém ficou sem cartas na mão OU se o deck acabou
         const anyPlayerHandEmpty = this.state.game.playerOrder.some(id => this.state.game.players[id].hand.length === 0);
@@ -212,6 +260,12 @@ export const EngineModule = {
         }
     },
 
+    /**
+     * Activates a special concept power for the player.
+     * Deducts score cost and executes the concept's handler.
+     * @param {object} concept - The concept data object.
+     * @param {HTMLElement} conceptEl - The DOM element representing the concept card.
+     */
     onActivateConcept(concept, conceptEl) {
         if (this.state.isAnimating || this.state.isPaused) return;
         const player = this.state.game.players['player-main'];
@@ -246,6 +300,10 @@ export const EngineModule = {
         }, 500);
     },
 
+    /**
+     * Replenishes the player's concept deck when it runs out.
+     * Shuffles available concepts that are not currently in the player's hand.
+     */
     replenishConceptDeck() {
         const player = this.state.game.players['player-main'];
         this.logEvent('Seu deck de conceitos foi reembaralhado!', 'game-event');

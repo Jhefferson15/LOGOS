@@ -12,6 +12,7 @@ let activeMiniCard = null; // Rastreia o mini-card de lição que está aberto
 /**
  * Inicializa a tela da Biblioteca (Árvore do Conhecimento).
  * Estrutura os dados, cria a trilha de aprendizado visual e atualiza a UI.
+ * @module Screens/Library
  * @param {object} globalGameState - O estado global do jogo.
  * @param {function} updateDynamicUI - Função para atualizar a UI dinâmica.
  * @param {object} toast - Utilitário de notificações.

@@ -5,6 +5,7 @@ import { popupManager } from '../ui/PopupManager.js';
 /**
  * Initializes the Philosophers Collection Screen.
  * Renders the grid of collected and undiscovered philosopher cards.
+ * @module Screens/Philosophers
  * @param {object} gameState - The global game state.
  * @param {function} updateDynamicUI - Function to refresh the UI.
  * @param {object} toast - Toast notification utility.

@@ -2,7 +2,16 @@ import { PHILOSOPHERS_DATA } from './../../data/philosophers.js';
 import { CONCEPTS_DATA } from './../../data/concepts.js';
 import { ERA_COLOR_MAP } from './constants.js';
 
+/**
+ * Module responsible for rendering the game UI.
+ * Handles DOM manipulation and updates based on the game state.
+ * @namespace RendererModule
+ */
 export const RendererModule = {
+    /**
+     * Caches DOM elements to improve performance.
+     * Should be called during initialization.
+     */
     cacheDOMElements() {
         this.elements = {
             gameScreen: document.getElementById('game-screen'),
@@ -36,6 +45,10 @@ export const RendererModule = {
         };
     },
 
+    /**
+     * Main render loop.
+     * Updates all dynamic UI elements based on the current game state.
+     */
     render() {
         this.renderOpponentHands();
         this.renderTurnIndicator();
@@ -48,6 +61,10 @@ export const RendererModule = {
         this.renderUsedPowerIndicators();
     },
 
+    /**
+     * Renders the player areas (opponents) on the game board.
+     * Positions them in a semi-circle layout.
+     */
     renderPlayerAreas() {
         const container = document.getElementById('game-board-container');
         container.querySelectorAll('.player-area.opponent').forEach(el => el.remove());
@@ -85,6 +102,9 @@ export const RendererModule = {
         this.elements.playerAreas = document.querySelectorAll('.player-area');
     },
 
+    /**
+     * Updates the card count display for opponent hands.
+     */
     renderOpponentHands() {
         Object.keys(this.state.game.players).forEach(id => {
             if (id !== 'player-main') {
@@ -94,12 +114,18 @@ export const RendererModule = {
         });
     },
 
+    /**
+     * Updates the visual indicator for the active player's turn.
+     */
     renderTurnIndicator() {
         if (this.elements.playerAreas) {
             this.elements.playerAreas.forEach(area => area.classList.toggle('active-turn', area.id === this.state.game.currentPlayerId));
         }
     },
 
+    /**
+     * Renders the top card of the discard pile.
+     */
     renderDiscardPile() {
         const cardId = this.state.game.lastPlayedCard;
         const discardPileEl = this.elements.discardPile;
@@ -111,6 +137,9 @@ export const RendererModule = {
         }
     },
 
+    /**
+     * Renders the bottom HUD, including player hand, concepts, and elixir bar.
+     */
     renderBottomHud() {
         this.renderPlayerHandArc();
         this.renderConcepts();
@@ -118,6 +147,10 @@ export const RendererModule = {
         this.renderElixirBar();
     },
 
+    /**
+     * Renders the player's hand in an arc layout.
+     * Handles card positioning, rotation, and interactivity.
+     */
     renderPlayerHandArc() {
         const handContainer = this.elements.crHandContainer;
         const selectedCardSlot = this.elements.selectedCardSlot;
@@ -179,6 +212,9 @@ export const RendererModule = {
         });
     },
 
+    /**
+     * Renders the player's available concept powers.
+     */
     renderConcepts() {
         const powersContainer = this.elements.powersContainer;
         powersContainer.innerHTML = '';
@@ -202,6 +238,9 @@ export const RendererModule = {
         });
     },
 
+    /**
+     * Renders a preview of the next concept card in the player's deck.
+     */
     renderNextConceptPreview() {
         const nextPowerCardEl = this.elements.nextPowerCard;
         const nextConcept = this.state.game.players['player-main'].conceptDeck[0];
@@ -214,6 +253,9 @@ export const RendererModule = {
         }
     },
 
+    /**
+     * Renders indicators for powers used during the current round.
+     */
     renderUsedPowerIndicators() {
         document.querySelectorAll('.player-area .used-power-indicator').forEach(el => {
             el.innerHTML = '';
@@ -233,15 +275,26 @@ export const RendererModule = {
         });
     },
 
+    /**
+     * Generates the HTML content for a card.
+     * @param {object} cardData - The data of the card to render.
+     * @returns {string} The HTML string for the card content.
+     */
     renderCardContent(cardData) {
         return `<span class="card-value">${cardData.name}</span><div class="card-cost">${cardData.date}</div>`;
     },
 
+    /**
+     * Updates the counters for the draw deck and discard pile.
+     */
     renderDeckCounters() {
         this.elements.drawDeckCounter.textContent = this.state.game.drawDeck.length;
         this.elements.discardPileCounter.textContent = this.state.game.discardPile.length;
     },
 
+    /**
+     * Updates the score display for all players.
+     */
     renderScores() {
         this.state.game.playerOrder.forEach(id => {
             const playerEl = document.getElementById(id);
@@ -252,6 +305,9 @@ export const RendererModule = {
         });
     },
 
+    /**
+     * Renders active status effects for all players.
+     */
     renderStatusEffects() {
         this.state.game.playerOrder.forEach(id => {
             const playerEl = document.getElementById(id);
@@ -266,6 +322,9 @@ export const RendererModule = {
         });
     },
 
+    /**
+     * Renders the game log messages.
+     */
     renderLog() {
         this.elements.logList.innerHTML = this.state.logMessages.map(entry => {
             const playerNameHtml = entry.playerName ? `<span class="player-name">${entry.playerName}</span>` : '';
@@ -274,6 +333,9 @@ export const RendererModule = {
         this.elements.logList.scrollTop = 0;
     },
 
+    /**
+     * Renders the elixir (score) progress bar.
+     */
     renderElixirBar() {
         const player = this.state.game.players['player-main'];
         const elixirFill = document.getElementById('elixir-bar-fill');
@@ -287,6 +349,11 @@ export const RendererModule = {
         if (elixirText) elixirText.textContent = `${currentElixir}/${maxElixir}`;
     },
 
+    /**
+     * Displays a tooltip for a card or element.
+     * @param {object} cardData - Data to display in the tooltip.
+     * @param {HTMLElement} targetElement - The element triggering the tooltip.
+     */
     showTooltip(cardData, targetElement) {
         if (!cardData.description) return;
         const rect = targetElement.getBoundingClientRect();
@@ -305,10 +372,16 @@ export const RendererModule = {
         tooltipEl.style.top = `${top}px`;
     },
 
+    /**
+     * Hides the tooltip.
+     */
     hideTooltip() {
         this.elements.tooltip.classList.remove('visible');
     },
 
+    /**
+     * Displays a summary of the round's events (e.g., powers used) and resets round data.
+     */
     showRoundSummaryAndReset() {
         const summary = this.state.roundSummary;
         if (summary.powersUsed.length === 0) {
@@ -357,6 +430,12 @@ export const RendererModule = {
         }, 3000);
     },
 
+    /**
+     * Logs a game event and updates the log display.
+     * @param {string} message - The message to log.
+     * @param {string} [type='generic'] - The type of event (for styling).
+     * @param {string} [playerId=''] - The ID of the player associated with the event.
+     */
     logEvent(message, type = 'generic', playerId = '') {
         const playerName = playerId && this.state.playersData[playerId] ? this.state.playersData[playerId].name : '';
         this.state.logMessages.unshift({ message, type, playerName });

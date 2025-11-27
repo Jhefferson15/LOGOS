@@ -41,6 +41,11 @@ class PopupManager {
         return true;
     }
 
+    /**
+     * Attaches global event listeners for closing the popup.
+     * Handles clicks on the close button, background overlay, and Escape key press.
+     * @private
+     */
     _attachGlobalListeners() {
         this.closeBtn.onclick = () => this.close();
 

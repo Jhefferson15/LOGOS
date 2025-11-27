@@ -1,8 +1,12 @@
 /**
  * Shop Data
  * Contains all shop items including daily deals, chests, and currency packs
+ * @namespace Data
  */
 
+/**
+ * @memberof Data
+ */
 export const SHOP_DATA = {
     dailyDeals: [
         { id: 'deal_01', type: 'philosopher', philosopherId: 1, quantity: 5, cost: { currency: 'scrolls', amount: 50 } },

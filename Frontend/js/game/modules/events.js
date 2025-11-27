@@ -1,15 +1,31 @@
 import { SoundManager } from './audio.js';
 import { popupManager } from '../../ui/PopupManager.js';
 
+/**
+ * Module responsible for handling user input and game events.
+ * Manages event listeners, pointer interactions, and drag-and-drop logic.
+ * @namespace EventsModule
+ */
 export const EventsModule = {
     listeners: [],
 
+    /**
+     * Adds an event listener to an element and tracks it for cleanup.
+     * @param {HTMLElement|Window} element - The target element.
+     * @param {string} event - The event name.
+     * @param {Function} handler - The event handler function.
+     * @param {object|boolean} [options=false] - Event listener options.
+     */
     addListener(element, event, handler, options = false) {
         if (!element) return;
         element.addEventListener(event, handler, options);
         this.listeners.push({ element, event, handler });
     },
 
+    /**
+     * Removes all registered event listeners.
+     * Should be called when the game is destroyed or restarted.
+     */
     cleanupEventListeners() {
         this.listeners.forEach(({ element, event, handler }) => {
             element.removeEventListener(event, handler);
@@ -17,6 +33,10 @@ export const EventsModule = {
         this.listeners = [];
     },
 
+    /**
+     * Binds all necessary event listeners for the game.
+     * Includes UI buttons, keyboard shortcuts, and pointer events.
+     */
     bindEventListeners() {
         this.cleanupEventListeners();
 
@@ -43,11 +63,19 @@ export const EventsModule = {
         this.addListener(this.elements.logToggle, 'click', () => this.elements.gameLog.classList.toggle('collapsed'));
     },
 
+    /**
+     * Toggles the game pause state.
+     * @param {boolean} pauseState - True to pause, false to resume.
+     */
     togglePause(pauseState) {
         this.state.isPaused = pauseState;
         this.elements.pauseMenuOverlay.classList.toggle('hidden', !this.state.isPaused);
     },
 
+    /**
+     * Handles the player quitting the game.
+     * Calculates partial rewards and redirects to the main menu.
+     */
     handleQuit() {
         // Close pause menu
         this.togglePause(false);
@@ -73,6 +101,11 @@ export const EventsModule = {
     },
 
     // --- Pointer Logic & Drag ---
+    /**
+     * Handles the pointer down event (mouse click or touch start).
+     * Initiates card selection or dragging.
+     * @param {PointerEvent} e - The pointer event.
+     */
     onPointerDown(e) {
         if (this.state.isAnimating || this.state.game.currentPlayerId !== 'player-main' || this.state.isPaused || e.button !== 0) return;
 
@@ -103,6 +136,13 @@ export const EventsModule = {
         }
     },
 
+    /**
+     * Starts the drag operation for a card.
+     * Creates a visual clone of the card for dragging.
+     * @param {PointerEvent} e - The pointer event.
+     * @param {HTMLElement} originalEl - The original card element.
+     * @param {number} index - The index of the card in the hand.
+     */
     startDrag(e, originalEl, index) {
         if (this.state.dragState.isDragging) return;
 
@@ -125,6 +165,11 @@ export const EventsModule = {
         originalEl.style.opacity = '0';
     },
 
+    /**
+     * Handles the pointer move event.
+     * Updates the position of the dragged card clone.
+     * @param {PointerEvent} e - The pointer event.
+     */
     onPointerMove(e) {
         if (!this.state.dragState.isDragging) return;
         e.preventDefault();
@@ -140,6 +185,11 @@ export const EventsModule = {
         this.elements.discardPile.classList.toggle('droppable', isOverDiscard);
     },
 
+    /**
+     * Handles the pointer up event (release).
+     * Completes the drag operation, playing the card if dropped on the discard pile.
+     * @param {PointerEvent} e - The pointer event.
+     */
     onPointerUp(e) {
         if (!this.state.dragState.isDragging) return;
 

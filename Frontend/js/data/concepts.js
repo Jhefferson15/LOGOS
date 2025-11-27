@@ -6,6 +6,7 @@
  * uma pontuação associada e uma lista de filósofos que o desenvolveram.
  * Este é o principal recurso que os jogadores usam para pontuar, conectando
  * o conceito correto ao filósofo em jogo.
+ * @namespace Data
  */
 
 
@@ -24,6 +25,7 @@
 /**
  * Database of Active Concepts (Abilities).
  * These are special powers players can use during the game.
+ * @memberof Data
  * @type {Object.<string, {
  *   id: string,
  *   name: string,
@@ -123,6 +125,7 @@ export const CONCEPTS_DATA = {
 /**
  * Database of Collectible Concepts.
  * These are the concepts associated with specific philosophers for collection purposes.
+ * @memberof Data
  * @type {Object.<number, {
  *   name: string,
  *   philosophers: number[],

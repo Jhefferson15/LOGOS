@@ -1,7 +1,7 @@
 /**
  * Login Screen Logic.
  * Handles the login form submission and user authentication.
- * @module LoginScreen
+ * @module Screens/Login
  */
 import { USERS } from '../data/login.js';
 import { loginWithGoogle } from '../services/auth-service.js';

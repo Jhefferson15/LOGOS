@@ -6,6 +6,7 @@
  * grande movimento filosófico, servindo como "lar" para um conjunto específico
  * de escolas de pensamento. A progressão pelas arenas guia o jogador através
  * da história da filosofia.
+ * @namespace Data
  */
 
 import { SCHOOLS } from './philosophers.js'; // Importa as escolas para garantir consistência
@@ -13,6 +14,7 @@ import { SCHOOLS } from './philosophers.js'; // Importa as escolas para garantir
 /**
  * List of Game Arenas.
  * Each arena corresponds to a philosophical era or movement.
+ * @memberof Data
  * @type {Array<{
  *   id: number,
  *   name: string,

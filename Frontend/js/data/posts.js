@@ -1,5 +1,10 @@
 /**
  * Database of Social Media Posts (Reels).
+ * @namespace Data
+ */
+
+/**
+ * @memberof Data
  * @type {Array<{
  *   id: number,
  *   philosopherId: string,

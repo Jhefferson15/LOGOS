@@ -1,6 +1,7 @@
 /**
  * Authentication Service.
  * Handles Google Login and user session management.
+ * @module Services/Auth
  */
 import { auth, googleProvider } from './firebase-config.js';
 import { signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";

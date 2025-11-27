@@ -7,21 +7,24 @@
         "excludePattern": "(^|\\/|\\\\)_"
     },
     "opts": {
-        "template": "node_modules/docdash",
+        "template": "node_modules/clean-jsdoc-theme",
         "encoding": "utf8",
         "destination": "docs/",
         "recurse": true,
-        "verbose": true
-    },
-    "templates": {
-        "docdash": {
-            "static": true,
-            "sort": true,
+        "verbose": true,
+        "theme_opts": {
+            "default_theme": "dark",
             "search": true,
-            "collapse": true,
-            "typedefs": true,
-            "removeQuotes": "none",
-            "scripts": []
+            "title": "LOGOS Documentation",
+            "menu": [
+                {
+                    "title": "Website",
+                    "link": "../index.html",
+                    "target": "_blank",
+                    "class": "menu-item",
+                    "id": "website_link"
+                }
+            ]
         }
     }
 }

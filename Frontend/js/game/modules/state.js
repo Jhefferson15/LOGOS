@@ -3,7 +3,16 @@ import { CONCEPTS_DATA } from '../../data/concepts.js';
 import { MAIN_PLAYER_DATA, OPPONENT_POOL, PLAYER_CONCEPT_SLOTS } from './constants.js';
 import { Utils } from './utils.js';
 
+/**
+ * Module responsible for managing the game state.
+ * Initializes and resets the state, including players, decks, and game variables.
+ * @namespace StateModule
+ */
 export const StateModule = {
+    /**
+     * Initializes the game state for a new match.
+     * Sets up players, decks, initial hands, and game flags.
+     */
     initializeState() {
         const opponentData = Utils.shuffleArray([...OPPONENT_POOL]).slice(0, 3);
         const playerIds = [MAIN_PLAYER_DATA.id];

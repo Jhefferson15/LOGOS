@@ -3,6 +3,7 @@ import { toast } from '../../Toast.js';
 
 /**
  * Módulo para o popup de seleção de modo de jogo.
+ * @memberof Popups
  */
 export const GameModeSelectionPopup = {
     title: 'Modo de Jogo',

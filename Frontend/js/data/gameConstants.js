@@ -1,16 +1,8 @@
-/**
- * Stores all static game data and constants.
- * @module GameConstants
- */
-
-export const ELIXIR_TICK_RATE = 280;
-export const OPPONENT_PLAY_DELAY = 1500;
-export const MAX_ELIXIR = 10;
-export const ELIXIR_PER_TICK = 0.1;
 
 /**
  * Enum for Card Colors.
  * @readonly
+ * @memberof Data
  * @enum {string}
  */
 export const CardColors = { RED: 'red', GREEN: 'green', BLUE: 'blue', YELLOW: 'yellow', WILD: 'wild' };
@@ -18,6 +10,7 @@ export const CardColors = { RED: 'red', GREEN: 'green', BLUE: 'blue', YELLOW: 'y
 /**
  * SVG Icons for special cards.
  * @readonly
+ * @memberof Data
  * @enum {string}
  */
 export const CardIcons = {
@@ -31,6 +24,7 @@ export const CardIcons = {
 /**
  * Base deck configuration.
  * Contains the definitions for special cards.
+ * @memberof Data
  * @type {Array<{value: string, color: string, cost: number, icon: string, description: string}>}
  */
 export const CARD_DECK_BASE = [
@@ -49,6 +43,7 @@ export const CARD_DECK_BASE = [
 /**
  * Player profile data.
  * Includes names and avatar SVGs.
+ * @memberof Data
  * @type {Object.<string, {name: string, avatarSVG: string}>}
  */
 export const PLAYER_DATA = {

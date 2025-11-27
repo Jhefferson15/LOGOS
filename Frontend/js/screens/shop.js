@@ -120,7 +120,7 @@ function handlePurchase(itemId) {
         toast.show('Moeda insuficiente!', 'error');
         return;
     }
-    
+
     // Simple confirmation for now. Could be a dedicated popup.
     popupManager.open('shared:confirmation', {
         title: 'Confirmar Compra',
@@ -144,7 +144,7 @@ function handlePurchase(itemId) {
                     // Here you would add the chest to the player's chest slots if there is space.
                     break;
             }
-            
+
             // Update the main UI
             document.dispatchEvent(new CustomEvent('update-ui'));
             popupManager.close();
@@ -154,12 +154,20 @@ function handlePurchase(itemId) {
 }
 
 
+/**
+ * Initializes the Shop Screen.
+ * Renders daily deals, chests, and currency packs.
+ * @module Screens/Shop
+ * @param {object} gameState - The global game state.
+ * @param {function} updateDynamicUI - Function to refresh the UI.
+ * @param {object} toast - Toast notification utility.
+ */
 export function initShopScreen(gameState, updateDynamicUI, toast) {
     renderDailyDeals();
     renderChests();
     renderCurrencyPacks();
 
-     // Add event listener for purchase buttons
+    // Add event listener for purchase buttons
     const shopScreen = document.querySelector('.shop-screen');
     shopScreen.addEventListener('click', (e) => {
         const purchaseButton = e.target.closest('.btn-purchase');

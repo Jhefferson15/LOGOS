@@ -2,9 +2,11 @@
 /**
  * Study Content for Tales de Mileto (ID: 21)
  * Contains detailed articles, quizzes, and comics for this philosopher.
+ * @namespace Data
  */
 
 /**
+ * @memberof Data
  * @type {{
  *   realImage: string,
  *   totalPages: number,

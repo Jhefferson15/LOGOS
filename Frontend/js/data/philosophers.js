@@ -7,6 +7,7 @@
  * mecânicas de jogo complexas como linhas de pensamento e evolução conceitual.
  * 
  * **MODIFICADO:** Adicionada a propriedade `pos` a cada filósofo para layout visual.
+ * @namespace Data
  */
 
 /**
@@ -55,6 +56,7 @@ export const SCHOOLS = {
 /**
  * Main database of Philosopher cards.
  * Indexed by unique ID.
+ * @memberof Data
  * @type {Object.<number, {
  *   date: number,
  *   name: string,

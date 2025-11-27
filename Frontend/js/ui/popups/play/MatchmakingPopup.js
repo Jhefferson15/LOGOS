@@ -1,5 +1,8 @@
 import { SoundManager } from '../../../game/modules/audio.js';
 
+/**
+ * @memberof Popups
+ */
 export const MatchmakingPopup = {
     title: null, // No title for a full-screen experience
 

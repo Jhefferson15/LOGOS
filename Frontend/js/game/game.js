@@ -28,16 +28,29 @@ if (window.GameUI && typeof window.GameUI.cleanupEventListeners === 'function') 
     }
 
     // --- OBJETO PRINCIPAL (GameUI) ---
+    /**
+     * Main game controller object.
+     * Integrates all game modules and manages the game lifecycle.
+     * @namespace GameUI
+     */
     const GameUI = {
         state: {},
         elements: {},
 
         // Método de inicialização central
+        /**
+         * Initializes the game.
+         * Caches DOM elements and starts the game loop.
+         */
         init() {
             this.cacheDOMElements();
             this.restartGame();
         },
 
+        /**
+         * Restarts the game session.
+         * Resets state, re-renders UI, and starts animations.
+         */
         restartGame() {
             this.initializeState(); // Do StateModule
             this.renderPlayerAreas(); // Do RendererModule
@@ -50,6 +63,11 @@ if (window.GameUI && typeof window.GameUI.cleanupEventListeners === 'function') 
             this.animatePlayerEntry(); // Do AnimationsModule
         },
 
+        /**
+         * Ends the game and declares a winner.
+         * Calculates rewards, saves results, and redirects to the main menu.
+         * @param {string} winnerId - The ID of the winning player.
+         */
         endGame(winnerId) {
             console.log('!!! DEBUG: endGame EXECUTED !!! Winner:', winnerId);
             this.state.isGameOver = true;

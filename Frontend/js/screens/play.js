@@ -4,6 +4,7 @@ import { popupManager } from '../../js/ui/PopupManager.js';
 /**
  * Initializes the Play Screen (Main Debate Arena).
  * Sets up the arena background and name based on the current level.
+ * @module Screens/Play
  * @param {object} gameState - The global game state.
  * @param {function} updateDynamicUI - Function to refresh the UI.
  * @param {object} toast - Toast notification utility.
@@ -140,18 +141,18 @@ export function handlePlayScreenClick(e, gameState, updateDynamicUI, toast) {
         if (c.status === 'ready') {
             const chest = gameState.chestSlots[i];
             // Simulate rewards. In a real scenario, this would come from a service.
-            const rewards = { scrolls: 50, books: 1, cardCount: 5 }; 
-            
+            const rewards = { scrolls: 50, books: 1, cardCount: 5 };
+
             // Add rewards to gameState
             gameState.scrolls += rewards.scrolls;
             gameState.books += rewards.books;
-            
+
             // Open the new chest opening animation popup
             popupManager.open('arena:chest-opening', { chestType: chest.type, rewards: rewards });
 
             // Remove the chest from the slot
             gameState.chestSlots[i] = null;
-            
+
             // Update the UI to reflect changes
             updateDynamicUI();
             return;

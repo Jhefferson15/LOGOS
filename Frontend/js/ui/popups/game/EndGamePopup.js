@@ -1,6 +1,9 @@
 import { gameState } from '../../../data/gameState.js';
 import { SoundManager } from '../../../game/modules/audio.js';
 
+/**
+ * @memberof Popups
+ */
 export const EndGamePopup = {
     title: null, // Full-screen experience
 
