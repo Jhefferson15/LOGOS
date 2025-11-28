@@ -8,5 +8,6 @@ router.use(verifyToken);
 router.post('/guilds/create', socialController.createGuild);
 router.post('/guilds/join', socialController.joinGuild);
 router.get('/friends', socialController.listFriends);
+router.post('/donate', socialController.donate);
 
 module.exports = router;

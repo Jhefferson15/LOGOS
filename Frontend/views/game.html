@@ -3,108 +3,108 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filosofia - Jogo de Cartas</title>
-    <!-- Link para o arquivo de estilos CSS -->
-    <link rel="stylesheet" href="./../css/screens/game.css">
-</head>
+    <!DOCTYPE html>
+    <html lang="pt-br">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Filosofia - Jogo de Cartas</title>
+        <!-- Link para o arquivo de estilos CSS -->
+        <link rel="stylesheet" href="./../css/screens/game.css">
+    </head>
 
 <body>
-
-    <!-- TELA PRINCIPAL DO JOGO -->
     <div id="game-screen">
+        <!-- ÁREA DO TABULEIRO (Oponentes e Centro) -->
         <div id="game-board-container">
+            <!-- Áreas dos Oponentes (Injetadas via JS) -->
 
             <!-- ÁREA CENTRAL DO TABULEIRO -->
             <div id="table-center">
-                <!-- Deck de Compra -->
-                <div id="draw-deck" class="card-pile">
-                    <div class="cr-card back"></div>
-                    <!-- Contador de Cartas -->
-                    <span id="draw-deck-counter" class="deck-counter"></span>
-                </div>
-
-                <!-- Pilha de Descarte -->
                 <div id="discard-pile" class="card-pile">
-                    <!-- Contador de Cartas -->
-                    <span id="discard-pile-counter" class="deck-counter"></span>
+                    <div id="discard-pile-counter" class="card-counter"></div>
                 </div>
-            </div>
-
-            <!-- ÁREAS DOS JOGADORES OPONENTES -->
-            <!-- Esta seção agora está vazia. O JavaScript irá gerar e posicionar os oponentes dinamicamente aqui dentro de #game-board-container. -->
-
-            <!-- ÁREA DO JOGADOR PRINCIPAL (única área de jogador fixa no HTML) -->
-            <div id="player-main" class="player-area">
-                <!-- Indicador de Status -->
-                <div class="status-effects-container"></div>
-                <div class="avatar"></div>
-                <div class="player-name">Você</div>
-            </div>
-
-            <!-- HUD (Heads-Up Display) INFERIOR -->
-            <div id="bottom-hud">
-                <!-- Próximo Poder (NOVO) -->
-                <div id="next-power-preview">
-                    <span>Próximo Poder:</span>
-                    <div id="next-power-card" class="cr-card"></div>
+                <div id="draw-deck" class="card-pile">
+                    <div id="draw-deck-counter" class="card-counter"></div>
                 </div>
-
-                <!-- ÁREA DE PODERES -->
-                <div id="powers-container">
-                    <!-- Os slots de poder em formato de carta serão gerados dinamicamente pelo JavaScript -->
-                </div>
-
-                <!-- Próxima Carta -->
-                <div id="next-card-preview">
-                    <span>Próxima:</span>
-                    <div id="next-card" class="cr-card"></div>
-                </div>
-
-                <!-- Mão do Jogador (Contêiner para o arco de cartas) -->
-                <div id="cr-hand"></div>
-
-                <!-- Slot para a carta selecionada -->
-                <div id="selected-card-slot"></div>
-
-                <!-- Barra de Elixir -->
-                <div id="elixir-bar-container">
-                    <div id="elixir-bar-fill"></div>
-                    <span id="elixir-text"></span>
-                </div>
-            </div>
-            <div id="hud-toggle">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 15l-6-6-6 6" />
-                </svg>
+                <!-- Conteúdo injetado dinamicamente pelo RendererModule.renderLayout() -->
             </div>
         </div>
 
-        <!-- LOG DE EVENTOS DO JOGO (COM BOTÃO DE TOGGLE) -->
-        <div id="game-log">
-            <div id="log-toggle">
-                <svg viewBox="0 0 24 24">
-                    <path d="M3 12h18M3 6h18M3 18h18" />
-                </svg>
-            </div>
-            <ul id="log-list"></ul>
+        <!-- ÁREA DO JOGADOR (HUD) -->
+        <div id="player-main" class="player-area">
+            <!-- Indicador de Status -->
+            <div class="status-effects-container"></div>
+            <div class="avatar"></div>
+            <div class="player-name">Você</div>
         </div>
 
-        <!-- BOTÃO DE PAUSA -->
-        <div id="pause-button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
-                stroke-linejoin="round">
-                <line x1="6" y1="4" x2="6" y2="20"></line>
-                <line x1="18" y1="4" x2="18" y2="20"></line>
+        <!-- HUD (Heads-Up Display) INFERIOR -->
+        <div id="bottom-hud">
+            <!-- Próximo Poder (NOVO) -->
+            <div id="next-power-preview">
+                <span>Próximo Poder:</span>
+                <div id="next-power-card" class="cr-card"></div>
+            </div>
+
+            <!-- ÁREA DE PODERES -->
+            <div id="powers-container">
+                <!-- Os slots de poder em formato de carta serão gerados dinamicamente pelo JavaScript -->
+            </div>
+
+            <!-- Próxima Carta -->
+            <div id="next-card-preview">
+                <span>Próxima:</span>
+                <div id="next-card" class="cr-card"></div>
+            </div>
+
+            <!-- Mão do Jogador (Contêiner para o arco de cartas) -->
+            <div id="cr-hand-container">
+                <!-- Cartas injetadas via JS -->
+            </div>
+
+            <!-- Slot para a carta selecionada -->
+            <div id="selected-card-slot"></div>
+
+            <!-- Barra de Elixir -->
+            <div id="elixir-bar-container">
+                <div id="elixir-bar-fill"></div>
+                <span id="elixir-text"></span>
+            </div>
+        </div>
+
+        <div id="hud-toggle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 15l-6-6-6 6" />
             </svg>
         </div>
+    </div>
 
-        <!-- TOOLTIP PARA DETALHES DA CARTA/PODER -->
-        <div id="card-tooltip">
-            <h3 id="tooltip-title"></h3>
-            <p id="tooltip-description"></p>
+    <!-- LOG DE EVENTOS DO JOGO (COM BOTÃO DE TOGGLE) -->
+    <div id="game-log">
+        <div id="log-toggle">
+            <svg viewBox="0 0 24 24">
+                <path d="M3 12h18M3 6h18M3 18h18" />
+            </svg>
         </div>
+        <ul id="log-list"></ul>
+    </div>
+
+    <!-- BOTÃO DE PAUSA -->
+    <div id="pause-button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+            stroke-linejoin="round">
+            <line x1="6" y1="4" x2="6" y2="20"></line>
+            <line x1="18" y1="4" x2="18" y2="20"></line>
+        </svg>
+    </div>
+
+    <!-- TOOLTIP PARA DETALHES DA CARTA/PODER -->
+    <div id="card-tooltip">
+        <h3 id="tooltip-title"></h3>
+        <p id="tooltip-description"></p>
     </div>
 
     <!-- OVERLAYS (Fora da #game-screen para cobrir a tela inteira) -->

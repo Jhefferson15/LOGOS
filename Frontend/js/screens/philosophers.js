@@ -1,6 +1,7 @@
 import { PHILOSOPHERS_DATA } from '../data/philosophers.js';
 import { CONCEPTS_DATA } from '../data/concepts.js';
 import { popupManager } from '../ui/PopupManager.js';
+import { ImageService } from '../services/ImageService.js';
 
 /**
  * Initializes the Philosophers Collection Screen.
@@ -30,7 +31,7 @@ export function initPhilosophersScreen(gameState, updateDynamicUI, toast) {
 
         if (isDiscovered) {
             cardElement.innerHTML = `
-                <img src="${philosopher.image}" alt="${philosopher.name}" class="card-image">
+                <img src="${ImageService.getUrl(philosopher.image, ImageService.Sizes.THUMB)}" alt="${philosopher.name}" class="card-image">
                 <span class="card-name">${philosopher.name}</span>
                 <span class="card-level">Nível ${philosopherState.level}</span>
             `;

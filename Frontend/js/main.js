@@ -319,6 +319,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveCounter = 0;
             }
         }, 1000);
+        // --- RESIZE LISTENER ---
+        window.addEventListener('resize', () => {
+            if (isDesktopView() && currentContextScreenName === 'play') {
+                // If we switch to desktop and the context panel was showing 'play',
+                // switch it to a default screen (e.g., philosophers) to avoid duplication.
+                loadScreen('philosophers');
+            }
+        });
+
     };
 
     // --- START THE APPLICATION ---

@@ -1,5 +1,6 @@
 import { gameState } from '../../../data/gameState.js';
 import { toast } from '../../Toast.js';
+import { MechanicManager } from '../../../game/mechanics/MechanicManager.js';
 
 /**
  * Módulo para o popup de seleção de modo de jogo.
@@ -14,26 +15,36 @@ export const GameModeSelectionPopup = {
      * @returns {string} HTML do conteúdo do popup.
      */
     getHTML: (data) => {
-        const modes = gameState.gameModes || {
-            classic: { name: 'Debate Clássico', desc: 'Duelo padrão 1v1', icon: 'fa-book' },
-            ranked: { name: 'Ranqueado', desc: 'Valendo troféus', icon: 'fa-trophy', req: 0 },
-            event: { name: 'Evento Filosófico', desc: 'Regras especiais', icon: 'fa-star', req: 500 }
-        };
-        const currentMode = gameState.gameMode || 'classic';
-        const playerTrophies = gameState.trophies;
+        const mechanics = MechanicManager.getAvailableMechanics();
+        const activeMechanic = MechanicManager.getActiveMechanic();
+        const currentModeId = activeMechanic ? activeMechanic.id : 'temporal';
 
-        const modesHTML = Object.entries(modes).map(([key, mode]) => {
-            const isLocked = mode.req && playerTrophies < mode.req;
-            const isSelected = key === currentMode;
+        // Map mechanics to UI structure
+        // We can add icons or specific requirements here if needed, or extend GameMechanic to include them.
+        // For now, we'll use a default icon map or random.
+        const iconMap = {
+            'temporal': 'fa-hourglass-half',
+            'uno': 'fa-layer-group',
+            'conceptual': 'fa-brain',
+            'combat': 'fa-fist-raised',
+            'truco': 'fa-hand-paper',
+            'pifpaf': 'fa-clone'
+        };
+
+        const modesHTML = mechanics.map(mechanic => {
+            const isSelected = mechanic.id === currentModeId;
             const activeClass = isSelected ? 'active' : '';
+            const icon = iconMap[mechanic.id] || 'fa-gamepad';
+            // Future: Add locking logic based on player level/trophies if desired
+            const isLocked = false;
             const lockedClass = isLocked ? 'locked' : '';
 
             return `
-                <div class="game-mode-card ${activeClass} ${lockedClass}" data-mode="${key}">
-                    <div class="mode-icon"><i class="fas ${mode.icon}"></i></div>
+                <div class="game-mode-card ${activeClass} ${lockedClass}" data-mode="${mechanic.id}">
+                    <div class="mode-icon"><i class="fas ${icon}"></i></div>
                     <div class="mode-info">
-                        <h3>${mode.name}</h3>
-                        <p>${mode.desc}</p>
+                        <h3>${mechanic.name}</h3>
+                        <p>${mechanic.description}</p>
                     </div>
                     ${isSelected ? '<div class="selected-badge"><i class="fas fa-check"></i></div>' : ''}
                     ${isLocked ? '<div class="lock-overlay"><i class="fas fa-lock"></i></div>' : ''}
@@ -74,17 +85,27 @@ export const GameModeSelectionPopup = {
                     return;
                 }
                 const modeKey = card.dataset.mode;
+
+                // Set active mechanic
+                MechanicManager.setActiveMechanic(modeKey);
+
+                // Update gameState for persistence if needed
                 gameState.gameMode = modeKey;
+                localStorage.setItem('selectedGameMode', modeKey);
 
                 const event = new CustomEvent('gamemode-changed', { detail: { mode: modeKey } });
                 document.dispatchEvent(event);
 
                 const modeName = card.querySelector('h3').innerText;
                 toast.show(`Modo ${modeName} selecionado!`, 'success');
-                // Assume that the `onSuccess` callback from PopupManager.open will be passed here.
-                // This callback will be responsible for opening the next popup in the chain.
+
+                // Restart game to apply new mechanic
+                if (window.GameUI && typeof window.GameUI.restartGame === 'function') {
+                    window.GameUI.restartGame();
+                }
+
                 popupManager.close(() => {
-                    if (data.onGameModeSelected) {
+                    if (data && data.onGameModeSelected) {
                         data.onGameModeSelected();
                     }
                 });

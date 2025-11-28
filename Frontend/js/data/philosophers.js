@@ -50,6 +50,22 @@ export const SCHOOLS = {
 };
 
 /**
+ * School Advantage Relationships (Rock-Paper-Scissors style).
+ * Key wins against Value.
+ * @readonly
+ */
+export const SCHOOL_RELATIONSHIPS = {
+    [SCHOOLS.RACIONALISMO]: [SCHOOLS.EMPIRISMO, SCHOOLS.SOFISMO],
+    [SCHOOLS.EMPIRISMO]: [SCHOOLS.IDEALISMO_ALEMAO, SCHOOLS.RACIONALISMO], // Modified for balance
+    [SCHOOLS.IDEALISMO_ALEMAO]: [SCHOOLS.MATERIALISMO, SCHOOLS.EXISTENCIALISMO],
+    [SCHOOLS.MATERIALISMO]: [SCHOOLS.IDEALISMO_ALEMAO, SCHOOLS.CAPITALISMO], // Assuming Capitalismo exists or generic
+    [SCHOOLS.EXISTENCIALISMO]: [SCHOOLS.ESSENCIALISMO, SCHOOLS.POSITIVISMO],
+    [SCHOOLS.GREGA]: [SCHOOLS.SOFISMO],
+    [SCHOOLS.SOFISMO]: [SCHOOLS.DOGMATISMO],
+    // Add more as needed for balance
+};
+
+/**
  * PHILOSOPHERS_DATA
  * Banco de dados principal das cartas de filósofos.
  */
@@ -72,7 +88,7 @@ export const SCHOOLS = {
 export const PHILOSOPHERS_DATA = {
     // --- ANTIGUIDADE ---
     // Pré-Socráticos
-    21: { date: -624, name: 'Tales de Mileto', school: SCHOOLS.PRE_SOCRATICO_MILETO, era: 'Antiga', predecessors: [], keyConcepts: [108, 109], description: 'Considerado o primeiro filósofo, buscou a origem de tudo na água.', image: 'assets/game/images/philosophers/tales.png', pos: { x: '15%', y: '50%' } },
+    21: { date: -624, name: 'Tales de Mileto', school: SCHOOLS.PRE_SOCRATICO_MILETO, era: 'Antiga', predecessors: [], keyConcepts: [108, 109], description: 'Considerado o primeiro filósofo, buscou a origem de tudo na água.', image: 'assets/game/images/philosophers/tales.png', pos: { x: '15%', y: '50%' }, reputation: 85 },
     22: { date: -610, name: 'Anaximandro', school: SCHOOLS.PRE_SOCRATICO_MILETO, era: 'Antiga', predecessors: [21], keyConcepts: [108, 110], description: 'Propôs o "Ápeiron" (o ilimitado) como o princípio fundamental do universo.', image: 'assets/game/images/philosophers/anaximandro.png', pos: { x: '50%', y: '50%' } },
     23: { date: -585, name: 'Anaxímenes', school: SCHOOLS.PRE_SOCRATICO_MILETO, era: 'Antiga', predecessors: [22], keyConcepts: [108, 111], description: 'Defendia que o ar, através da rarefação e condensação, formava todas as coisas.', image: 'assets/game/images/philosophers/anaximenes.png', pos: { x: '85%', y: '50%' } },
     35: { date: -570, name: 'Xenófanes', school: SCHOOLS.PRE_SOCRATICO_ELEIA, era: 'Antiga', predecessors: [], keyConcepts: [126], description: 'Criticou a representação antropomórfica dos deuses.', image: 'assets/game/images/philosophers/xenofanes.png', pos: { x: '20%', y: '50%' } },
@@ -89,9 +105,9 @@ export const PHILOSOPHERS_DATA = {
     38: { date: -450, name: 'Trasímaco', school: SCHOOLS.SOFISMO, era: 'Antiga', predecessors: [30, 37], keyConcepts: [128], description: 'Defendia que a justiça é "o interesse do mais forte".', image: 'assets/game/images/philosophers/trasimaco.png', pos: { x: '80%', y: '50%' } },
 
     // Período Clássico e Helenístico
-    1: { date: -470, name: 'Sócrates', school: SCHOOLS.GREGA, era: 'Antiga', predecessors: [30], keyConcepts: [101, 102], description: 'O mestre do questionamento. "Só sei que nada sei".', image: 'assets/game/images/philosophers/socrates.png', pos: { x: '15%', y: '50%' } },
-    2: { date: -427, name: 'Platão', school: SCHOOLS.GREGA, era: 'Antiga', predecessors: [1, 24, 26], keyConcepts: [103, 104], description: 'Discípulo de Sócrates, idealizou um mundo de formas perfeitas.', image: 'assets/game/images/philosophers/platao.png', pos: { x: '50%', y: '50%' } },
-    3: { date: -384, name: 'Aristóteles', school: SCHOOLS.GREGA, era: 'Antiga', predecessors: [2], keyConcepts: [105, 106], description: 'Fundador da lógica formal e defensor do conhecimento empírico.', image: 'assets/game/images/philosophers/aristoteles.png', pos: { x: '85%', y: '50%' } },
+    1: { date: -470, name: 'Sócrates', school: SCHOOLS.GREGA, era: 'Antiga', predecessors: [30], keyConcepts: [101, 102], description: 'O mestre do questionamento. "Só sei que nada sei".', image: 'assets/game/images/philosophers/socrates.png', pos: { x: '15%', y: '50%' }, reputation: 95 },
+    2: { date: -427, name: 'Platão', school: SCHOOLS.GREGA, era: 'Antiga', predecessors: [1, 24, 26], keyConcepts: [103, 104], description: 'Discípulo de Sócrates, idealizou um mundo de formas perfeitas.', image: 'assets/game/images/philosophers/platao.png', pos: { x: '50%', y: '50%' }, reputation: 98 },
+    3: { date: -384, name: 'Aristóteles', school: SCHOOLS.GREGA, era: 'Antiga', predecessors: [2], keyConcepts: [105, 106], description: 'Fundador da lógica formal e defensor do conhecimento empírico.', image: 'assets/game/images/philosophers/aristoteles.png', pos: { x: '85%', y: '50%' }, reputation: 97 },
     41: { date: -430, name: 'Xenofonte', school: SCHOOLS.GREGA, era: 'Antiga', predecessors: [1], keyConcepts: [130], description: 'Historiador e discípulo de Sócrates.', image: 'assets/game/images/philosophers/xenofonte.png', pos: { x: '30%', y: '80%' } },
     40: { date: -445, name: 'Antístenes', school: SCHOOLS.CINISMO, era: 'Antiga', predecessors: [1], keyConcepts: [123], description: 'Fundador da filosofia cínica.', image: 'assets/game/images/philosophers/antistenes.png', pos: { x: '30%', y: '50%' } },
     32: { date: -412, name: 'Diógenes de Sinope', school: SCHOOLS.CINISMO, era: 'Antiga', predecessors: [40], keyConcepts: [123], description: 'O Cínico que vivia num barril.', image: 'assets/game/images/philosophers/diogenes.png', pos: { x: '70%', y: '50%' } },
@@ -108,16 +124,16 @@ export const PHILOSOPHERS_DATA = {
     6: { date: 1225, name: 'Tomás de Aquino', school: SCHOOLS.ESCOLASTICA, era: 'Medieval', predecessors: [3, 5], keyConcepts: [202], description: 'Sintetizou o pensamento aristotélico com a doutrina cristã.', image: 'assets/game/images/philosophers/aquinas.png', pos: { x: '75%', y: '50%' } },
 
     // --- MODERNIDADE ---
-    7: { date: 1596, name: 'Descartes', school: SCHOOLS.RACIONALISMO, era: 'Moderna', predecessors: [], keyConcepts: [301, 302], description: '"Penso, logo existo." O pai da filosofia moderna.', image: 'assets/game/images/philosophers/descartes.png', pos: { x: '20%', y: '50%' } },
+    7: { date: 1596, name: 'Descartes', school: SCHOOLS.RACIONALISMO, era: 'Moderna', predecessors: [], keyConcepts: [301, 302], description: '"Penso, logo existo." O pai da filosofia moderna.', image: 'assets/game/images/philosophers/descartes.png', pos: { x: '20%', y: '50%' }, reputation: 92 },
     8: { date: 1632, name: 'Spinoza', school: SCHOOLS.RACIONALISMO, era: 'Moderna', predecessors: [7], keyConcepts: [303], description: 'Via Deus e a Natureza como uma única substância.', image: 'assets/game/images/philosophers/spinoza.png', pos: { x: '50%', y: '50%' } },
     9: { date: 1632, name: 'John Locke', school: SCHOOLS.EMPIRISMO, era: 'Moderna', predecessors: [], keyConcepts: [304, 305], description: 'Defensor da mente como uma "tábula rasa".', image: 'assets/game/images/philosophers/locke.png', pos: { x: '20%', y: '50%' } },
     10: { date: 1711, name: 'David Hume', school: SCHOOLS.EMPIRISMO, era: 'Moderna', predecessors: [9], keyConcepts: [306], description: 'Levou o empirismo ao seu ceticismo radical.', image: 'assets/game/images/philosophers/hume.png', pos: { x: '50%', y: '50%' } },
-    11: { date: 1724, name: 'Kant', school: SCHOOLS.ILUMINISMO, era: 'Moderna', predecessors: [7, 10], keyConcepts: [307, 308], description: 'Realizou a "revolução copernicana" na filosofia.', image: 'assets/game/images/philosophers/kant.png', pos: { x: '50%', y: '50%' } },
+    11: { date: 1724, name: 'Kant', school: SCHOOLS.ILUMINISMO, era: 'Moderna', predecessors: [7, 10], keyConcepts: [307, 308], description: 'Realizou a "revolução copernicana" na filosofia.', image: 'assets/game/images/philosophers/kant.png', pos: { x: '50%', y: '50%' }, reputation: 96 },
     12: { date: 1770, name: 'Hegel', school: SCHOOLS.IDEALISMO_ALEMAO, era: 'Moderna', predecessors: [11], keyConcepts: [309], description: 'Desenvolveu um sistema dialético para explicar a história.', image: 'assets/game/images/philosophers/hegel.png', pos: { x: '50%', y: '50%' } },
 
     // --- CONTEMPORÂNEA ---
     13: { date: 1818, name: 'Karl Marx', school: SCHOOLS.MATERIALISMO, era: 'Contemporânea', predecessors: [12], keyConcepts: [401, 402], description: 'Crítico do capitalismo que via a história como uma luta de classes.', image: 'assets/game/images/philosophers/marx.png', pos: { x: '50%', y: '50%' } },
-    14: { date: 1844, name: 'Nietzsche', school: SCHOOLS.EXISTENCIALISMO, era: 'Contemporânea', predecessors: [2, 11], keyConcepts: [403, 404], description: 'Proclamou a "morte de Deus" e exaltou o Super-Homem.', image: 'assets/game/images/philosophers/nietzsche.png', pos: { x: '20%', y: '50%' } },
+    14: { date: 1844, name: 'Nietzsche', school: SCHOOLS.EXISTENCIALISMO, era: 'Contemporânea', predecessors: [2, 11], keyConcepts: [403, 404], description: 'Proclamou a "morte de Deus" e exaltou o Super-Homem.', image: 'assets/game/images/philosophers/nietzsche.png', pos: { x: '20%', y: '50%' }, reputation: 99 },
     15: { date: 1905, name: 'Sartre', school: SCHOOLS.EXISTENCIALISMO, era: 'Contemporânea', predecessors: [14], keyConcepts: [405, 406], description: '"A existência precede a essência".', image: 'assets/game/images/philosophers/sartre.png', pos: { x: '50%', y: '35%' } },
     16: { date: 1908, name: 'Simone de Beauvoir', school: SCHOOLS.EXISTENCIALISMO, era: 'Contemporânea', predecessors: [15], keyConcepts: [407], description: '"Não se nasce mulher, torna-se.".', image: 'assets/game/images/philosophers/beauvoir.png', pos: { x: '50%', y: '65%' } },
     19: { date: 1903, name: 'Adorno', school: SCHOOLS.ESCOLA_DE_FRANKFURT, era: 'Contemporânea', predecessors: [13, 12], keyConcepts: [411], description: 'Crítico da "indústria cultural" e da razão instrumental.', image: 'assets/game/images/philosophers/adorno.png', pos: { x: '50%', y: '50%' } },

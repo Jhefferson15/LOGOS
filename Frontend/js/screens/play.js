@@ -1,5 +1,6 @@
 import { arenas } from '../../js/data/arenas.js';
 import { popupManager } from '../../js/ui/PopupManager.js';
+import { MechanicManager } from '../game/mechanics/MechanicManager.js';
 
 /**
  * Initializes the Play Screen (Main Debate Arena).
@@ -54,9 +55,24 @@ export function initPlayScreen(gameState, updateDynamicUI, toast) {
     }
 
     const updateGameModeUI = () => {
-        if (gameModeBtn && gameState.gameModes) {
-            const mode = gameState.gameModes[gameState.gameMode || 'classic'];
-            gameModeBtn.innerHTML = `<i class="fas ${mode.icon}"></i> <span>${mode.name}</span> <i class="fas fa-chevron-down" style="font-size: 0.8em; margin-left: 5px; opacity: 0.7;"></i>`;
+        if (gameModeBtn) {
+            try {
+                const mechanic = MechanicManager.getActiveMechanic();
+                const iconMap = {
+                    'temporal': 'fa-hourglass-half',
+                    'uno': 'fa-layer-group',
+                    'conceptual': 'fa-brain',
+                    'combat': 'fa-fist-raised',
+                    'truco': 'fa-hand-paper',
+                    'pifpaf': 'fa-clone'
+                };
+                const icon = iconMap[mechanic.id] || 'fa-gamepad';
+
+                gameModeBtn.innerHTML = `<i class="fas ${icon}"></i> <span>${mechanic.name}</span> <i class="fas fa-chevron-down" style="font-size: 0.8em; margin-left: 5px; opacity: 0.7;"></i>`;
+            } catch (e) {
+                console.warn("Could not update game mode UI:", e);
+                gameModeBtn.innerHTML = `<i class="fas fa-gamepad"></i> <span>Modo de Jogo</span>`;
+            }
         }
     };
     updateGameModeUI();

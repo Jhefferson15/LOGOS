@@ -1,127 +1,311 @@
-/* Frontend/css/components/chest-opening.css */
+/* --- Overlay e Container Principal --- */
+.chest-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(130, 130, 43, 0.7);
+    /* Fundo escuro levemente quente */
+    backdrop-filter: blur(8px);
+    /* Desfoque moderno */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
 
-.chest-opening-popup {
+.chest-opening-content {
+    position: relative;
+    width: 100%;
+    max-width: 850px;
+    min-height: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
-    width: 100%;
-    background: radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.95) 100%);
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.chest-container {
     text-align: center;
 }
 
-.chest-image-wrapper {
-    position: relative;
-    margin-bottom: 2rem;
-    animation: float 3s ease-in-out infinite;
+/* --- Efeito de Raios de Luz (Sunburst) --- */
+.sunburst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: repeating-conic-gradient(from 0deg,
+            rgba(255, 255, 255, 0.1) 0deg 10deg,
+            transparent 10deg 20deg);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    z-index: -1;
+    transition: all 0.5s ease;
+    opacity: 0;
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
+.sunburst.active {
+    width: 800px;
+    height: 800px;
+    opacity: 1;
+    animation: rotateSunburst 20s linear infinite;
+}
+
+@keyframes rotateSunburst {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* --- Baú e Botões --- */
+.chest-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    animation: floatChest 3s ease-in-out infinite;
 }
 
 .chest-image {
-    max-width: 250px;
-    transition: transform 0.5s ease-in-out;
+    width: 180px;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));
+    transition: transform 0.2s;
 }
 
-.chest-container.opening .chest-image {
-    animation: shake 0.8s, glow-and-fade 1s forwards;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-    20%, 40%, 60%, 80% { transform: translateX(10px); }
-}
-
-@keyframes glow-and-fade {
-    0% { filter: drop-shadow(0 0 10px #fff) brightness(1); }
-    50% { filter: drop-shadow(0 0 30px #fff) brightness(3); }
-    100% { filter: drop-shadow(0 0 50px #fff) brightness(5); transform: scale(1.5); opacity: 0; }
-}
-
-
-#open-chest-btn {
+.chest-title {
+    color: #fff;
     font-size: 1.5rem;
-    padding: 1rem 3rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    margin: 0;
 }
 
-.rewards-container {
-    display: none;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 20px;
-    width: 100%;
-    max-width: 800px;
-    position: relative;
-}
-
-.reward-card {
-    background-color: var(--bg-paper);
+.btn-primary {
+    background: #e0d6c2;
+    /* Bege/Dourado suave da UI */
+    border: none;
+    border-bottom: 4px solid #bba684;
     border-radius: 12px;
-    padding: 10px;
-    text-align: center;
-    border: 2px solid var(--border-light);
-    box-shadow: var(--box-shadow-light);
-    opacity: 0;
-    transform: translateY(30px) scale(0.9);
-    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    padding: 12px 32px;
+    color: #4a4a4a;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-.reward-card.revealed {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
-
-.reward-image {
-    width: 100%;
-    height: 120px;
-    background-size: cover;
-    background-position: center;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
-
-.reward-image.gold-reward {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 4rem;
-    color: var(--accent-yellow);
-    background: #fff8e1;
-}
-
-.reward-name {
-    font-weight: bold;
-    font-size: 1.1em;
-    color: var(--text-primary);
-}
-
-.reward-amount {
-    font-size: 1em;
-    color: var(--text-secondary);
-}
-
-.duplicate-indicator {
-    background-color: var(--color-accent);
-    color: white;
-    font-size: 0.7em;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-top: 5px;
-    display: inline-block;
+.btn-primary:active {
+    transform: translateY(2px);
+    border-bottom-width: 0px;
 }
 
 .btn-done {
-    grid-column: 1 / -1; /* Make button span all columns */
     margin-top: 20px;
-    padding: 1rem;
-    font-size: 1.2rem;
+    background: #fff;
+    color: #333;
+}
+
+/* --- Animações do Baú --- */
+.shaking {
+    animation: shakeChest 0.5s cubic-bezier(.36, .07, .19, .97) both infinite;
+}
+
+.opening-burst {
+    animation: burstChest 0.4s forwards;
+}
+
+@keyframes floatChest {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes shakeChest {
+
+    10%,
+    90% {
+        transform: translate3d(-2px, 0, 0) rotate(-2deg);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(3px, 0, 0) rotate(2deg);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-5px, 0, 0) rotate(-5deg);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(5px, 0, 0) rotate(5deg);
+    }
+}
+
+@keyframes burstChest {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.4);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+/* --- Cards de Recompensa --- */
+.rewards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.reward-card {
+    width: 130px;
+    height: 180px;
+    perspective: 1000px;
+}
+
+.card-inner {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+/* Cores de borda por raridade (Opcional) */
+.card-inner.common-reward {
+    border-bottom: 4px solid #a0a0a0;
+}
+
+.card-inner.rare-reward {
+    border-bottom: 4px solid #3498db;
+}
+
+.card-inner.epic-reward {
+    border-bottom: 4px solid #9b59b6;
+}
+
+.card-inner.legendary-reward {
+    border-bottom: 4px solid #f1c40f;
+}
+
+.card-portrait {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 10px;
+    border: 3px solid #f4f1ea;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.reward-icon {
+    font-size: 3rem;
+    color: #d4af37;
+    margin: 20px 0;
+}
+
+.reward-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.reward-type {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #999;
+    letter-spacing: 1px;
+}
+
+.reward-name {
+    font-weight: 700;
+    color: #333;
+    font-size: 0.9rem;
+    margin: 4px 0;
+}
+
+.tag-new,
+.tag-duplicate {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.tag-new {
+    background: #e7f7e9;
+    color: #27ae60;
+}
+
+.tag-duplicate {
+    background: #fef5e6;
+    color: #f39c12;
+}
+
+/* Animação de entrada do card */
+.animate-card-flip {
+    animation: flipIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    opacity: 0;
+    transform: scale(0.5) translateY(50px);
+}
+
+@keyframes flipIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) rotateY(90deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) rotateY(0);
+    }
+}
+
+.animate-pop-in {
+    animation: popIn 0.3s ease forwards;
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }

@@ -50,6 +50,30 @@ const handleResize = () => {
     }
 
     console.log(`LayoutManager: Resize - W: ${width}, H: ${height}, Aspect Ratio: ${aspectRatio.toFixed(2)}`);
+
+    checkLayoutIntegrity();
+};
+
+/**
+ * Verifica se o layout está sendo aplicado corretamente via CSS.
+ * Se detectar inconsistência (ex: desktop sem grid), tenta forçar classes ou logar erro.
+ */
+const checkLayoutIntegrity = () => {
+    if (!gameScreen) return;
+
+    if (isDesktopView()) {
+        const computedStyle = window.getComputedStyle(gameScreen);
+        if (computedStyle.display !== 'grid') {
+            console.warn('LayoutManager: ALERTA - Layout Desktop detectado mas display não é GRID. Tentando corrigir...');
+            // Força uma classe de "correção" se necessário, ou apenas alerta
+            gameScreen.style.display = 'grid'; // Fallback forçado via JS
+        } else {
+            // Limpa estilo inline se o CSS estiver funcionando
+            if (gameScreen.style.display === 'grid') {
+                gameScreen.style.display = '';
+            }
+        }
+    }
 };
 
 /**
@@ -64,12 +88,14 @@ export const initLayoutManager = () => {
 
     // Listeners de eventos
     window.addEventListener('resize', handleResize);
-    
+
     // Verificação inicial
     handleResize();
 
     // Setup sidebar state from localStorage
-    if (isDesktopView() && localStorage.getItem('sidebarState') !== 'expanded') {
+    // Default to collapsed if no state is saved (or if explicitly collapsed)
+    const savedState = localStorage.getItem('sidebarState');
+    if (isDesktopView() && (savedState === 'collapsed' || !savedState)) {
         gameScreen.classList.add('sidebar-collapsed');
     }
 

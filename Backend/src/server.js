@@ -23,6 +23,8 @@ app.use('/api/game', gameRoutes);
 app.use('/api/pvp', pvpRoutes);
 app.use('/api/social', socialRoutes);
 app.use('/api/content', contentRoutes);
+app.use('/api/shop', require('./routes/shopRoutes'));
+app.use('/api/seed', require('./routes/seedRoutes'));
 
 // Health Check
 app.get('/', (req, res) => {

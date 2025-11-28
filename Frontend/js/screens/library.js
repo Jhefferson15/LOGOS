@@ -3,6 +3,7 @@ import { PHILOSOPHERS_DATA } from '../data/philosophers.js';
 // Importe o seu arquivo de conteúdo de estudo.
 import { STUDY_CONTENT_DATA } from '../data/study_content.js';
 import { popupManager } from '../ui/PopupManager.js';
+import { ImageService } from '../services/ImageService.js';
 
 // --- Variáveis Globais do Módulo ---
 let structuredData = {}; // Para armazenar os dados organizados por escola
@@ -136,7 +137,7 @@ function createKnowledgeTreeDOM() {
             const offsetX = index % 2 === 0 ? '50px' : '-50px';
             nodeElement.style.setProperty('--offset-x', offsetX);
 
-            nodeElement.innerHTML = `<img src="${node.image}" alt="${node.name}">`;
+            nodeElement.innerHTML = `<img src="${ImageService.getUrl(node.image, ImageService.Sizes.THUMB)}" alt="${node.name}">`;
             content.appendChild(nodeElement);
         });
 

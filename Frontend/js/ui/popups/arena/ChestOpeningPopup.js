@@ -1,23 +1,30 @@
 import { PHILOSOPHERS_DATA } from '../../../data/philosophers.js';
 import { gameState } from '../../../data/gameState.js';
 import { SoundManager } from '../../../game/modules/audio.js';
+import { ImageService } from '../../../services/ImageService.js';
 
 export const ChestOpeningPopup = {
-    title: null, // Full screen experience
+    title: null,
 
     getHTML: (data) => {
-        const { chestType, rewards } = data;
-        // The initial state shows the chest, ready to be opened.
+        const { chestType } = data;
+        // Adicionei 'sunburst' para o efeito de luz rotativa atrás do baú/cartas
         return `
-            <div class="chest-opening-popup">
-                <div class="chest-container">
-                    <div class="chest-image-wrapper">
-                        <img src="assets/game/chests/${chestType.toLowerCase().replace(' ', '_')}.png" alt="${chestType}" class="chest-image">
+            <div class="chest-overlay">
+                <div class="chest-opening-content">
+                    <div class="sunburst"></div> 
+                    
+                    <div class="chest-container">
+                        <div class="chest-image-wrapper">
+                            <img src="assets/game/chests/${chestType.toLowerCase().replace(' ', '_')}.png" alt="${chestType}" class="chest-image">
+                        </div>
+                        <h2 class="chest-title">Baú do Conhecimento</h2>
+                        <button id="open-chest-btn" class="btn-primary">Revelar Sabedoria</button>
                     </div>
-                    <button id="open-chest-btn" class="btn-main">Abrir Baú</button>
-                </div>
-                <div class="rewards-container">
-                    <!-- Rewards will be revealed here one by one -->
+
+                    <div class="rewards-container" style="display: none;">
+                        <!-- Cards injetados via JS -->
+                    </div>
                 </div>
             </div>
             <link rel="stylesheet" href="css/components/chest-opening.css">
@@ -25,45 +32,52 @@ export const ChestOpeningPopup = {
     },
 
     setupListeners: (element, data, popupManager) => {
-        const { chestType, rewards } = data;
+        const { rewards } = data;
         const openChestBtn = element.querySelector('#open-chest-btn');
         const chestContainer = element.querySelector('.chest-container');
         const rewardsContainer = element.querySelector('.rewards-container');
+        const chestImage = element.querySelector('.chest-image');
+        const sunburst = element.querySelector('.sunburst');
+
         let revealedRewards = 0;
-        
-        // Generate a list of reward items to be revealed
-        // This is a simplified simulation
         const rewardsToReveal = [];
-        // 1. Gold
+
+        // Preparar recompensas
         if (rewards.scrolls) {
             rewardsToReveal.push({ type: 'scrolls', amount: rewards.scrolls });
         }
-        // 2. Philosophers
         for (let i = 0; i < rewards.cardCount; i++) {
-             // Just pick a random philosopher for demonstration
-            const randomPhiloId = Object.keys(PHILOSOPHERS_DATA)[Math.floor(Math.random() * Object.keys(PHILOSOPHERS_DATA).length)];
+            const keys = Object.keys(PHILOSOPHERS_DATA);
+            const randomPhiloId = keys[Math.floor(Math.random() * keys.length)];
             rewardsToReveal.push({ type: 'philosopher', philosopherId: randomPhiloId, quantity: 1 });
         }
 
-
         openChestBtn.addEventListener('click', () => {
             SoundManager.play('chest_open');
-            chestContainer.classList.add('opening'); // CSS animation for chest opening
 
-            // After animation, start revealing rewards
+            // Animação de abrir
+            openChestBtn.style.opacity = '0';
+            chestImage.classList.add('shaking');
+
             setTimeout(() => {
-                chestContainer.style.display = 'none';
-                rewardsContainer.style.display = 'grid';
-                revealNextReward();
-            }, 1000); // Should match CSS animation duration
+                chestImage.classList.remove('shaking');
+                chestImage.classList.add('opening-burst'); // Efeito de explosão/sumiço
+                sunburst.classList.add('active'); // Ativa os raios de luz
+
+                setTimeout(() => {
+                    chestContainer.style.display = 'none';
+                    rewardsContainer.style.display = 'flex';
+                    revealNextReward();
+                }, 600);
+            }, 800);
         });
 
         const revealNextReward = () => {
             if (revealedRewards >= rewardsToReveal.length) {
-                // All rewards revealed, show a "Done" button
+                // Botão de Concluir
                 const doneButton = document.createElement('button');
-                doneButton.textContent = 'Concluir';
-                doneButton.className = 'btn-main btn-done';
+                doneButton.textContent = 'Coletar Tudo';
+                doneButton.className = 'btn-primary btn-done animate-pop-in';
                 doneButton.onclick = () => popupManager.close();
                 rewardsContainer.appendChild(doneButton);
                 return;
@@ -71,39 +85,43 @@ export const ChestOpeningPopup = {
 
             const reward = rewardsToReveal[revealedRewards];
             const rewardCard = document.createElement('div');
-            rewardCard.className = 'reward-card';
+            rewardCard.className = 'reward-card animate-card-flip';
 
             if (reward.type === 'scrolls') {
                 rewardCard.innerHTML = `
-                    <div class="reward-image gold-reward"><i class="fas fa-scroll"></i></div>
-                    <div class="reward-name">Papiros</div>
-                    <div class="reward-amount">+${reward.amount}</div>
+                    <div class="card-inner common-reward">
+                        <div class="glow-effect"></div>
+                        <div class="reward-icon"><i class="fas fa-scroll"></i></div>
+                        <div class="reward-info">
+                            <span class="reward-name">Papiros</span>
+                            <span class="reward-amount">+${reward.amount}</span>
+                        </div>
+                    </div>
                 `;
             } else if (reward.type === 'philosopher') {
                 const philosopher = PHILOSOPHERS_DATA[reward.philosopherId];
-                // Check if player already owns this philosopher to simulate getting XP/duplicates
+                // Lógica de duplicata
                 const isDuplicate = gameState.ownedPhilosophers && gameState.ownedPhilosophers[reward.philosopherId];
-                
+                const rarityClass = philosopher.rarity || 'common'; // Assumindo que exista propriedade rarity
+
                 rewardCard.innerHTML = `
-                    <div class="reward-image" style="background-image: url('${philosopher.image}')"></div>
-                    <div class="reward-name">${philosopher.name}</div>
-                    <div class="reward-amount">x${reward.quantity}</div>
-                    ${isDuplicate ? '<div class="duplicate-indicator">DUPLICADA</div>' : ''}
+                    <div class="card-inner ${rarityClass}-reward">
+                        <div class="glow-effect"></div>
+                        <div class="card-portrait" style="background-image: url('${ImageService.getUrl(philosopher.image, ImageService.Sizes.MEDIUM)}')"></div>
+                        <div class="reward-info">
+                            <span class="reward-type">Filósofo</span>
+                            <span class="reward-name">${philosopher.name}</span>
+                            ${isDuplicate ? '<span class="tag-duplicate">Convertido em XP</span>' : '<span class="tag-new">Novo!</span>'}
+                        </div>
+                    </div>
                 `;
             }
-            
+
             rewardsContainer.appendChild(rewardCard);
-            
-            // Add animation and set up next reveal
-            setTimeout(() => {
-                rewardCard.classList.add('revealed');
-                SoundManager.play('play_card');
-            }, 100);
+            SoundManager.play('play_card');
 
             revealedRewards++;
-
-            // Wait before revealing the next card, or for the user to click
-            setTimeout(revealNextReward, 1500); // Automatically reveal next card after 1.5s
+            setTimeout(revealNextReward, 1200); // Ritmo da revelação
         };
     }
 };

@@ -1,6 +1,7 @@
 import { ERA_COLOR_MAP } from './constants.js';
 import { PHILOSOPHERS_DATA } from '../../data/philosophers.js';
 import { SoundManager } from './audio.js';
+import { Utils } from './utils.js';
 
 /**
  * Module responsible for handling game animations.
@@ -26,7 +27,7 @@ export const AnimationsModule = {
         cardEl.dataset.color = color;
 
         if (isOpponent) cardEl.classList.add('back');
-        else cardEl.innerHTML = this.renderCardContent(cardData);
+        else cardEl.innerHTML = Utils.renderCardContent(cardData);
 
         document.body.appendChild(cardEl);
 
@@ -86,7 +87,7 @@ export const AnimationsModule = {
             const cardData = PHILOSOPHERS_DATA[cardId];
             const card = document.createElement('div');
             card.className = 'cr-card shuffling-card';
-            card.innerHTML = this.renderCardContent(cardData);
+            card.innerHTML = Utils.renderCardContent(cardData);
             Object.assign(card.style, { top: `${discardRect.top}px`, left: `${discardRect.left}px`, width: `${discardRect.width}px`, height: `${discardRect.height}px` });
             document.body.appendChild(card);
             return card;

@@ -3,6 +3,7 @@ import { CONCEPTS_DATA } from './../../data/concepts.js';
 import { ERA_COLOR_MAP, OPPONENT_PLAY_DELAY } from './constants.js';
 import { SoundManager } from './audio.js';
 import { Utils } from './utils.js';
+import { MechanicManager } from '../mechanics/MechanicManager.js';
 
 /**
  * Core game logic module.
@@ -43,38 +44,17 @@ export const EngineModule = {
     async playCard(cardIndex) {
         if (this.state.isAnimating || this.state.isGameOver) return;
 
+        const mechanic = MechanicManager.getActiveMechanic();
         const player = this.state.game.players['player-main'];
         const cardToPlayId = player.hand[cardIndex];
 
-        const points = this.calculateChronologicalScore(cardToPlayId);
-        player.score += points;
+        if (!mechanic.canPlayCard(this.state, 'player-main', cardIndex, PHILOSOPHERS_DATA[cardToPlayId])) {
+            SoundManager.play('error');
+            // Visual feedback for invalid move could be added here
+            return;
+        }
 
-        this.state.isAnimating = true;
-        this.hideTooltip();
-        SoundManager.play('play_card');
-
-        let startElement = this.elements.selectedCardSlot.querySelector('.cr-card') || Array.from(this.elements.crHandContainer.children).find(el => parseInt(el.dataset.index) === cardIndex);
-
-        if (!startElement) startElement = Array.from(this.elements.crHandContainer.children)[0];
-
-        await this.animateCardFly(startElement, this.elements.discardPile, PHILOSOPHERS_DATA[cardToPlayId]);
-
-        const playedCardId = player.hand.splice(cardIndex, 1)[0];
-        this.state.game.discardPile.push(playedCardId);
-        this.state.game.lastPlayedCard = playedCardId;
-        this.logEvent(`jogou ${PHILOSOPHERS_DATA[playedCardId].name} e ganhou ${points} Pontos de Sabedoria!`, 'play-card', 'player-main');
-
-        const cardData = PHILOSOPHERS_DATA[playedCardId];
-        const color = ERA_COLOR_MAP[cardData.era] || 'wild';
-        const discardRect = this.elements.discardPile.getBoundingClientRect();
-        this.triggerVFX(discardRect.left + discardRect.width / 2, discardRect.top + discardRect.height / 2, color);
-
-        // --- ALTERAÇÃO AQUI ---
-        // As linhas que compravam uma nova carta foram removidas.
-        // O jogador agora ficará com uma carta a menos na mão após jogar.
-
-        this.state.selectedCardIndex = null;
-        this.render();
+        await mechanic.playCard(this, 'player-main', cardIndex, PHILOSOPHERS_DATA[cardToPlayId]);
 
         this.checkForWinner();
         if (this.state.isGameOver) {
@@ -82,7 +62,7 @@ export const EngineModule = {
             return;
         }
 
-        this.applyCardEffect(cardData);
+        this.applyCardEffect(PHILOSOPHERS_DATA[cardToPlayId]);
         this.advanceTurn();
         this.state.isAnimating = false;
     },
@@ -93,21 +73,7 @@ export const EngineModule = {
      * @returns {number} The calculated score points.
      */
     calculateChronologicalScore(playedPhilosopherId) {
-        const topOfPileId = this.state.game.lastPlayedCard;
-        const orderedList = this.state.game.orderedPhilosophers;
-
-        const playedIndex = orderedList.indexOf(playedPhilosopherId);
-        const topOfPileIndex = orderedList.indexOf(topOfPileId);
-
-        if (playedIndex === -1 || topOfPileIndex === -1) return 0;
-
-        const indexDiff = Math.abs(playedIndex - topOfPileIndex);
-
-        if (indexDiff === 0) return 0;
-        if (indexDiff === 1) return 10;
-
-        const points = 10 - 2 * (indexDiff - 1);
-        return Math.max(0, points);
+        return MechanicManager.getActiveMechanic().calculateScore(this.state, playedPhilosopherId);
     },
 
     /**
@@ -161,6 +127,10 @@ export const EngineModule = {
         }
 
         this.render();
+
+        const mechanic = MechanicManager.getActiveMechanic();
+        mechanic.onTurnStart(this, nextPlayerId);
+
         if (game.currentPlayerId !== 'player-main' && !this.state.isGameOver) {
             setTimeout(() => this.simulateOpponentTurn(), OPPONENT_PLAY_DELAY);
         }
@@ -174,60 +144,14 @@ export const EngineModule = {
      */
     async simulateOpponentTurn() {
         if (this.state.isGameOver || this.state.isPaused) return;
-
         const opponentId = this.state.game.currentPlayerId;
-        const opponent = this.state.game.players[opponentId];
 
-        let bestCardIndex = -1;
-        let maxScore = -1;
+        await MechanicManager.getActiveMechanic().simulateOpponentTurn(this, opponentId);
 
-        if (opponent.hand.length > 0) {
-            opponent.hand.forEach((cardId, index) => {
-                const score = this.calculateChronologicalScore(cardId);
-                if (score > maxScore) {
-                    maxScore = score;
-                    bestCardIndex = index;
-                }
-            });
-        }
-
-        // Lógica da IA: Se não tiver boa jogada, compra carta
-        if (bestCardIndex === -1 || (maxScore <= 2 && Math.random() < 0.5)) {
-            const newCard = await this.drawCardFromDeck();
-            if (newCard) {
-                opponent.hand.push(newCard);
-                this.logEvent(`comprou uma carta.`, 'draw-card', opponentId);
-                this.render();
-            } else {
-                this.logEvent(`tentou comprar mas o baralho está vazio.`, 'draw-card', opponentId);
-            }
-            this.advanceTurn();
-            return;
-        }
-
-        const cardToPlayId = opponent.hand[bestCardIndex];
-        opponent.score += maxScore;
-
-        this.state.isAnimating = true;
-        SoundManager.play('play_card');
-        await this.animateCardFly(document.getElementById(opponentId), this.elements.discardPile, PHILOSOPHERS_DATA[cardToPlayId], true);
-
-        const playedCardId = opponent.hand.splice(bestCardIndex, 1)[0];
-        this.state.game.discardPile.push(playedCardId);
-        this.state.game.lastPlayedCard = playedCardId;
-        this.logEvent(`jogou ${PHILOSOPHERS_DATA[playedCardId].name} e ganhou ${maxScore} pts!`, 'play-card', opponentId);
-
-        // --- ALTERAÇÃO AQUI ---
-        // Também removi a compra automática da IA para manter as regras iguais para todos.
-        // const newCard = await this.drawCardFromDeck();
-        // if (newCard) opponent.hand.push(newCard);
-
-        this.render();
         this.checkForWinner();
-        if (this.state.isGameOver) { this.state.isAnimating = false; return; }
+        if (this.state.isGameOver) return;
 
         this.advanceTurn();
-        this.state.isAnimating = false;
     },
 
     /**
@@ -243,19 +167,8 @@ export const EngineModule = {
      * Determines the winner based on the highest score.
      */
     checkForWinner() {
-        // Verifica se alguém ficou sem cartas na mão OU se o deck acabou
-        const anyPlayerHandEmpty = this.state.game.playerOrder.some(id => this.state.game.players[id].hand.length === 0);
-
-        if (this.state.game.drawDeck.length === 0 || anyPlayerHandEmpty) {
-            let winnerId = this.state.game.playerOrder[0];
-            let highScore = -1;
-            this.state.game.playerOrder.forEach(id => {
-                const playerScore = this.state.game.players[id].score;
-                if (playerScore > highScore) {
-                    highScore = playerScore;
-                    winnerId = id;
-                }
-            });
+        const winnerId = MechanicManager.getActiveMechanic().checkWinCondition(this.state);
+        if (winnerId) {
             this.endGame(winnerId);
         }
     },

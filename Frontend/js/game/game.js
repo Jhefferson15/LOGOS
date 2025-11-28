@@ -9,9 +9,38 @@ import { AnimationsModule } from './modules/animations.js';
 import { EventsModule } from './modules/events.js';
 import { Utils } from './modules/utils.js'; // Importar se quiser expor utilitários globalmente, opcional
 import { popupManager } from '../ui/PopupManager.js';
+import { MechanicManager } from './mechanics/MechanicManager.js';
+import { gameState } from '../data/gameState.js';
 
 // Inicializa o SoundManager imediatamente
 SoundManager.init();
+
+// Initialize MechanicManager (registers all mechanics)
+MechanicManager.init();
+
+// FORCE active mechanic from localStorage
+const storedMode = localStorage.getItem('selectedGameMode');
+const targetMode = storedMode || 'temporal';
+
+console.log(`[GameInit] Enforcing game mode: ${targetMode}`);
+MechanicManager.setActiveMechanic(targetMode);
+
+// Double check
+if (MechanicManager.activeMechanicId !== targetMode) {
+    console.warn(`[GameInit] Mechanic mismatch! Forcing ${targetMode}...`);
+    MechanicManager.setActiveMechanic(targetMode);
+}
+
+// Expose MechanicManager globally for debugging/switching
+window.MechanicManager = MechanicManager;
+window.setGameMechanic = (id) => {
+    MechanicManager.setActiveMechanic(id);
+    // gameState.gameMode = id; // Removed to avoid conflicts
+    localStorage.setItem('selectedGameMode', id); // Persist change
+    if (window.GameUI) {
+        window.GameUI.restartGame();
+    }
+};
 
 // Verifica lógica SPA (Single Page App) para evitar duplicidade
 if (window.GameUI && typeof window.GameUI.cleanupEventListeners === 'function') {
@@ -38,15 +67,6 @@ if (window.GameUI && typeof window.GameUI.cleanupEventListeners === 'function') 
         elements: {},
 
         // Método de inicialização central
-        /**
-         * Initializes the game.
-         * Caches DOM elements and starts the game loop.
-         */
-        init() {
-            this.cacheDOMElements();
-            this.restartGame();
-        },
-
         /**
          * Restarts the game session.
          * Resets state, re-renders UI, and starts animations.
@@ -115,9 +135,11 @@ if (window.GameUI && typeof window.GameUI.cleanupEventListeners === 'function') 
         document.addEventListener('DOMContentLoaded', () => {
             GameUI.init();
             GameUI.bindEventListeners();
+            GameUI.restartGame();
         });
     } else {
         GameUI.init();
         GameUI.bindEventListeners();
+        GameUI.restartGame();
     }
 }

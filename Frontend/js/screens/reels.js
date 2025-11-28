@@ -3,6 +3,7 @@ import { POSTS_DATA } from '../data/posts.js';
 import { PINTEREST_MEDIA } from '../data/pinterest_data.js';
 import { PHILOSOPHERS_DATA } from '../data/philosophers.js';
 import { popupManager } from '../ui/PopupManager.js';
+import { ImageService } from '../services/ImageService.js';
 
 let lastTap = 0; // Para detectar o toque duplo
 let isCleanView = false; // Estado global do modo limpo
@@ -96,7 +97,7 @@ function renderReels(gameState) {
                 <!-- Info na Parte Inferior -->
                 <div class="reel-bottom-info">
                     <div class="reel-info" data-philosopher-id="${post.philosopherId}">
-                        <img src="${philosopher.image}" alt="${philosopher.name}" class="reel-avatar">
+                        <img src="${ImageService.getUrl(philosopher.image, ImageService.Sizes.THUMB)}" alt="${philosopher.name}" class="reel-avatar">
                         <div class="reel-text-info">
                             <strong>@${philosopher.name.toLowerCase().replace(/\s+/g, '_')}</strong>
                             <p class="reel-caption-text">${post.caption}</p>
