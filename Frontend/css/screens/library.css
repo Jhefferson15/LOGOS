@@ -1,6 +1,6 @@
 :root {
     /* Cores baseadas no seu tema, mas adaptadas para o estilo 'Button 3D' */
-    --node-size: 80px;
+    --node-size: 100px;
     --btn-depth: 6px;
     /* Profundidade do botão 3D */
 

@@ -137,7 +137,7 @@ function createKnowledgeTreeDOM() {
             const offsetX = index % 2 === 0 ? '50px' : '-50px';
             nodeElement.style.setProperty('--offset-x', offsetX);
 
-            nodeElement.innerHTML = `<img src="${ImageService.getUrl(node.image, ImageService.Sizes.THUMB)}" alt="${node.name}">`;
+            nodeElement.innerHTML = `<img src="${ImageService.getUrl(node.image, ImageService.Sizes.ICON_THUMB)}" alt="${node.name}">`;
             content.appendChild(nodeElement);
         });
 
@@ -261,10 +261,10 @@ function findNodeGlobally(nodeId) {
 function checkPrerequisites(node) {
     if (!node || node.req.length === 0) return true; // Nós iniciais estão sempre disponíveis
 
-    // Verifica se o jogador já iniciou o estudo de TODOS os predecessores
+    // Verifica se o jogador já COMPLETOU o estudo de TODOS os predecessores (Passou no Quiz)
     return node.req.every(reqId => {
         const reqProgress = gameState.studyProgress[reqId];
-        // O pré-requisito é cumprido se o jogador já viu pelo menos uma página do filósofo anterior.
-        return reqProgress && reqProgress.pagesViewed.size > 0;
+        // O pré-requisito é cumprido se o jogador completou o filósofo anterior (Quiz > 80%)
+        return reqProgress && reqProgress.completed;
     });
 }

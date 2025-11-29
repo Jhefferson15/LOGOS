@@ -10,6 +10,7 @@
 export const ImageService = {
     Sizes: {
         THUMB: 'thumb',
+        ICON_THUMB: 'icon_thumb',
         MEDIUM: 'medium',
         LARGE: 'large',
         ORIGINAL: 'original'

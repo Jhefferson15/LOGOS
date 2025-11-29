@@ -39,26 +39,26 @@ export async function saveUserProfile(user) {
 export async function saveGameProgress(userId, gameState) {
     if (!userId || !gameState) return;
 
-    const gameRef = doc(db, "users", userId, "gameData", "progress");
-
-    // Create a clean copy of the game state to avoid circular references or non-serializable data
-    const dataToSave = {
-        xp: gameState.xp || 0,
-        xpMax: gameState.xpMax || 100,
-        level: gameState.level || 1,
-        scrolls: gameState.scrolls || 0,
-        books: gameState.books || 0,
-        trophies: gameState.trophies || 0,
-        timers: gameState.timers || {},
-        chestSlots: gameState.chestSlots || [],
-        lastSaved: serverTimestamp()
-    };
-
+    // TEMPORARY: Save to LocalStorage instead of Firestore
     try {
-        await setDoc(gameRef, dataToSave);
-        console.log("Game progress saved.");
+        // Prepare data for serialization (convert Sets to Arrays)
+        const dataToSave = { ...gameState };
+
+        // Deep copy studyProgress to handle Sets
+        if (dataToSave.studyProgress) {
+            dataToSave.studyProgress = {};
+            for (const [key, value] of Object.entries(gameState.studyProgress)) {
+                dataToSave.studyProgress[key] = {
+                    ...value,
+                    pagesViewed: Array.from(value.pagesViewed || [])
+                };
+            }
+        }
+
+        localStorage.setItem(`gameProgress_${userId}`, JSON.stringify(dataToSave));
+        console.log("Game progress saved to LocalStorage.");
     } catch (error) {
-        console.error("Error saving game progress:", error);
+        console.error("Error saving game progress to LocalStorage:", error);
     }
 }
 
@@ -70,19 +70,29 @@ export async function saveGameProgress(userId, gameState) {
 export async function loadGameProgress(userId) {
     if (!userId) return null;
 
-    const gameRef = doc(db, "users", userId, "gameData", "progress");
-
+    // TEMPORARY: Load from LocalStorage instead of Firestore
     try {
-        const docSnap = await getDoc(gameRef);
-        if (docSnap.exists()) {
-            console.log("Game progress loaded.");
-            return docSnap.data();
+        const savedData = localStorage.getItem(`gameProgress_${userId}`);
+        if (savedData) {
+            const parsedData = JSON.parse(savedData);
+
+            // Restore Sets in studyProgress
+            if (parsedData.studyProgress) {
+                for (const key in parsedData.studyProgress) {
+                    if (parsedData.studyProgress[key].pagesViewed) {
+                        parsedData.studyProgress[key].pagesViewed = new Set(parsedData.studyProgress[key].pagesViewed);
+                    }
+                }
+            }
+
+            console.log("Game progress loaded from LocalStorage.");
+            return parsedData;
         } else {
-            console.log("No saved game found.");
+            console.log("No saved game found in LocalStorage.");
             return null;
         }
     } catch (error) {
-        console.error("Error loading game progress:", error);
+        console.error("Error loading game progress from LocalStorage:", error);
         return null;
     }
 }

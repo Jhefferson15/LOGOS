@@ -19,7 +19,7 @@ export function initPhilosophersScreen(gameState, updateDynamicUI, toast) {
 
     const sortedPhilosophers = Object.entries(PHILOSOPHERS_DATA)
         .map(([id, philosopher]) => ({ ...philosopher, id: parseInt(id) }))
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => a.date - b.date);
 
     sortedPhilosophers.forEach(philosopher => {
         const philosopherState = gameState.collection.philosophers[philosopher.id];
@@ -32,7 +32,6 @@ export function initPhilosophersScreen(gameState, updateDynamicUI, toast) {
         if (isDiscovered) {
             cardElement.innerHTML = `
                 <img src="${ImageService.getUrl(philosopher.image, ImageService.Sizes.THUMB)}" alt="${philosopher.name}" class="card-image">
-                <span class="card-name">${philosopher.name}</span>
                 <span class="card-level">Nível ${philosopherState.level}</span>
             `;
         } else {
@@ -53,10 +52,10 @@ export function initPhilosophersScreen(gameState, updateDynamicUI, toast) {
  * Handles click events on the Philosophers Screen.
  * Opens detailed views for discovered philosophers.
  * @param {Event} e - The click event object.
- * @param {object} gameState - The global game state.
- * @param {function} updateDynamicUI - Function to refresh the UI.
- * @param {object} toast - Toast notification utility.
- */
+                * @param {object} gameState - The global game state.
+                * @param {function} updateDynamicUI - Function to refresh the UI.
+                * @param {object} toast - Toast notification utility.
+                */
 export function handlePhilosophersScreenClick(e, gameState, updateDynamicUI, toast) {
     const cardItem = e.target.closest('.card-item');
 
