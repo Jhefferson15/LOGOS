@@ -11,6 +11,7 @@ import { StudySummary } from './study/StudySummary.js';
 import { StudyTheory } from './study/StudyTheory.js';
 import { StudyComic } from './study/StudyComic.js';
 import { StudyQuiz } from './study/StudyQuiz.js';
+import { FlashcardReviewModule } from './FlashcardReviewModule.js';
 
 /**
  * Módulo para o popup de estudo aprofundado do filósofo (tela cheia).
@@ -184,6 +185,7 @@ export const PhilosopherStudyModulePopup = {
                         <button class="tab-btn" data-tab="summary">Sumário</button>
                         <button class="tab-btn" data-tab="theory">Teoria</button>
                         <button class="tab-btn" data-tab="comic">HQ</button>
+                        <button class="tab-btn" data-tab="flashcards">Flashcards</button>
                         <button class="tab-btn" data-tab="quiz">Quiz</button>
                     </div>
                 </header>
@@ -312,6 +314,15 @@ export const PhilosopherStudyModulePopup = {
 
                         StudyQuiz.render(viewport, studyData, quizStateWithUnlock, philosopherId);
                         StudyQuiz.setup(viewport, studyData, quizStateWithUnlock, updateState);
+                        break;
+
+                    case 'flashcards':
+                        toolbar.style.display = 'none';
+                        footer.style.display = 'none';
+                        FlashcardReviewModule.getHTML({ philosopherId }); // Just to get styles if needed, but we render directly
+                        // The module structure is slightly different, let's adapt:
+                        viewport.innerHTML = FlashcardReviewModule.getHTML({ philosopherId });
+                        FlashcardReviewModule.setupListeners(root, { philosopherId }, popupManager);
                         break;
                 }
             } catch (error) {

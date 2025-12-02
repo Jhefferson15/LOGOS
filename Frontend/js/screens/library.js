@@ -160,7 +160,10 @@ function showMiniCard(nodeElement, nodeData) {
     card.innerHTML = `
         <div class="mini-card-header">${nodeData.name}</div>
         <div class="mini-card-desc">${nodeData.school}</div>
-        <button class="mini-start-btn">COMEÇAR ESTUDO</button>
+        <div class="mini-actions" style="display: flex; gap: 10px;">
+            <button class="mini-start-btn" style="flex: 2;">COMEÇAR ESTUDO</button>
+            <button class="mini-review-btn" style="flex: 1; background: #fff; border: 2px solid #8d6e63; color: #8d6e63; border-radius: 12px; cursor: pointer; font-weight: bold;"><i class="fas fa-brain"></i></button>
+        </div>
     `;
 
     container.appendChild(card);
@@ -184,6 +187,12 @@ function showMiniCard(nodeElement, nodeData) {
     // Adiciona o evento de clique ao botão "COMEÇAR"
     card.querySelector('.mini-start-btn').addEventListener('click', () => {
         popupManager.open('library:philosopher-study-module', { philosopherId: nodeData.id });
+        closeMiniCard();
+    });
+
+    // Adiciona o evento de clique ao botão "REVISÃO"
+    card.querySelector('.mini-review-btn').addEventListener('click', () => {
+        popupManager.open('library:flashcard-review', { philosopherId: nodeData.id });
         closeMiniCard();
     });
 }

@@ -15,6 +15,8 @@ import { MatchmakingPopup } from './play/MatchmakingPopup.js';
 import { DeckBuilderPopup } from './play/DeckBuilderPopup.js';
 import { EndGamePopup } from './game/EndGamePopup.js';
 
+import { FlashcardReviewModule } from './library/FlashcardReviewModule.js';
+
 /**
  * Mapeia os IDs de popup (com namespace) para seus respectivos módulos de implementação.
  * Cada módulo deve exportar no mínimo os métodos `getHTML(data)` e `setupListeners(element, data)`.
@@ -34,6 +36,7 @@ export const popupRegistry = {
     'arena:chest-rewards': ChestRewardsPopup,
     'arena:chest-opening': ChestOpeningPopup,
     'library:philosopher-study-module': PhilosopherStudyModulePopup,
+    'library:flashcard-review': FlashcardReviewModule,
     'philosophers:details': PhilosopherDetailsPopup,
     'reels:settings': ReelsSettingsPopup,
     'shared:settings': SettingsPopup,
